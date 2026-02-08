@@ -66,38 +66,51 @@ export default function ChartPage() {
   };
 
   useEffect(() => {
+    const init = async () => {
     try {
       // Try new profile format first
       const profileData = loadProfile();
+      let birthData: BirthData | null = null;
+      let profilePayload: StoredBirthPayload | null = null;
+
       if (profileData) {
-        setProfile({
+        birthData = profileData.birthData;
+        profilePayload = {
           name: profileData.name,
           locationName: profileData.locationName,
           birthData: profileData.birthData,
-        });
-        const natal = calculateNatalChart(profileData.birthData);
-        const daily = calculateDailyCelestialData();
-        setNatalChart(natal);
-        setDailyData(daily);
-        setLoadingChart(false);
-        return;
+        };
+      } else {
+        // Fall back to old format
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) { router.replace('/'); return; }
+        const parsed = JSON.parse(raw) as StoredBirthPayload;
+        if (!parsed?.birthData) { router.replace('/'); return; }
+        birthData = parsed.birthData;
+        profilePayload = parsed;
       }
 
-      // Fall back to old format
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        router.replace('/');
-        return;
+      // Re-derive timezone from birth coordinates to fix any stale browser-TZ data
+      if (birthData.latitude && birthData.longitude) {
+        try {
+          const tzResp = await fetch(`/api/timezone?lat=${birthData.latitude}&lon=${birthData.longitude}`);
+          const tzData = await tzResp.json() as { timezone?: string };
+          if (tzData.timezone && tzData.timezone !== birthData.timezone) {
+            birthData = { ...birthData, timezone: tzData.timezone };
+            profilePayload = { ...profilePayload!, birthData };
+            // Update stored profile with corrected timezone
+            if (profileData) {
+              const { saveProfile: sp } = await import('@/lib/profile');
+              sp({ ...profileData, birthData });
+            }
+          }
+        } catch {
+          // If API fails, proceed with existing timezone
+        }
       }
 
-      const parsed = JSON.parse(raw) as StoredBirthPayload;
-      if (!parsed?.birthData) {
-        router.replace('/');
-        return;
-      }
-
-      setProfile(parsed);
-      const natal = calculateNatalChart(parsed.birthData);
+      setProfile(profilePayload);
+      const natal = calculateNatalChart(birthData);
       const daily = calculateDailyCelestialData();
       setNatalChart(natal);
       setDailyData(daily);
@@ -106,6 +119,8 @@ export default function ChartPage() {
     } finally {
       setLoadingChart(false);
     }
+    };
+    init();
   }, [router, t.chartError]);
 
   useEffect(() => {

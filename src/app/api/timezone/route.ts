@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { find } from 'geo-tz';
+
+// @photostructure/tz-lookup embeds timezone data directly in the package
+// (no external files needed — works on Vercel serverless)
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const tzlookup = require('@photostructure/tz-lookup');
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -18,8 +22,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const timezones = find(latitude, longitude);
-    const timezone = timezones[0] || 'UTC';
+    const timezone = tzlookup(latitude, longitude) || 'UTC';
     return NextResponse.json({ timezone });
   } catch {
     return NextResponse.json({ timezone: 'UTC' });

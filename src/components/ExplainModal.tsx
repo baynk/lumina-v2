@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { translations, type Language } from '@/lib/translations';
+import { getPlanetWhyItMatters, getHouseTheme } from '@/lib/education';
 
 type ExplainModalProps = {
   isOpen: boolean;
@@ -102,6 +103,23 @@ export default function ExplainModal({
             ×
           </button>
         </div>
+
+        {/* Why this matters context */}
+        {planet && (
+          <div className="mb-4 flex-shrink-0 rounded-xl border border-lumina-gold/20 bg-white/5 p-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-lumina-champagne/80 mb-1.5">
+              {language === 'en' ? 'Why this matters' : 'Почему это важно'}
+            </p>
+            {getPlanetWhyItMatters(planet, language) && (
+              <p className="text-sm text-cream/70">{getPlanetWhyItMatters(planet, language)}</p>
+            )}
+            {house && getHouseTheme(house, language) && (
+              <p className="mt-1 text-sm text-cream/50">
+                {language === 'en' ? 'House' : 'Дом'} {house}: {getHouseTheme(house, language)}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Scrollable content */}
         <div className="overflow-y-auto flex-1 -mr-2 pr-2 overscroll-contain">

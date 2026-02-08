@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import LanguageToggle from '@/components/LanguageToggle';
 import { useLanguage } from '@/context/LanguageContext';
 import { planetNames, translatePlanet, translateSign } from '@/lib/translations';
-import { getZodiacSymbol } from '@/lib/zodiacSymbols';
+import { getZodiacIcon } from '@/components/icons/ZodiacIcons';
 
 export default function PlanetPage() {
   const params = useParams<{ name: string }>();
@@ -68,8 +68,9 @@ export default function PlanetPage() {
             <h1 className="mt-2 font-heading text-4xl text-lumina-champagne">
               {translatePlanet(englishPlanet, language)}
             </h1>
-            <p className="mt-2 text-lg text-warmWhite">
-              {getZodiacSymbol(sign)} {translateSign(sign, language)} • {t.house} {house}
+            <p className="mt-2 flex items-center gap-2 text-lg text-warmWhite">
+              {(() => { const Icon = getZodiacIcon(sign); return Icon ? <Icon size={20} className="inline-block" /> : null; })()}
+              <span>{translateSign(sign, language)} • {t.house} {house}</span>
             </p>
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">

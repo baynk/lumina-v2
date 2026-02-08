@@ -89,6 +89,12 @@ textarea {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(212, 175, 55, 0.18);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.06), 0 0 40px rgba(212, 175, 55, 0.03);
 }
 
 .lumina-label {

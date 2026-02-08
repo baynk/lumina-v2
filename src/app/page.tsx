@@ -29,7 +29,7 @@ const minutes = Array.from({ length: 60 }, (_, idx) => idx);
 
 export default function LandingPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   const [name, setName] = useState('');
   const [day, setDay] = useState('');
@@ -149,9 +149,12 @@ export default function LandingPage() {
         <header className="mb-8 text-center">
           <p className="font-heading text-5xl text-lumina-champagne sm:text-6xl">Lumina</p>
           <p className="mt-3 text-base text-cream">{t.tagline}</p>
+          <p className="mt-1.5 text-sm text-cream/50">
+            {language === 'ru' ? 'Твой персональный гид по звёздам' : 'Your personal guide to the stars'}
+          </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="glass-card space-y-5 p-5 sm:p-7">
+        <form onSubmit={handleSubmit} className="glass-card space-y-6 p-6 sm:p-8">
           <div>
             <label htmlFor="name" className="lumina-label">
               {t.name} ({t.optional})
@@ -278,6 +281,30 @@ export default function LandingPage() {
             {t.discoverYourChart}
           </button>
         </form>
+
+        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
+          <div className="rounded-xl bg-white/5 p-3">
+            <p className="text-lg text-lumina-champagne">✦</p>
+            <p className="mt-1 text-xs font-semibold text-cream/80">
+              {language === 'ru' ? 'Точные расчёты' : 'Precise Calculations'}
+            </p>
+            <p className="mt-0.5 text-[10px] text-cream/40">astronomy-engine</p>
+          </div>
+          <div className="rounded-xl bg-white/5 p-3">
+            <p className="text-lg text-lumina-champagne">✧</p>
+            <p className="mt-1 text-xs font-semibold text-cream/80">
+              {language === 'ru' ? 'AI-инсайты' : 'AI Insights'}
+            </p>
+            <p className="mt-0.5 text-[10px] text-cream/40">Gemini</p>
+          </div>
+          <div className="rounded-xl bg-white/5 p-3">
+            <p className="text-lg text-lumina-champagne">◇</p>
+            <p className="mt-1 text-xs font-semibold text-cream/80">
+              {language === 'ru' ? 'Приватность' : 'Your Data Stays Private'}
+            </p>
+            <p className="mt-0.5 text-[10px] text-cream/40">localStorage</p>
+          </div>
+        </div>
       </section>
     </div>
   );

@@ -49,6 +49,19 @@ textarea {
   animation: driftStars 20s linear infinite;
 }
 
+.star-field::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(1px 1px at 15% 45%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 45% 15%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 80% 70%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 55% 90%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 25% 65%, rgba(255, 255, 255, 0.35), transparent);
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
 .celestial-gradient {
   position: fixed;
   inset: 0;
@@ -118,9 +131,9 @@ textarea {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.lumina-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 15px 38px rgba(212, 175, 55, 0.35);
+.lumina-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.4), 0 15px 40px rgba(212, 175, 55, 0.3);
 }
 
 .lumina-button:disabled {
@@ -179,6 +192,60 @@ textarea {
   50% {
     transform: scale(1.03);
   }
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes gentleFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float {
+  animation: gentleFloat 4s ease-in-out infinite;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-1 {
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.animate-stagger-2 {
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.animate-stagger-3 {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.animate-stagger-4 {
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.animate-stagger-5 {
+  animation: fadeInUp 0.6s ease-out 0.5s both;
 }
 
 select.lumina-input {

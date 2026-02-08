@@ -1,31 +1,31 @@
-import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Cormorant_Garamond, Inter } from 'next/font/google';
+import './globals.css';
+import AppProviders from '@/components/providers/AppProviders';
+import Footer from '@/components/Footer';
 
 const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-cormorant",
-  display: "swap",
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '600', '700'],
+  variable: '--font-playfair',
+  display: 'swap',
 });
 
 const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-inter",
-  display: "swap",
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-inter',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "Lumina — Your Celestial Guide",
-  description: "Discover your natal chart, daily transits, and personalized cosmic insights. Premium astrology powered by astronomical precision.",
+  title: 'Lumina V2',
+  description: 'Premium astrology insights with natal chart precision and daily celestial guidance.',
 };
 
 export const viewport: Viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#0a0e1a",
+  themeColor: '#0a0e27',
 };
 
 export default function RootLayout({
@@ -35,15 +35,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="font-body bg-navy text-cream antialiased min-h-screen">
-        {/* Cosmic background orbs */}
-        <div className="cosmic-orb cosmic-orb-1" aria-hidden="true" />
-        <div className="cosmic-orb cosmic-orb-2" aria-hidden="true" />
-        <div className="cosmic-orb cosmic-orb-3" aria-hidden="true" />
-        
-        <main className="relative z-10 min-h-screen">
-          {children}
-        </main>
+      <body className="min-h-screen bg-midnight text-warmWhite font-body antialiased">
+        <AppProviders>
+          <div className="star-field" aria-hidden="true" />
+          <div className="celestial-gradient" aria-hidden="true" />
+          <main className="relative z-10 min-h-screen">{children}</main>
+          <Footer />
+        </AppProviders>
       </body>
     </html>
   );

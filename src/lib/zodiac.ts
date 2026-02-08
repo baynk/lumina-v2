@@ -26,6 +26,14 @@ export const PLANET_SYMBOLS: Record<string, string> = {
   Pluto: '♇',
 };
 
+const ASPECT_SYMBOLS: Record<string, string> = {
+  conjunction: '☌',
+  opposition: '☍',
+  trine: '△',
+  square: '□',
+  sextile: '⚹',
+};
+
 export const ZODIAC_DESCRIPTIONS: Record<string, string> = {
   Aries: 'The Ram — Bold, ambitious, driven',
   Taurus: 'The Bull — Grounded, sensual, steadfast',
@@ -47,4 +55,8 @@ export function getZodiacGlyph(sign: string): string {
 
 export function getPlanetSymbol(planet: string): string {
   return PLANET_SYMBOLS[planet] || '•';
+}
+
+export function getAspectSymbol(type: string): string {
+  return ASPECT_SYMBOLS[type.toLowerCase()] || '⚹';
 }

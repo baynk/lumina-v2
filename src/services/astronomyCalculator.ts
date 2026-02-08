@@ -60,33 +60,28 @@ function longitudeToZodiac(longitude: number): { sign: string; degrees: number }
 }
 
 /**
- * Calculate Ascendant (Rising Sign) properly using astronomical formulas
+ * Calculate Ascendant (Rising Sign) using standard astronomical formulas
  * The Ascendant is the zodiac degree rising on the eastern horizon at birth time/location
+ * Uses epoch-dependent obliquity for precision
  */
 function calculateAscendant(date: Date, latitude: number, longitudeDeg: number): number {
   const time = Astronomy.MakeTime(date);
 
-  console.log('🔭 Calculating Ascendant:');
-  console.log('  Date:', date.toISOString());
-  console.log('  Latitude:', latitude, '°');
-  console.log('  Longitude:', longitudeDeg, '°');
-
   // Step 1: Get Greenwich Sidereal Time (GST) in hours
   const gst = Astronomy.SiderealTime(time);
-  console.log('  Greenwich Sidereal Time:', gst.toFixed(4), 'hours');
 
   // Step 2: Calculate Local Sidereal Time (LST)
-  // LST = GST + (longitude / 15)  where longitude is in degrees
   const lst = gst + (longitudeDeg / 15);
-  const lstNormalized = ((lst % 24) + 24) % 24; // Keep in 0-24 hour range
-  console.log('  Local Sidereal Time:', lstNormalized.toFixed(4), 'hours');
+  const lstNormalized = ((lst % 24) + 24) % 24;
 
   // Step 3: Convert LST to degrees (RAMC - Right Ascension of Midheaven)
-  const ramc = lstNormalized * 15; // Convert hours to degrees
-  console.log('  RAMC:', ramc.toFixed(2), '°');
+  const ramc = lstNormalized * 15;
 
-  // Step 4: Calculate Ascendant using standard astronomical formula
-  const obliquity = 23.4397; // Obliquity of the ecliptic in degrees
+  // Step 4: Calculate mean obliquity for the epoch (Laskar's formula)
+  const jd = time.ut + 2451545.0;
+  const T = (jd - 2451545.0) / 36525.0; // Julian centuries from J2000
+  const eps0 = 84381.406 - 46.836769 * T - 0.0001831 * T * T + 0.00200340 * T * T * T;
+  const obliquity = eps0 / 3600; // Convert arcseconds to degrees
 
   // Convert to radians
   const ramcRad = (ramc * Math.PI) / 180;
@@ -94,17 +89,14 @@ function calculateAscendant(date: Date, latitude: number, longitudeDeg: number):
   const oblRad = (obliquity * Math.PI) / 180;
 
   // Standard Ascendant formula:
-  // tan(ASC) = cos(RAMC) / (-sin(RAMC) * cos(ε) - tan(φ) * sin(ε))
+  // ASC = atan2(cos(RAMC), -(sin(ε)*tan(φ) + cos(ε)*sin(RAMC)))
   const x = Math.cos(ramcRad);
-  const y = -Math.sin(ramcRad) * Math.cos(oblRad) - Math.tan(latRad) * Math.sin(oblRad);
+  const y = -(Math.sin(oblRad) * Math.tan(latRad) + Math.cos(oblRad) * Math.sin(ramcRad));
 
   let ascendant = Math.atan2(x, y) * (180 / Math.PI);
 
   // Normalize to 0-360
   ascendant = ((ascendant % 360) + 360) % 360;
-
-  const { sign, degrees } = longitudeToZodiac(ascendant);
-  console.log('  ✅ Ascendant:', ascendant.toFixed(2), '° =', sign, degrees.toFixed(2), '°');
 
   return ascendant;
 }
@@ -230,27 +222,16 @@ function determineHouse(planetLongitude: number, houses: number[], ascendant: nu
  * Calculate natal chart
  */
 export function calculateNatalChart(birthData: BirthData): NatalChartData {
-  console.log('\n' + '='.repeat(60));
-  console.log('🌟 CALCULATING NATAL CHART');
-  console.log('='.repeat(60));
-  console.log('📅 Birth Data Input:', JSON.stringify(birthData, null, 2));
-
   // IMPORTANT: JavaScript Date months are 0-indexed (0=January, 11=December)
   // Our birthData.month is already 0-indexed from the form
 
   // Step 1: Create a date string representing the LOCAL time at the birth location
   const localDateString = `${birthData.year}-${String(birthData.month + 1).padStart(2, '0')}-${String(birthData.day).padStart(2, '0')} ${String(birthData.hour).padStart(2, '0')}:${String(birthData.minute).padStart(2, '0')}:00`;
 
-  console.log('🕐 Local Birth Time:', localDateString, `(${birthData.timezone})`);
-
   // Step 2: Convert local time to UTC using fromZonedTime
   // This interprets the date/time as being in the specified timezone and converts to UTC
   // It properly handles timezone offsets and historical DST rules
   const birthDateUTC = fromZonedTime(localDateString, birthData.timezone);
-
-  console.log('🕐 Converted to UTC:', birthDateUTC.toISOString());
-  console.log('🌍 Coordinates:', `${birthData.latitude}°N, ${birthData.longitude}°E`);
-  console.log('');
 
   // ✅ Now we have the correct UTC time for astronomical calculations!
 

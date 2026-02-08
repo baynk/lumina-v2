@@ -132,14 +132,27 @@ export default function LandingPage() {
     return () => clearTimeout(timeout);
   }, [locationQuery]);
 
-  const handleSelectLocation = (result: LocationResult) => {
+  const handleSelectLocation = async (result: LocationResult) => {
     setSelectedLocationName(result.display_name);
     setLocationQuery(result.display_name);
-    setLatitude(Number.parseFloat(result.lat));
-    setLongitude(Number.parseFloat(result.lon));
+    const lat = Number.parseFloat(result.lat);
+    const lon = Number.parseFloat(result.lon);
+    setLatitude(lat);
+    setLongitude(lon);
     setLocationResults([]);
-    const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (detectedTimezone) setTimezone(detectedTimezone);
+
+    // Look up the timezone for the birth LOCATION (not the user's browser)
+    try {
+      const tzResp = await fetch(`/api/timezone?lat=${lat}&lon=${lon}`);
+      const tzData = await tzResp.json() as { timezone?: string };
+      if (tzData.timezone) {
+        setTimezone(tzData.timezone);
+      }
+    } catch {
+      // Fallback to browser timezone if API fails
+      const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (detectedTimezone) setTimezone(detectedTimezone);
+    }
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {

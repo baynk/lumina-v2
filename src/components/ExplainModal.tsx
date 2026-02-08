@@ -25,8 +25,20 @@ export default function ExplainModal({
   const [loading, setLoading] = useState(false);
   const [explanation, setExplanation] = useState('');
 
+  // Lock body scroll when modal is open
   useEffect(() => {
-    if (!isOpen || !planet || !sign || !Number.isFinite(house)) {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !planet || !sign) {
       return;
     }
 
@@ -40,16 +52,20 @@ export default function ExplainModal({
         const response = await fetch('/api/explain', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ planet, sign, house, language }),
+          body: JSON.stringify({ planet, sign, house: house ?? 1, language }),
           signal: controller.signal,
         });
 
         const payload = (await response.json()) as { explanation?: string };
         setExplanation(payload.explanation || translations[language].explanationFallback);
       } catch {
-        setExplanation(translations[language].explanationFallback);
+        if (!controller.signal.aborted) {
+          setExplanation(translations[language].explanationFallback);
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -64,40 +80,50 @@ export default function ExplainModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm animate-fadeInUp"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={title}
     >
       <div
-        className="glass-card relative w-full max-w-lg rounded-2xl border border-lumina-gold/30 p-6 sm:p-7"
+        className="relative w-full max-w-lg max-h-[85vh] rounded-t-2xl sm:rounded-2xl border border-lumina-gold/30 bg-[#0d1229]/95 backdrop-blur-xl p-5 sm:p-7 overflow-hidden flex flex-col animate-slideUp sm:animate-fadeInUp"
         onClick={(event) => event.stopPropagation()}
       >
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-4 top-4 min-h-11 min-w-11 text-2xl leading-none text-cream transition hover:text-warmWhite"
-          aria-label={translations[language].closeModal}
-        >
-          ×
-        </button>
+        {/* Sticky header */}
+        <div className="flex items-start justify-between mb-4 flex-shrink-0">
+          <h2 className="pr-4 font-heading text-2xl text-lumina-champagne">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="min-h-11 min-w-11 flex items-center justify-center text-2xl leading-none text-cream/60 transition hover:text-warmWhite flex-shrink-0"
+            aria-label={translations[language].closeModal}
+          >
+            ×
+          </button>
+        </div>
 
-        <h2 className="pr-8 font-heading text-2xl text-lumina-champagne">{title}</h2>
-
-        <div className="mt-5">
+        {/* Scrollable content */}
+        <div className="overflow-y-auto flex-1 -mr-2 pr-2 overscroll-contain">
           {loading ? (
-            <div className="space-y-3">
+            <div className="space-y-3 py-2">
               <div className="skeleton h-4 w-full" />
               <div className="skeleton h-4 w-11/12" />
               <div className="skeleton h-4 w-10/12" />
               <div className="skeleton h-4 w-9/12" />
               <div className="skeleton h-4 w-8/12" />
+              <div className="skeleton h-4 w-full mt-4" />
+              <div className="skeleton h-4 w-10/12" />
             </div>
           ) : (
-            <p className="whitespace-pre-wrap leading-relaxed text-warmWhite">{explanation || translations[language].explanationFallback}</p>
+            <div className="whitespace-pre-wrap leading-relaxed text-warmWhite text-[15px] pb-4">
+              {explanation || translations[language].explanationFallback}
+            </div>
           )}
         </div>
+
+        {/* Bottom safe area for mobile */}
+        <div className="h-2 flex-shrink-0 sm:hidden" />
       </div>
     </div>
   );

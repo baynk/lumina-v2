@@ -35,16 +35,27 @@ export async function POST(request: Request) {
         : 'Write in natural modern English with a premium astrology tone.';
 
     const prompt = [
-      'You are an astrologer explaining one natal placement in depth.',
+      'You are a warm, insightful astrologer writing for a modern audience.',
       languageInstruction,
       `Placement: ${body.planet} in ${body.sign}, House ${body.house}.`,
-      'Output 180-260 words in 3 short paragraphs.',
-      'Cover: strengths, growth edge, relationships/career expression, and one practical integration tip.',
-      'Be specific and vivid. No disclaimers.',
+      'Output 120-180 words in 2-3 short paragraphs.',
+      'Cover: what this placement means for personality, one strength, one growth area, and a practical tip.',
+      'Be specific, warm, and vivid. No disclaimers or hedging.',
     ].join('\n');
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+
+    try {
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      });
+      clearTimeout(timeout);
+      var text = result.response.text().trim();
+    } catch {
+      clearTimeout(timeout);
+      return NextResponse.json({ explanation: fallbackText[body.language] });
+    }
 
     return NextResponse.json({ explanation: text || fallbackText[body.language] });
   } catch {

@@ -1,284 +1,279 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import LanguageToggle from '@/components/LanguageToggle';
-import { useLanguage } from '@/context/LanguageContext';
-import type { BirthData } from '@/lib/types';
+import { saveBirthData, loadBirthData, StoredBirthData } from '@/lib/localStorage';
 
-type LocationResult = {
-  place_id: string;
+interface NominatimResult {
   display_name: string;
   lat: string;
   lon: string;
-};
+}
 
-type StoredBirthPayload = {
-  name?: string;
-  locationName: string;
-  birthData: BirthData;
-};
-
-const STORAGE_KEY = 'lumina_birth_data';
-
-const months = Array.from({ length: 12 }, (_, idx) => idx + 1);
-const days = Array.from({ length: 31 }, (_, idx) => idx + 1);
-const years = Array.from({ length: 100 }, (_, idx) => new Date().getFullYear() - idx);
-const hours = Array.from({ length: 24 }, (_, idx) => idx);
-const minutes = Array.from({ length: 60 }, (_, idx) => idx);
-
-export default function LandingPage() {
+export default function HomePage() {
   const router = useRouter();
-  const { t } = useLanguage();
-
-  const [name, setName] = useState('');
-  const [day, setDay] = useState('');
-  const [month, setMonth] = useState('');
-  const [year, setYear] = useState('');
-  const [hour, setHour] = useState('');
-  const [minute, setMinute] = useState('');
-
+  const [birthDate, setBirthDate] = useState('');
+  const [birthHour, setBirthHour] = useState('12');
+  const [birthMinute, setBirthMinute] = useState('00');
   const [locationQuery, setLocationQuery] = useState('');
-  const [locationResults, setLocationResults] = useState<LocationResult[]>([]);
-  const [searchingLocation, setSearchingLocation] = useState(false);
-  const [selectedLocationName, setSelectedLocationName] = useState('');
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-  const [timezone, setTimezone] = useState('UTC');
-  const [submitting, setSubmitting] = useState(false);
-
-  const canSubmit = useMemo(
-    () =>
-      !!day &&
-      !!month &&
-      !!year &&
-      !!hour &&
-      !!minute &&
-      selectedLocationName.length > 0 &&
-      latitude !== null &&
-      longitude !== null,
-    [day, hour, latitude, longitude, minute, month, selectedLocationName, year],
-  );
+  const [locationResults, setLocationResults] = useState<NominatimResult[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<{
+    name: string;
+    lat: number;
+    lon: number;
+  } | null>(null);
+  const [timezone, setTimezone] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasLoadedStored, setHasLoadedStored] = useState(false);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (detectedTimezone) {
-      setTimezone(detectedTimezone);
+    const stored = loadBirthData();
+    if (stored) {
+      const dateStr = `${stored.year}-${String(stored.month + 1).padStart(2, '0')}-${String(stored.day).padStart(2, '0')}`;
+      setBirthDate(dateStr);
+      setBirthHour(String(stored.hour).padStart(2, '0'));
+      setBirthMinute(String(stored.minute).padStart(2, '0'));
+      setLocationQuery(stored.locationName);
+      setSelectedLocation({
+        name: stored.locationName,
+        lat: stored.latitude,
+        lon: stored.longitude,
+      });
+      setTimezone(stored.timezone);
     }
+    setHasLoadedStored(true);
   }, []);
 
   useEffect(() => {
-    const query = locationQuery.trim();
-    if (query.length < 2) {
-      setLocationResults([]);
-      return;
-    }
-
-    const timeout = setTimeout(async () => {
-      try {
-        setSearchingLocation(true);
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`,
-        );
-        if (!response.ok) {
-          setLocationResults([]);
-          return;
-        }
-
-        const payload = (await response.json()) as LocationResult[];
-        setLocationResults(payload);
-      } catch {
-        setLocationResults([]);
-      } finally {
-        setSearchingLocation(false);
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
       }
-    }, 350);
-
-    return () => clearTimeout(timeout);
-  }, [locationQuery]);
-
-  const handleSelectLocation = (result: LocationResult) => {
-    setSelectedLocationName(result.display_name);
-    setLocationQuery(result.display_name);
-    setLatitude(Number.parseFloat(result.lat));
-    setLongitude(Number.parseFloat(result.lon));
-    setLocationResults([]);
-
-    const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (detectedTimezone) {
-      setTimezone(detectedTimezone);
     }
-  };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!canSubmit || latitude === null || longitude === null) {
+  const searchLocation = useCallback(async (query: string) => {
+    if (query.length < 3) {
+      setLocationResults([]);
+      setShowDropdown(false);
       return;
     }
+    setIsSearching(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
+        { headers: { 'User-Agent': 'Lumina-Astrology-App/2.0' } }
+      );
+      const data: NominatimResult[] = await res.json();
+      setLocationResults(data);
+      setShowDropdown(data.length > 0);
+    } catch {
+      setLocationResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
 
-    setSubmitting(true);
-
-    const birthData: BirthData = {
-      year: Number.parseInt(year, 10),
-      month: Number.parseInt(month, 10) - 1,
-      day: Number.parseInt(day, 10),
-      hour: Number.parseInt(hour, 10),
-      minute: Number.parseInt(minute, 10),
-      latitude,
-      longitude,
-      timezone,
-    };
-
-    const payload: StoredBirthPayload = {
-      name: name.trim() || undefined,
-      locationName: selectedLocationName,
-      birthData,
-    };
-
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    router.push('/chart');
+  const handleLocationInput = (value: string) => {
+    setLocationQuery(value);
+    setSelectedLocation(null);
+    setTimezone('');
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => searchLocation(value), 400);
   };
+
+  const selectLocation = async (result: NominatimResult) => {
+    const lat = parseFloat(result.lat);
+    const lon = parseFloat(result.lon);
+    setSelectedLocation({ name: result.display_name, lat, lon });
+    setLocationQuery(result.display_name);
+    setShowDropdown(false);
+    setLocationResults([]);
+    try {
+      const tzRes = await fetch(
+        `https://timeapi.io/api/timezone/coordinate?latitude=${lat}&longitude=${lon}`
+      );
+      const tzData = await tzRes.json();
+      if (tzData.timeZone) {
+        setTimezone(tzData.timeZone);
+      }
+    } catch {
+      const offsetHours = Math.round(lon / 15);
+      const fallbackTz = `Etc/GMT${offsetHours <= 0 ? '+' : ''}${-offsetHours}`;
+      setTimezone(fallbackTz);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!birthDate || !selectedLocation || !timezone) return;
+    setIsLoading(true);
+    const [year, month, day] = birthDate.split('-').map(Number);
+    const hour = parseInt(birthHour);
+    const minute = parseInt(birthMinute);
+    const data: StoredBirthData = {
+      year,
+      month: month - 1,
+      day,
+      hour,
+      minute,
+      latitude: selectedLocation.lat,
+      longitude: selectedLocation.lon,
+      timezone,
+      locationName: selectedLocation.name,
+    };
+    saveBirthData(data);
+    const params = new URLSearchParams({
+      year: String(year),
+      month: String(month - 1),
+      day: String(day),
+      hour: String(hour),
+      minute: String(minute),
+      lat: String(selectedLocation.lat),
+      lon: String(selectedLocation.lon),
+      tz: timezone,
+    });
+    router.push(`/chart?${params.toString()}`);
+  };
+
+  const isFormValid = birthDate && selectedLocation && timezone;
+
+  if (!hasLoadedStored) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gold/50 loading-pulse text-lg">✦</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 py-8 sm:px-6">
-      <div className="absolute right-4 top-4 z-30 sm:right-6 sm:top-6">
-        <LanguageToggle />
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+      <div className="text-center mb-12">
+        <div className="text-gold/60 text-sm tracking-[0.3em] uppercase font-body mb-4">
+          ✦ Celestial Insights ✦
+        </div>
+        <h1 className="font-heading text-6xl md:text-7xl lg:text-8xl font-light gold-text mb-4">
+          Lumina
+        </h1>
+        <p className="font-body text-cream/50 text-base md:text-lg max-w-md mx-auto leading-relaxed">
+          Unveil the cosmic blueprint written in the stars at the moment of your birth
+        </p>
       </div>
 
-      <section className="w-full max-w-xl animate-fadeInUp">
-        <header className="mb-8 text-center">
-          <p className="font-heading text-5xl text-lumina-champagne sm:text-6xl">Lumina</p>
-          <p className="mt-3 text-base text-cream">{t.tagline}</p>
-        </header>
+      <form
+        onSubmit={handleSubmit}
+        className="glass-card p-8 md:p-10 w-full max-w-lg space-y-6"
+      >
+        <div className="text-center mb-2">
+          <h2 className="font-heading text-2xl text-cream/90">Birth Details</h2>
+          <div className="gold-divider mt-3 mb-1" />
+        </div>
 
-        <form onSubmit={handleSubmit} className="glass-card space-y-5 p-5 sm:p-7">
-          <div>
-            <label htmlFor="name" className="lumina-label">
-              {t.name} ({t.optional})
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="lumina-input"
-              placeholder={t.name}
-              autoComplete="name"
-            />
+        <div>
+          <label className="lumina-label font-body">Date of Birth</label>
+          <input
+            type="date"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+            className="lumina-input font-body"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="lumina-label font-body">Time of Birth</label>
+          <div className="flex gap-3 items-center">
+            <select
+              value={birthHour}
+              onChange={(e) => setBirthHour(e.target.value)}
+              className="lumina-input font-body flex-1"
+            >
+              {Array.from({ length: 24 }, (_, i) => (
+                <option key={i} value={String(i).padStart(2, '0')}>
+                  {String(i).padStart(2, '0')}
+                </option>
+              ))}
+            </select>
+            <span className="text-gold/50 text-xl font-light">:</span>
+            <select
+              value={birthMinute}
+              onChange={(e) => setBirthMinute(e.target.value)}
+              className="lumina-input font-body flex-1"
+            >
+              {Array.from({ length: 60 }, (_, i) => (
+                <option key={i} value={String(i).padStart(2, '0')}>
+                  {String(i).padStart(2, '0')}
+                </option>
+              ))}
+            </select>
           </div>
+          <p className="text-cream/30 text-xs mt-1.5 font-body">24-hour format · Check your birth certificate</p>
+        </div>
 
-          <div>
-            <p className="lumina-label mb-2">{t.dateOfBirth}</p>
-            <div className="grid grid-cols-3 gap-2">
-              <select className="lumina-input" value={day} onChange={(event) => setDay(event.target.value)} required>
-                <option value="">{t.day}</option>
-                {days.map((item) => (
-                  <option key={item} value={item}>
-                    {String(item).padStart(2, '0')}
-                  </option>
-                ))}
-              </select>
-              <select
-                className="lumina-input"
-                value={month}
-                onChange={(event) => setMonth(event.target.value)}
-                required
-              >
-                <option value="">{t.month}</option>
-                {months.map((item) => (
-                  <option key={item} value={item}>
-                    {String(item).padStart(2, '0')}
-                  </option>
-                ))}
-              </select>
-              <select className="lumina-input" value={year} onChange={(event) => setYear(event.target.value)} required>
-                <option value="">{t.year}</option>
-                {years.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <p className="lumina-label mb-2">{t.timeOfBirth}</p>
-            <div className="grid grid-cols-2 gap-2">
-              <select className="lumina-input" value={hour} onChange={(event) => setHour(event.target.value)} required>
-                <option value="">{t.hour}</option>
-                {hours.map((item) => (
-                  <option key={item} value={item}>
-                    {String(item).padStart(2, '0')}
-                  </option>
-                ))}
-              </select>
-              <select className="lumina-input" value={minute} onChange={(event) => setMinute(event.target.value)} required>
-                <option value="">{t.minute}</option>
-                {minutes.map((item) => (
-                  <option key={item} value={item}>
-                    {String(item).padStart(2, '0')}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
+        <div className="relative" ref={dropdownRef}>
+          <label className="lumina-label font-body">Place of Birth</label>
           <div className="relative">
-            <label htmlFor="birth-location" className="lumina-label">
-              {t.birthLocation}
-            </label>
             <input
-              id="birth-location"
               type="text"
               value={locationQuery}
-              onChange={(event) => {
-                setLocationQuery(event.target.value);
-                setSelectedLocationName('');
-                setLatitude(null);
-                setLongitude(null);
-              }}
-              className="lumina-input"
-              placeholder={t.searchCityOrPlace}
+              onChange={(e) => handleLocationInput(e.target.value)}
+              placeholder="Search city or town..."
+              className="lumina-input font-body"
               autoComplete="off"
-              required
             />
-
-            {locationResults.length > 0 && (
-              <div className="absolute z-40 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f1433]/95 backdrop-blur-md">
-                {locationResults.map((result) => (
-                  <button
-                    key={result.place_id}
-                    type="button"
-                    className="block min-h-11 w-full border-b border-white/5 px-3 py-3 text-left text-sm text-warmWhite transition hover:bg-white/10"
-                    onClick={() => handleSelectLocation(result)}
-                  >
-                    {result.display_name}
-                  </button>
-                ))}
+            {isSearching && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gold/40 text-sm">
+                ✦
               </div>
             )}
-
-            {searchingLocation && <p className="mt-2 text-xs text-cream">...</p>}
           </div>
-
-          {selectedLocationName && latitude !== null && longitude !== null && (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-cream">
-              <p className="text-warmWhite">{t.selectedLocation}: {selectedLocationName}</p>
-              <p>
-                {t.latitude}: {latitude.toFixed(4)} | {t.longitude}: {longitude.toFixed(4)}
-              </p>
-              <p>
-                {t.timezone}: {timezone}
-              </p>
+          {showDropdown && locationResults.length > 0 && (
+            <div className="location-dropdown">
+              {locationResults.map((result, idx) => (
+                <div
+                  key={idx}
+                  className="location-dropdown-item text-cream/80"
+                  onClick={() => selectLocation(result)}
+                >
+                  {result.display_name}
+                </div>
+              ))}
             </div>
           )}
+          {selectedLocation && (
+            <p className="text-cream/30 text-xs mt-1.5 font-body">
+              {selectedLocation.lat.toFixed(4)}°N, {selectedLocation.lon.toFixed(4)}°E
+              {timezone && ` · ${timezone}`}
+            </p>
+          )}
+        </div>
 
-          <button type="submit" disabled={!canSubmit || submitting} className="lumina-button w-full">
-            {t.discoverYourChart}
-          </button>
-        </form>
-      </section>
+        <button
+          type="submit"
+          disabled={!isFormValid || isLoading}
+          className={`gold-button w-full text-base font-body tracking-wider uppercase ${
+            !isFormValid || isLoading ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
+          }`}
+        >
+          {isLoading ? (
+            <span className="loading-pulse">Reading the stars...</span>
+          ) : (
+            'Reveal My Chart ✦'
+          )}
+        </button>
+      </form>
+
+      <div className="mt-10 text-center">
+        <p className="text-cream/20 text-xs font-body tracking-wider">
+          Powered by astronomical precision · Not fortune telling
+        </p>
+      </div>
     </div>
   );
 }

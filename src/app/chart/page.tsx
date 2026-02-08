@@ -90,22 +90,23 @@ export default function ChartPage() {
         profilePayload = parsed;
       }
 
-      // Re-derive timezone from birth coordinates to fix any stale browser-TZ data
+      // ALWAYS re-derive timezone from birth coordinates — this is the single source of truth.
+      // Never trust the stored timezone (could be stale browser TZ from before the fix).
       if (birthData.latitude && birthData.longitude) {
         try {
           const tzResp = await fetch(`/api/timezone?lat=${birthData.latitude}&lon=${birthData.longitude}`);
           const tzData = await tzResp.json() as { timezone?: string };
-          if (tzData.timezone && tzData.timezone !== birthData.timezone) {
+          if (tzData.timezone) {
             birthData = { ...birthData, timezone: tzData.timezone };
             profilePayload = { ...profilePayload!, birthData };
-            // Update stored profile with corrected timezone
+            // Persist the corrected timezone
             if (profileData) {
               const { saveProfile: sp } = await import('@/lib/profile');
               sp({ ...profileData, birthData });
             }
           }
         } catch {
-          // If API fails, proceed with existing timezone
+          // If API fails, proceed with existing timezone — best we can do
         }
       }
 

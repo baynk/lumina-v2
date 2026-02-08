@@ -229,8 +229,8 @@ export function calculateNatalChart(birthData: BirthData): NatalChartData {
   const localDateString = `${birthData.year}-${String(birthData.month + 1).padStart(2, '0')}-${String(birthData.day).padStart(2, '0')} ${String(birthData.hour).padStart(2, '0')}:${String(birthData.minute).padStart(2, '0')}:00`;
 
   // Step 2: Convert local time to UTC using fromZonedTime
-  // This interprets the date/time as being in the specified timezone and converts to UTC
-  // It properly handles timezone offsets and historical DST rules
+  // IMPORTANT: The timezone MUST be derived from birth coordinates before calling this function.
+  // Use /api/timezone?lat=X&lon=Y to get the correct timezone.
   const birthDateUTC = fromZonedTime(localDateString, birthData.timezone);
 
   // ✅ Now we have the correct UTC time for astronomical calculations!

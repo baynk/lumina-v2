@@ -155,11 +155,23 @@ export default function LandingPage() {
     }
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!canSubmit || latitude === null || longitude === null) return;
 
     setSubmitting(true);
+
+    // Always resolve timezone from coordinates before saving — don't trust state
+    let resolvedTz = timezone;
+    try {
+      const tzResp = await fetch(`/api/timezone?lat=${latitude}&lon=${longitude}`);
+      const tzData = await tzResp.json() as { timezone?: string };
+      if (tzData.timezone) {
+        resolvedTz = tzData.timezone;
+      }
+    } catch {
+      // Fall through with whatever timezone we have
+    }
 
     const birthData: BirthData = {
       year: Number.parseInt(year, 10),
@@ -169,7 +181,7 @@ export default function LandingPage() {
       minute: Number.parseInt(minute, 10),
       latitude,
       longitude,
-      timezone,
+      timezone: resolvedTz,
     };
 
     saveProfile({

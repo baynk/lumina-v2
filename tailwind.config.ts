@@ -11,24 +11,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        midnight: '#0a0e27',
-        indigoNight: '#151a3d',
+        midnight: '#080c1f',
+        indigoNight: '#0f1433',
         purpleBlack: '#1a1040',
         lumina: {
-          gold: '#d4af37',
-          champagne: '#f4e4bc',
-          rose: '#e8b4b8',
-          blush: '#d4a0a0',
+          accent: '#c4b5fd',
+          'accent-bright': '#a78bfa',
+          'accent-muted': '#8b7dcf',
+          soft: '#e8e0f6',
         },
         warmWhite: '#f5f0eb',
         cream: '#c8bfb6',
       },
       fontFamily: {
-        heading: ['var(--font-playfair)', 'serif'],
+        heading: ['var(--font-heading)', 'serif'],
         body: ['var(--font-inter)', 'sans-serif'],
       },
       boxShadow: {
-        glow: '0 16px 50px rgba(212, 175, 55, 0.25)',
+        glow: '0 16px 50px rgba(167, 139, 250, 0.25)',
       },
       animation: {
         fadeInUp: 'fadeInUp 0.7s ease-out both',

@@ -65,7 +65,7 @@ export default function PlanetPage() {
         {englishPlanet && sign && !Number.isNaN(house) ? (
           <>
             <p className="lumina-label">{t.generatedInsight}</p>
-            <h1 className="mt-2 font-heading text-4xl text-lumina-champagne">
+            <h1 className="mt-2 font-heading text-4xl text-lumina-soft">
               {translatePlanet(englishPlanet, language)}
             </h1>
             <p className="mt-2 flex items-center gap-2 text-lg text-warmWhite">

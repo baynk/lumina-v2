@@ -15,7 +15,7 @@ export default function LanguageToggle({ className = '' }: { className?: string 
           onClick={() => setLanguage(lang)}
           className={`min-h-11 min-w-11 rounded-full px-4 text-xs font-semibold uppercase tracking-[0.2em] transition ${
             language === lang
-              ? 'bg-gradient-to-r from-lumina-gold to-lumina-champagne text-midnight'
+              ? 'bg-gradient-to-r from-lumina-accent-bright to-lumina-accent text-white'
               : 'text-cream hover:text-warmWhite'
           }`}
         >

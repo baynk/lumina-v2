@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Inter } from 'next/font/google';
+import { DM_Serif_Display, Inter } from 'next/font/google';
 import './globals.css';
 import AppProviders from '@/components/providers/AppProviders';
 import Footer from '@/components/Footer';
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['400', '600', '700'],
-  variable: '--font-playfair',
+const dmSerif = DM_Serif_Display({
+  subsets: ['latin', 'latin-ext'],
+  weight: '400',
+  variable: '--font-heading',
   display: 'swap',
 });
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#0a0e27',
+  themeColor: '#080c1f',
 };
 
 export default function RootLayout({
@@ -34,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="en" className={`${dmSerif.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-midnight text-warmWhite font-body antialiased">
         <AppProviders>
           <div className="star-field" aria-hidden="true" />

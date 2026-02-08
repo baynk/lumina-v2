@@ -88,12 +88,12 @@ export default function ExplainModal({
       aria-label={title}
     >
       <div
-        className="relative w-full max-w-lg max-h-[85vh] rounded-t-2xl sm:rounded-2xl border border-lumina-gold/30 bg-[#0d1229]/95 backdrop-blur-xl p-5 sm:p-7 overflow-hidden flex flex-col animate-slideUp sm:animate-fadeInUp"
+        className="relative w-full max-w-lg max-h-[85vh] rounded-t-2xl sm:rounded-2xl border border-lumina-accent/30 bg-[#0d1229]/95 backdrop-blur-xl p-5 sm:p-7 overflow-hidden flex flex-col animate-slideUp sm:animate-fadeInUp"
         onClick={(event) => event.stopPropagation()}
       >
         {/* Sticky header */}
         <div className="flex items-start justify-between mb-4 flex-shrink-0">
-          <h2 className="pr-4 font-heading text-2xl text-lumina-champagne">{title}</h2>
+          <h2 className="pr-4 font-heading text-2xl text-lumina-soft">{title}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -106,8 +106,8 @@ export default function ExplainModal({
 
         {/* Why this matters context */}
         {planet && (
-          <div className="mb-4 flex-shrink-0 rounded-xl border border-lumina-gold/20 bg-white/5 p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-lumina-champagne/80 mb-1.5">
+          <div className="mb-4 flex-shrink-0 rounded-xl border border-lumina-accent/20 bg-white/5 p-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-lumina-soft/80 mb-1.5">
               {language === 'en' ? 'Why this matters' : 'Почему это важно'}
             </p>
             {getPlanetWhyItMatters(planet, language) && (

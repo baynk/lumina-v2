@@ -325,7 +325,7 @@ export default function ChartPage() {
                       <ZodiacSvg sign={natalChart.risingSign} size={72} />
                     </div>
                     <p className="font-heading text-lg sm:text-xl text-lumina-soft">{translateSign(natalChart.risingSign, language)}</p>
-                    <p className="mt-1 text-[10px] leading-tight text-cream/50">{getPlanetWhyItMatters('Sun', language)}</p>
+                    <p className="mt-1 text-[10px] leading-tight text-cream/50">{language === 'en' ? 'Your mask — how the world sees you' : 'Твоя маска — как тебя видит мир'}</p>
                   </div>
                 </div>
                 <button type="button" className="lumina-button mt-5 w-full" onClick={() => setShowShareCard(true)}>
@@ -415,8 +415,8 @@ export default function ChartPage() {
 
       {/* Share Card Modal */}
       {showShareCard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-6" onClick={() => setShowShareCard(false)}>
-          <div className="w-full max-w-sm rounded-2xl border-2 border-lumina-accent/40 bg-midnight p-8 text-center" onClick={(event) => event.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 px-4 py-6" onClick={() => setShowShareCard(false)}>
+          <div className="w-full max-w-sm rounded-t-2xl sm:rounded-2xl border-2 border-lumina-accent/40 bg-[#080c1f] p-8 text-center animate-slideUp sm:animate-fadeInUp" onClick={(event) => event.stopPropagation()}>
             <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
             {profile?.name && <p className="mt-2 text-warmWhite">{profile.name}</p>}
             <div className="mt-6 space-y-4 text-left">
@@ -426,8 +426,8 @@ export default function ChartPage() {
                   <span>{t.sun}</span>
                 </p>
                 <p className="mt-1 flex items-center gap-2 text-lumina-soft">
-                  <ZodiacSvg sign={natalChart.zodiacSign} />
-                  <span>{translateSign(natalChart.zodiacSign, language)}</span>
+                  <ZodiacSvg sign={natalChart.zodiacSign} size={32} />
+                  <span className="font-heading text-lg">{translateSign(natalChart.zodiacSign, language)}</span>
                 </p>
               </div>
               <div className="rounded-xl bg-white/5 p-3">
@@ -436,22 +436,47 @@ export default function ChartPage() {
                   <span>{t.moon}</span>
                 </p>
                 <p className="mt-1 flex items-center gap-2 text-lumina-soft">
-                  <ZodiacSvg sign={moonSign || ''} />
-                  <span>{translateSign(moonSign || '', language)}</span>
+                  <ZodiacSvg sign={moonSign || ''} size={32} />
+                  <span className="font-heading text-lg">{translateSign(moonSign || '', language)}</span>
                 </p>
               </div>
               <div className="rounded-xl bg-white/5 p-3">
                 <p className="text-xs uppercase tracking-[0.13em] text-cream">↑ {t.rising}</p>
                 <p className="mt-1 flex items-center gap-2 text-lumina-soft">
-                  <ZodiacSvg sign={natalChart.risingSign} />
-                  <span>{translateSign(natalChart.risingSign, language)}</span>
+                  <ZodiacSvg sign={natalChart.risingSign} size={32} />
+                  <span className="font-heading text-lg">{translateSign(natalChart.risingSign, language)}</span>
                 </p>
               </div>
             </div>
-            <p className="mt-6 text-xs tracking-[0.18em] text-cream/70">lumina.app</p>
-            <button type="button" className="mt-5 min-h-11 text-sm text-cream/60 transition hover:text-cream" onClick={() => setShowShareCard(false)}>
-              {t.closeModal}
-            </button>
+            <p className="mt-6 text-xs tracking-[0.18em] text-cream/70">lumina-v2-five.vercel.app</p>
+
+            {/* Share buttons */}
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                className="lumina-button flex-1 text-sm"
+                onClick={async () => {
+                  const shareText = `✨ My Lumina Chart ✨\n☉ ${t.sun}: ${translateSign(natalChart.zodiacSign, language)}\n☽ ${t.moon}: ${translateSign(moonSign || '', language)}\n↑ ${t.rising}: ${translateSign(natalChart.risingSign, language)}\n\nDiscover yours → lumina-v2-five.vercel.app`;
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({ title: 'My Lumina Chart', text: shareText, url: 'https://lumina-v2-five.vercel.app' });
+                    } catch { /* user cancelled */ }
+                  } else {
+                    await navigator.clipboard.writeText(shareText);
+                    alert(language === 'ru' ? 'Скопировано!' : 'Copied to clipboard!');
+                  }
+                }}
+              >
+                {language === 'ru' ? 'Поделиться' : 'Share'}
+              </button>
+              <button
+                type="button"
+                className="min-h-11 flex-1 rounded-full border border-lumina-accent/30 px-4 text-sm text-cream transition hover:border-lumina-accent/60"
+                onClick={() => setShowShareCard(false)}
+              >
+                {t.closeModal}
+              </button>
+            </div>
           </div>
         </div>
       )}

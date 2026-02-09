@@ -297,6 +297,16 @@ export default function ChartPage() {
                 </div>
               </section>
 
+              {/* Consultation CTA after aspects */}
+              <div className="mb-6 text-center animate-stagger-4">
+                <a
+                  href="/consultation"
+                  className="text-sm text-cream/60 hover:text-lumina-accent transition"
+                >
+                  {t.ctaDecoded}
+                </a>
+              </div>
+
               {/* Daily Tip */}
               <section className="glass-card p-5 sm:p-6 animate-stagger-4">
                 <p className="lumina-label mb-3">{t.dailyTip}</p>
@@ -345,9 +355,17 @@ export default function ChartPage() {
                     <p className="mt-1 text-[10px] leading-tight text-cream/50">{language === 'en' ? 'Your mask — how the world sees you' : 'Твоя маска — как тебя видит мир'}</p>
                   </div>
                 </div>
-                <button type="button" className="lumina-button mt-5 w-full" onClick={() => setShowShareCard(true)}>
-                  {t.shareYourChart}
-                </button>
+                <div className="mt-5 flex gap-3">
+                  <button type="button" className="lumina-button flex-1" onClick={() => setShowShareCard(true)}>
+                    {t.shareYourChart}
+                  </button>
+                  <a
+                    href="/consultation"
+                    className="flex-1 flex items-center justify-center min-h-[48px] rounded-full border border-lumina-accent/30 px-4 text-sm text-cream transition hover:border-lumina-accent/60 hover:text-warmWhite"
+                  >
+                    {t.ctaPersonalReading}
+                  </a>
+                </div>
               </section>
 
               <section className="glass-card p-5 sm:p-6 animate-stagger-2">

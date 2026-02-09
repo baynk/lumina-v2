@@ -187,6 +187,17 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Consultation CTA */}
+        <div className="mb-5 rounded-xl bg-white/5 border border-white/10 p-4 text-center">
+          <p className="text-sm text-cream/70 mb-3">{t.ctaConsultationLabel}</p>
+          <a
+            href="/consultation"
+            className="inline-flex items-center justify-center min-h-[44px] rounded-full border border-lumina-accent/30 px-6 text-sm text-cream transition hover:border-lumina-accent/60 hover:text-warmWhite"
+          >
+            {t.ctaBookSession}
+          </a>
+        </div>
+
         {/* Save Button */}
         <button type="button" onClick={handleSave} className="lumina-button w-full">
           {saved ? t.profileSaved : t.saveProfileBtn}

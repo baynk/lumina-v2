@@ -285,6 +285,26 @@ export const aspectTypeNames = {
   },
 } as const;
 
+// Russian genitive case forms for zodiac signs (used after "с сердцем ___" and "с лицом ___")
+export const zodiacGenitive: Record<string, string> = {
+  Aries: 'Овна',
+  Taurus: 'Тельца',
+  Gemini: 'Близнецов',
+  Cancer: 'Рака',
+  Leo: 'Льва',
+  Virgo: 'Девы',
+  Libra: 'Весов',
+  Scorpio: 'Скорпиона',
+  Sagittarius: 'Стрельца',
+  Capricorn: 'Козерога',
+  Aquarius: 'Водолея',
+  Pisces: 'Рыб',
+};
+
+export function translateSignGenitive(sign: string): string {
+  return zodiacGenitive[sign] ?? sign;
+}
+
 export function translateSign(sign: string, language: Language): string {
   return zodiacNames[language][sign as keyof (typeof zodiacNames)['en']] ?? sign;
 }

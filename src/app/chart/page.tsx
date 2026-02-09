@@ -11,6 +11,7 @@ import {
   translateMoonPhase,
   translatePlanet,
   translateSign,
+  translateSignGenitive,
 } from '@/lib/translations';
 import { ZodiacImage } from '@/components/icons/ZodiacIcons';
 import { getAspectIcon, getPlanetIcon } from '@/components/icons/PlanetIcons';
@@ -315,7 +316,7 @@ export default function ChartPage() {
                 <p className="mb-6 text-center text-sm text-cream/70">
                   {language === 'en'
                     ? `You are a ${translateSign(natalChart.zodiacSign, language)} with a ${translateSign(moonSign || '', language)} heart and a ${translateSign(natalChart.risingSign, language)} face to the world.`
-                    : `Ты — ${translateSign(natalChart.zodiacSign, language)} с сердцем ${translateSign(moonSign || '', language)} и лицом ${translateSign(natalChart.risingSign, language)} для мира.`}
+                    : `Ты — ${translateSign(natalChart.zodiacSign, language)} с сердцем ${translateSignGenitive(moonSign || '')} и лицом ${translateSignGenitive(natalChart.risingSign)} для мира.`}
                 </p>
                 <p className="lumina-label mb-4 text-center">{t.bigThree}</p>
                 <div className="grid grid-cols-3 gap-3">

@@ -355,15 +355,15 @@ export default function ChartPage() {
                     <p className="mt-1 text-[10px] leading-tight text-cream/50">{language === 'en' ? 'Your mask — how the world sees you' : 'Твоя маска — как тебя видит мир'}</p>
                   </div>
                 </div>
-                <div className="mt-5 flex gap-3">
-                  <button type="button" className="lumina-button flex-1" onClick={() => setShowShareCard(true)}>
+                <div className="mt-5 flex flex-col items-center gap-3">
+                  <button type="button" className="lumina-button w-full" onClick={() => setShowShareCard(true)}>
                     {t.shareYourChart}
                   </button>
                   <a
                     href="/consultation"
-                    className="flex-1 flex items-center justify-center min-h-[48px] rounded-full border border-lumina-accent/30 px-4 text-sm text-cream transition hover:border-lumina-accent/60 hover:text-warmWhite"
+                    className="text-sm text-cream/50 hover:text-lumina-accent transition"
                   >
-                    {t.ctaPersonalReading}
+                    {t.ctaPersonalReading} →
                   </a>
                 </div>
               </section>

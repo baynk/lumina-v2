@@ -283,21 +283,26 @@ select.lumina-input {
   background-repeat: no-repeat;
 }
 
-/* Print styles for natal chart */
+/* Print styles for natal chart report */
 @media print {
-  body {
-    background: white !important;
-    color: #1a1a1a !important;
-  }
-  .star-field, .celestial-gradient, nav, footer {
-    display: none !important;
-  }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: white !important; color: #1a1a1a !important; font-size: 11pt !important; }
+  .star-field, .celestial-gradient, nav, footer { display: none !important; }
+  main { padding-top: 0 !important; }
   [class*="glass-card"] {
     background: white !important;
-    border: 1px solid #e5e5e5 !important;
+    border: 1px solid #ddd !important;
     backdrop-filter: none !important;
+    box-shadow: none !important;
+    break-inside: avoid;
   }
-  svg text {
-    fill: #333 !important;
-  }
+  svg text { fill: #333 !important; }
+  svg circle[fill="url(#wheelGlow)"] { fill: #fafafa !important; }
+  svg circle[fill="rgba(8,12,31,0.8)"] { fill: white !important; }
+  svg line { stroke: #aaa !important; }
+  h1, h2, p, td, th, span, a, label, div { color: #1a1a1a !important; }
+  table { border-collapse: collapse; }
+  thead tr { border-bottom: 2px solid #333 !important; }
+  tbody tr { border-bottom: 1px solid #eee !important; }
+  @page { margin: 1.5cm 2cm; size: A4; }
 }

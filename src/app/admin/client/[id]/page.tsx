@@ -502,168 +502,230 @@ export default function AdminClientWorkspacePage() {
 
   if (!data) return null;
 
+  const birthSummary = [data.consultation.birth_date, data.consultation.birth_time, data.consultation.birth_place].filter(Boolean).join(' · ');
+
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6">
-      <header className="mb-6 flex items-center justify-between gap-3">
+    <div className="mx-auto max-w-7xl px-4 pb-10 pt-14 sm:pt-6 sm:px-6">
+      {/* Header — compact, single line */}
+      <header className="mb-5 flex items-start justify-between gap-3 print:hidden">
         <div>
-          <p className="text-xs text-cream/50">Client Workspace</p>
-          <h1 className="font-heading text-3xl text-warmWhite">{data.consultation.name}</h1>
+          <p className="text-[10px] text-cream/40 uppercase tracking-widest mb-0.5">Client Workspace</p>
+          <h1 className="font-heading text-2xl text-warmWhite">{data.consultation.name}</h1>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-xs text-cream/50">
+            {(data.consultation.contact_email || data.user?.email) && (
+              <a href={`mailto:${data.consultation.contact_email || data.user?.email}`} className="hover:text-lumina-soft transition">
+                📧 {data.consultation.contact_email || data.user?.email}
+              </a>
+            )}
+            {data.consultation.contact_phone && (
+              <a href={`tel:${data.consultation.contact_phone}`} className="hover:text-lumina-soft transition">
+                📱 {data.consultation.contact_phone}
+              </a>
+            )}
+            {birthSummary && <span>🗓️ {birthSummary}</span>}
+          </div>
         </div>
-        <Link href="/admin" className="text-sm text-cream/50 hover:text-cream transition">← Back to admin</Link>
+        <div className="flex items-center gap-3">
+          <button onClick={() => window.print()} className="rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-[10px] text-cream/60 hover:text-cream hover:border-white/20 transition">
+            🖨️ Export
+          </button>
+          <Link href="/admin" className="text-sm text-cream/50 hover:text-cream transition">← Back</Link>
+        </div>
       </header>
 
-      <section className="glass-card p-5 sm:p-6 mb-6">
-        <p className="lumina-label mb-3">Client Information</p>
-        <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <p className="text-cream/40 text-xs mb-1">Name</p>
-            <p className="text-warmWhite">{data.consultation.name}</p>
-          </div>
-          <div>
-            <p className="text-cream/40 text-xs mb-1">Email</p>
-            <p className="text-warmWhite">{data.consultation.contact_email || data.user?.email || '—'}</p>
-          </div>
-          <div>
-            <p className="text-cream/40 text-xs mb-1">Phone</p>
-            <p className="text-warmWhite">{data.consultation.contact_phone || '—'}</p>
-          </div>
-          <div className="sm:col-span-2 lg:col-span-3">
-            <p className="text-cream/40 text-xs mb-1">Question</p>
-            <p className="text-warmWhite/90 leading-relaxed">{data.consultation.question}</p>
-          </div>
-          <div className="sm:col-span-2 lg:col-span-3">
-            <p className="text-cream/40 text-xs mb-2">Topics</p>
-            <div className="flex flex-wrap gap-1.5">
-              {data.consultation.topics?.length ? data.consultation.topics.map((topic) => (
-                <span key={topic} className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-cream/80">
-                  {topic}
-                </span>
-              )) : <span className="text-cream/60">—</span>}
+      {/* Question + Topics — only if present */}
+      {(data.consultation.question && data.consultation.question !== '-') && (
+        <div className="mb-5 rounded-xl bg-white/[0.03] border border-white/[0.06] px-4 py-3 print:hidden">
+          <div className="flex items-start gap-3">
+            <span className="text-cream/30 text-sm mt-0.5">💬</span>
+            <div>
+              <p className="text-sm text-cream/80 leading-relaxed">{data.consultation.question}</p>
+              {data.consultation.topics?.length ? (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {data.consultation.topics.map((topic) => (
+                    <span key={topic} className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-cream/60">{topic}</span>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
-      </section>
+      )}
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr),420px] mb-6">
-        <div className="glass-card p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <p className="lumina-label">Natal Chart Wheel</p>
-            <button onClick={() => window.print()} className="rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-[10px] text-cream/60 hover:text-cream hover:border-white/20 transition print:hidden">
-              🖨️ Print
-            </button>
+      {/* ===== PRINT HEADER (hidden on screen) ===== */}
+      <div className="hidden print:block mb-6">
+        <div className="text-center border-b-2 border-gray-300 pb-4 mb-4">
+          <h1 className="text-2xl font-bold tracking-wide" style={{ fontFamily: 'Georgia, serif' }}>✦ LUMINA ✦</h1>
+          <p className="text-xs text-gray-500 uppercase tracking-[0.3em] mt-1">Natal Chart Report</p>
+        </div>
+        <div className="flex justify-between text-sm">
+          <div>
+            <p className="font-semibold text-lg">{data.consultation.name}</p>
+            <p className="text-gray-600">{birthSummary}</p>
           </div>
+          <div className="text-right text-gray-500 text-xs">
+            <p>Prepared by Lumina Astrology</p>
+            <p>{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== CHART + DATA — 3-column on large screens ===== */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr_260px] mb-5">
+        {/* Column 1: Chart wheel */}
+        <div className="glass-card p-4">
+          <p className="lumina-label mb-2 print:hidden">Natal Chart</p>
           {data.natalChart ? (
-            <NatalWheel chart={data.natalChart} clientName={data.consultation.name} birthInfo={`${data.consultation.birth_date} ${data.consultation.birth_time} · ${data.consultation.birth_place}`} />
+            <NatalWheel chart={data.natalChart} clientName={data.consultation.name} birthInfo={birthSummary} />
           ) : (
             <p className="text-cream/60 text-sm">{data.chartError || 'Natal chart unavailable.'}</p>
           )}
         </div>
 
-        <div className="space-y-6">
-          <div className="glass-card p-4 sm:p-5">
-            <p className="lumina-label mb-3">Planets</p>
-            {data.natalChart ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead>
-                    <tr className="border-b border-white/10 text-cream/50 text-xs">
-                      <th className="pb-2 pr-2">Planet</th>
-                      <th className="pb-2 pr-2">Sign</th>
-                      <th className="pb-2 pr-2">House</th>
-                      <th className="pb-2">Degree</th>
+        {/* Column 2: Planet table (full height) */}
+        <div className="glass-card p-4">
+          <p className="lumina-label mb-2">Planetary Positions</p>
+          {data.natalChart ? (
+            <table className="w-full text-sm text-left">
+              <thead>
+                <tr className="border-b border-white/10 text-cream/50 text-[10px] uppercase tracking-wider print:text-gray-500 print:border-gray-300">
+                  <th className="pb-2 pr-2">Planet</th>
+                  <th className="pb-2 pr-2">Sign</th>
+                  <th className="pb-2 pr-2">Degree</th>
+                  <th className="pb-2 pr-2">House</th>
+                  <th className="pb-2 hidden sm:table-cell">Element</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.natalChart.planets.map((planet) => {
+                  const signElements: Record<string, string> = {
+                    Aries: '🔥 Fire', Taurus: '🌍 Earth', Gemini: '💨 Air', Cancer: '💧 Water',
+                    Leo: '🔥 Fire', Virgo: '🌍 Earth', Libra: '💨 Air', Scorpio: '💧 Water',
+                    Sagittarius: '🔥 Fire', Capricorn: '🌍 Earth', Aquarius: '💨 Air', Pisces: '💧 Water',
+                  };
+                  return (
+                    <tr key={planet.planet} className="border-b border-white/5 print:border-gray-200">
+                      <td className="py-1.5 pr-2 text-warmWhite print:text-gray-900 font-medium">
+                        <span className="text-lumina-soft print:text-gray-600">{PLANET_SYMBOLS[planet.planet]}</span> {planet.planet}
+                      </td>
+                      <td className="py-1.5 pr-2 text-cream print:text-gray-700">{planet.sign}</td>
+                      <td className="py-1.5 pr-2 text-cream/80 print:text-gray-600 tabular-nums">{formatDegree(planet.degrees)}</td>
+                      <td className="py-1.5 pr-2 text-cream/70 print:text-gray-600">{planet.house || '—'}</td>
+                      <td className="py-1.5 text-cream/50 print:text-gray-500 text-xs hidden sm:table-cell">{signElements[planet.sign] || ''}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {data.natalChart.planets.map((planet) => (
-                      <tr key={planet.planet} className="border-b border-white/5">
-                        <td className="py-2 pr-2 text-warmWhite">{PLANET_SYMBOLS[planet.planet]} {planet.planet}</td>
-                        <td className="py-2 pr-2 text-cream">{planet.sign}</td>
-                        <td className="py-2 pr-2 text-cream">{planet.house || '—'}</td>
-                        <td className="py-2 text-cream">{formatDegree(planet.degrees)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-sm text-cream/60">No planetary data.</p>
-            )}
-          </div>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-sm text-cream/60">No planetary data.</p>
+          )}
+        </div>
 
-          <div className="glass-card p-4 sm:p-5">
-            <p className="lumina-label mb-3">Aspects</p>
-            {data.natalChart ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-center text-xs">
-                  <thead>
-                    <tr>
-                      <th className="p-1" />
-                      {planetOrder.map((planet) => (
-                        <th key={planet} className="p-1 text-cream/60 font-normal">{PLANET_SYMBOLS[planet]}</th>
-                      ))}
+        {/* Column 3: Aspect grid (desktop) / below on mobile */}
+        <div className="glass-card p-4">
+          <p className="lumina-label mb-2">Aspects</p>
+          {data.natalChart ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-center text-[10px]">
+                <thead>
+                  <tr>
+                    <th className="p-0.5" />
+                    {planetOrder.map((planet) => (
+                      <th key={planet} className="p-0.5 text-cream/50 font-normal print:text-gray-500">{PLANET_SYMBOLS[planet]}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {planetOrder.map((rowPlanet, rowIdx) => (
+                    <tr key={rowPlanet}>
+                      <th className="p-0.5 text-cream/50 font-normal print:text-gray-500">{PLANET_SYMBOLS[rowPlanet]}</th>
+                      {planetOrder.map((colPlanet, colIdx) => {
+                        if (colIdx <= rowIdx) {
+                          return <td key={`${rowPlanet}-${colPlanet}`} className="p-0.5 text-cream/15">·</td>;
+                        }
+                        const aspect = aspectLookup.get(`${rowPlanet}-${colPlanet}`);
+                        if (!aspect) {
+                          return <td key={`${rowPlanet}-${colPlanet}`} className="p-0.5"> </td>;
+                        }
+                        return (
+                          <td key={`${rowPlanet}-${colPlanet}`} className="p-0.5" style={{ color: ASPECT_STYLES[aspect.type].color }} title={`${aspect.planet1} ${aspect.type} ${aspect.planet2} (orb ${aspect.orb}°)`}>
+                            {ASPECT_STYLES[aspect.type].symbol}
+                          </td>
+                        );
+                      })}
                     </tr>
-                  </thead>
-                  <tbody>
-                    {planetOrder.map((rowPlanet, rowIdx) => (
-                      <tr key={rowPlanet}>
-                        <th className="p-1 text-cream/60 font-normal">{PLANET_SYMBOLS[rowPlanet]}</th>
-                        {planetOrder.map((colPlanet, colIdx) => {
-                          if (colIdx <= rowIdx) {
-                            return <td key={`${rowPlanet}-${colPlanet}`} className="p-1 text-cream/25">·</td>;
-                          }
+                  ))}
+                </tbody>
+              </table>
 
-                          const aspect = aspectLookup.get(`${rowPlanet}-${colPlanet}`);
-                          if (!aspect) {
-                            return <td key={`${rowPlanet}-${colPlanet}`} className="p-1 text-cream/20"> </td>;
-                          }
-
-                          return (
-                            <td key={`${rowPlanet}-${colPlanet}`} className="p-1" style={{ color: ASPECT_STYLES[aspect.type].color }} title={`${aspect.planet1} ${aspect.type} ${aspect.planet2} (orb ${aspect.orb}°)`}>
-                              {ASPECT_STYLES[aspect.type].symbol}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              {/* Aspect legend */}
+              <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-cream/40 border-t border-white/5 pt-2 print:text-gray-500 print:border-gray-200">
+                {Object.entries(ASPECT_STYLES).map(([name, { symbol, color }]) => (
+                  <span key={name} className="flex items-center gap-1">
+                    <span style={{ color }}>{symbol}</span> {name}
+                  </span>
+                ))}
               </div>
-            ) : (
-              <p className="text-sm text-cream/60">No aspects available.</p>
-            )}
+            </div>
+          ) : (
+            <p className="text-sm text-cream/60">No aspects.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Key Aspects list — more readable than just the grid */}
+      {data.natalChart && data.natalChart.aspects.length > 0 && (
+        <div className="glass-card p-4 mb-5">
+          <p className="lumina-label mb-2">Key Aspects</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-1">
+            {data.natalChart.aspects
+              .sort((a, b) => parseFloat(String(a.orb)) - parseFloat(String(b.orb)))
+              .slice(0, 15)
+              .map((aspect) => (
+                <div key={`${aspect.planet1}-${aspect.planet2}`} className="flex items-center gap-2 text-xs py-1 border-b border-white/[0.04] print:border-gray-100">
+                  <span className="text-warmWhite print:text-gray-900 font-medium w-16 text-right">{PLANET_SYMBOLS[aspect.planet1]} {aspect.planet1}</span>
+                  <span style={{ color: ASPECT_STYLES[aspect.type]?.color }} className="text-sm">{ASPECT_STYLES[aspect.type]?.symbol}</span>
+                  <span className="text-warmWhite print:text-gray-900 font-medium w-16">{PLANET_SYMBOLS[aspect.planet2]} {aspect.planet2}</span>
+                  <span className="text-cream/40 print:text-gray-500 capitalize">{aspect.type}</span>
+                  <span className="text-cream/30 print:text-gray-400 tabular-nums ml-auto">{aspect.orb}°</span>
+                </div>
+              ))}
           </div>
         </div>
-      </section>
+      )}
 
-      <section className="glass-card p-5 sm:p-6">
+      {/* Session Notes */}
+      <section className="glass-card p-4 print:hidden">
         <label htmlFor="admin-notes" className="lumina-label block mb-2">Session Notes</label>
         <textarea
           id="admin-notes"
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
-          className="lumina-input min-h-[140px]"
+          className="lumina-input min-h-[120px]"
           placeholder="Write session notes, follow-ups, and action items..."
         />
-
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="text-xs text-cream/50">
-            Status: <span className="capitalize text-cream/70">{data.consultation.status.replace('_', ' ')}</span>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <p className="text-[10px] text-cream/40">
+            Status: <span className="capitalize text-cream/60">{data.consultation.status.replace('_', ' ')}</span>
           </p>
           <button
             onClick={saveNotes}
             disabled={savingNotes}
-            className="rounded-full border border-lumina-accent/40 px-4 py-2 text-sm text-lumina-soft hover:border-lumina-accent hover:text-warmWhite transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-full border border-lumina-accent/40 px-4 py-1.5 text-xs text-lumina-soft hover:border-lumina-accent hover:text-warmWhite transition disabled:opacity-50"
           >
             {savingNotes ? 'Saving...' : 'Save Notes'}
           </button>
         </div>
-
         {notesMessage && (
-          <p className={`mt-2 text-xs ${notesMessage === 'Notes saved.' ? 'text-emerald-300' : 'text-red-300'}`}>
-            {notesMessage}
-          </p>
+          <p className={`mt-1 text-xs ${notesMessage === 'Notes saved.' ? 'text-emerald-300' : 'text-red-300'}`}>{notesMessage}</p>
         )}
       </section>
+
+      {/* Print footer */}
+      <div className="hidden print:block mt-8 pt-4 border-t border-gray-300 text-center text-xs text-gray-400">
+        <p>Generated by Lumina · luminastrology.com</p>
+      </div>
     </div>
   );
 }

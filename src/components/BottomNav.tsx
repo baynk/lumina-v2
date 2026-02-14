@@ -66,8 +66,6 @@ export default function BottomNav() {
     };
   }, [pathname]);
 
-  if (!visible) return null;
-
   const items: NavItem[] = [
     { href: '/', label: t.bottomNavHome, icon: (active) => <HomeIcon active={active} /> },
     { href: '/chart', label: t.bottomNavChart, icon: (active) => <ChartIcon active={active} /> },

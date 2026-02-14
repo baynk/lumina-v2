@@ -202,7 +202,7 @@ export default function ChartPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-6xl px-4 pb-10 pt-14 sm:pt-6 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-0 sm:px-6">
         {/* Header */}
         <header className="mb-6 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="min-h-11 rounded-full px-4 text-sm text-cream hover:text-warmWhite">

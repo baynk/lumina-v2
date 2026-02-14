@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
+import { useLanguage } from '@/context/LanguageContext';
 
 type Stats = {
   totalUsers: number;
@@ -54,8 +55,39 @@ const STATUS_COLORS: Record<string, string> = {
   closed: 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30',
 };
 
+const T: Record<string, Record<string, string>> = {
+  en: {
+    title: 'Lumina Admin', subtitle: 'Dashboard & management', backToApp: '← Back to app',
+    overview: '📊 Overview', users: '👤 Users', consultations: '💬 Consultations',
+    totalUsers: 'Total Users', onboarded: 'Onboarded', last7: 'Last 7 Days',
+    consultationsLabel: 'Consultations', newRequests: 'New Requests',
+    usersTotal: 'users total', joined: 'Joined', lastActive: 'Last Active',
+    user: 'User', email: 'Email', birth: 'Birth', gender: 'Gender', status: 'Status',
+    active: 'Active', pending: 'Pending', consultationsTotal: 'consultations total',
+    noConsultations: 'No consultation requests yet.',
+    markInReview: 'Mark In Review', markResponded: 'Mark Responded', close: 'Close',
+    question: 'Question', birthDetails: 'Birth Details', prefers: 'Prefers',
+    format: 'Format', registeredUser: 'Registered user', notes: 'Notes',
+  },
+  ru: {
+    title: 'Lumina Админ', subtitle: 'Панель управления', backToApp: '← К приложению',
+    overview: '📊 Обзор', users: '👤 Пользователи', consultations: '💬 Консультации',
+    totalUsers: 'Всего', onboarded: 'Онбординг', last7: 'За 7 дней',
+    consultationsLabel: 'Консультации', newRequests: 'Новые',
+    usersTotal: 'пользователей', joined: 'Регистрация', lastActive: 'Активность',
+    user: 'Пользователь', email: 'Email', birth: 'Рождение', gender: 'Пол', status: 'Статус',
+    active: 'Активен', pending: 'Ожидание', consultationsTotal: 'консультаций',
+    noConsultations: 'Запросов на консультации пока нет.',
+    markInReview: 'На рассмотрении', markResponded: 'Ответ отправлен', close: 'Закрыть',
+    question: 'Вопрос', birthDetails: 'Данные рождения', prefers: 'Предпочитает',
+    format: 'Формат', registeredUser: 'Зарегистрирован', notes: 'Заметки',
+  },
+};
+
 export default function AdminPage() {
   const { data: session, status: authStatus } = useSession();
+  const { language } = useLanguage();
+  const l = T[language] || T.en;
   const [tab, setTab] = useState<'stats' | 'users' | 'consultations'>('stats');
   const [stats, setStats] = useState<Stats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -144,10 +176,10 @@ export default function AdminPage() {
       {/* Header */}
       <header className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-3xl text-lumina-soft">Lumina Admin</h1>
-          <p className="text-sm text-cream/50 mt-1">Dashboard & management</p>
+          <h1 className="font-heading text-3xl text-lumina-soft">{l.title}</h1>
+          <p className="text-sm text-cream/50 mt-1">{l.subtitle}</p>
         </div>
-        <a href="/" className="text-sm text-cream/50 hover:text-cream transition">← Back to app</a>
+        <a href="/" className="text-sm text-cream/50 hover:text-cream transition">{l.backToApp}</a>
       </header>
 
       {/* Tabs */}
@@ -162,7 +194,7 @@ export default function AdminPage() {
                 : 'text-cream/60 hover:text-cream'
             }`}
           >
-            {t === 'stats' ? '📊 Overview' : t === 'users' ? '👤 Users' : '💬 Consultations'}
+            {t === 'stats' ? l.overview : t === 'users' ? l.users : l.consultations}
             {t === 'consultations' && stats && stats.newConsultations > 0 && (
               <span className="ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-black">
                 {stats.newConsultations}
@@ -181,29 +213,29 @@ export default function AdminPage() {
           {/* Stats Tab */}
           {tab === 'stats' && stats && (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-              <StatCard label="Total Users" value={stats.totalUsers} />
-              <StatCard label="Onboarded" value={stats.completedOnboarding} />
-              <StatCard label="Last 7 Days" value={stats.signupsLast7Days} />
-              <StatCard label="Consultations" value={stats.totalConsultations} />
-              <StatCard label="New Requests" value={stats.newConsultations} highlight={stats.newConsultations > 0} />
+              <div className="cursor-pointer" onClick={() => setTab('users')}><StatCard label={l.totalUsers} value={stats.totalUsers} /></div>
+              <div className="cursor-pointer" onClick={() => setTab('users')}><StatCard label={l.onboarded} value={stats.completedOnboarding} /></div>
+              <div className="cursor-pointer" onClick={() => setTab('users')}><StatCard label={l.last7} value={stats.signupsLast7Days} /></div>
+              <div className="cursor-pointer" onClick={() => setTab('consultations')}><StatCard label={l.consultationsLabel} value={stats.totalConsultations} /></div>
+              <div className="cursor-pointer" onClick={() => setTab('consultations')}><StatCard label={l.newRequests} value={stats.newConsultations} highlight={stats.newConsultations > 0} /></div>
             </div>
           )}
 
           {/* Users Tab */}
           {tab === 'users' && (
             <div className="space-y-2">
-              <p className="text-xs text-cream/40 mb-3">{users.length} users total</p>
+              <p className="text-xs text-cream/40 mb-3">{users.length} {l.usersTotal}</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr className="border-b border-white/10 text-xs text-cream/50">
-                      <th className="pb-2 pr-4">User</th>
-                      <th className="pb-2 pr-4">Email</th>
-                      <th className="pb-2 pr-4">Birth</th>
-                      <th className="pb-2 pr-4">Gender</th>
-                      <th className="pb-2 pr-4">Status</th>
-                      <th className="pb-2 pr-4">Joined</th>
-                      <th className="pb-2">Last Active</th>
+                      <th className="pb-2 pr-4">{l.user}</th>
+                      <th className="pb-2 pr-4">{l.email}</th>
+                      <th className="pb-2 pr-4">{l.birth}</th>
+                      <th className="pb-2 pr-4">{l.gender}</th>
+                      <th className="pb-2 pr-4">{l.status}</th>
+                      <th className="pb-2 pr-4">{l.joined}</th>
+                      <th className="pb-2">{l.lastActive}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -230,7 +262,7 @@ export default function AdminPage() {
                               ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                               : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                           }`}>
-                            {u.onboarding_completed ? 'Active' : 'Pending'}
+                            {u.onboarding_completed ? l.active : l.pending}
                           </span>
                         </td>
                         <td className="py-2.5 pr-4 text-cream/50 text-xs">{formatDate(u.created_at)}</td>
@@ -246,10 +278,10 @@ export default function AdminPage() {
           {/* Consultations Tab */}
           {tab === 'consultations' && (
             <div className="space-y-4">
-              <p className="text-xs text-cream/40">{consultations.length} consultations total</p>
+              <p className="text-xs text-cream/40">{consultations.length} {l.consultationsTotal}</p>
               {consultations.length === 0 ? (
                 <div className="glass-card p-8 text-center text-cream/50">
-                  No consultation requests yet.
+                  {l.noConsultations}
                 </div>
               ) : (
                 consultations.map((c) => (
@@ -289,12 +321,12 @@ export default function AdminPage() {
                       )}
                       {c.contact_preference && (
                         <div className="flex items-center gap-1.5 text-xs text-cream/40">
-                          Prefers: <span className="text-cream/60 capitalize">{c.contact_preference}</span>
+                          {l.prefers}: <span className="text-cream/60 capitalize">{c.contact_preference}</span>
                         </div>
                       )}
                       {c.preferred_format && (
                         <div className="flex items-center gap-1.5 text-xs text-cream/40">
-                          Format: <span className="text-cream/60 capitalize">{c.preferred_format}</span>
+                          {l.format}: <span className="text-cream/60 capitalize">{c.preferred_format}</span>
                         </div>
                       )}
                     </div>
@@ -310,14 +342,14 @@ export default function AdminPage() {
 
                     {/* Question */}
                     <div className="mb-3">
-                      <p className="text-[10px] text-cream/40 uppercase tracking-wider mb-1">Question</p>
+                      <p className="text-[10px] text-cream/40 uppercase tracking-wider mb-1">{l.question}</p>
                       <p className="text-sm text-cream/80 leading-relaxed">{c.question}</p>
                     </div>
 
                     {/* Birth data */}
                     {(c.birth_date || c.birth_place) && (
                       <div className="mb-3 rounded-lg bg-white/5 p-3">
-                        <p className="text-[10px] text-cream/40 uppercase tracking-wider mb-1.5">Birth Details</p>
+                        <p className="text-[10px] text-cream/40 uppercase tracking-wider mb-1.5">{l.birthDetails}</p>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 text-xs text-cream/70">
                           {c.birth_date && <div>📅 {c.birth_date}</div>}
                           {c.birth_time && <div>🕐 {c.birth_time}</div>}
@@ -329,28 +361,28 @@ export default function AdminPage() {
 
                     {/* User link */}
                     {c.user_id && (
-                      <p className="text-[10px] text-cream/30 mb-3">🔗 Registered user: {c.user_name || c.user_email}</p>
+                      <p className="text-[10px] text-cream/30 mb-3">🔗 {l.registeredUser}: {c.user_name || c.user_email}</p>
                     )}
 
                     {c.admin_notes && (
-                      <p className="text-xs text-cream/40 italic mb-3 border-l-2 border-white/10 pl-2">Notes: {c.admin_notes}</p>
+                      <p className="text-xs text-cream/40 italic mb-3 border-l-2 border-white/10 pl-2">{l.notes}: {c.admin_notes}</p>
                     )}
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-2 border-t border-white/5">
                       {c.status === 'new' && (
                         <button onClick={() => updateStatus(c.id, 'in_review')} className="rounded-lg bg-blue-500/20 px-3 py-1.5 text-xs text-blue-300 hover:bg-blue-500/30 transition">
-                          Mark In Review
+                          {l.markInReview}
                         </button>
                       )}
                       {(c.status === 'new' || c.status === 'in_review') && (
                         <button onClick={() => updateStatus(c.id, 'responded')} className="rounded-lg bg-emerald-500/20 px-3 py-1.5 text-xs text-emerald-300 hover:bg-emerald-500/30 transition">
-                          Mark Responded
+                          {l.markResponded}
                         </button>
                       )}
                       {c.status !== 'closed' && (
                         <button onClick={() => updateStatus(c.id, 'closed')} className="rounded-lg bg-zinc-500/20 px-3 py-1.5 text-xs text-zinc-400 hover:bg-zinc-500/30 transition">
-                          Close
+                          {l.close}
                         </button>
                       )}
                     </div>

@@ -145,13 +145,15 @@ function isAdminEmail(email: string | null | undefined) {
   return ADMIN_EMAILS.includes(email) || ADMIN_DOMAINS.includes(domain);
 }
 
-function NatalWheel({ chart }: { chart: NatalChart }) {
+function NatalWheel({ chart, clientName, birthInfo }: { chart: NatalChart; clientName?: string; birthInfo?: string }) {
   const center = 250;
   const outerRadius = 230;
   const zodiacRadius = 210;
   const houseRadius = 180;
   const planetRadius = 154;
   const aspectRadius = 116;
+
+  const [tooltip, setTooltip] = useState<{ x: number; y: number; text: string } | null>(null);
 
   const planetsWithLon = chart.planets.map((planet) => ({
     ...planet,
@@ -163,9 +165,25 @@ function NatalWheel({ chart }: { chart: NatalChart }) {
     longitude: toLongitude(house.sign, house.degrees),
   }));
 
+  // ASC is house 1 cusp, MC is house 10 cusp
+  const ascLon = houseCusps.find(h => h.house === 1)?.longitude ?? 0;
+  const mcLon = houseCusps.find(h => h.house === 10)?.longitude ?? 0;
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <div className="mx-auto w-full max-w-[500px]">
-      <svg viewBox="0 0 500 500" className="h-auto w-full">
+    <div className="relative mx-auto w-full max-w-[500px]">
+      {/* Tooltip */}
+      {tooltip && (
+        <div className="pointer-events-none absolute z-50 rounded-lg border border-white/20 bg-[#0f1433]/95 backdrop-blur-md px-3 py-2 text-xs text-cream shadow-lg"
+          style={{ left: `${tooltip.x}px`, top: `${tooltip.y - 50}px`, transform: 'translateX(-50%)' }}>
+          {tooltip.text}
+        </div>
+      )}
+      <svg viewBox="0 0 500 500" className="h-auto w-full print:bg-white"
+        onMouseLeave={() => setTooltip(null)}>
         <defs>
           <radialGradient id="wheelGlow" cx="50%" cy="50%" r="60%">
             <stop offset="0%" stopColor="rgba(196,181,253,0.10)" />
@@ -208,6 +226,35 @@ function NatalWheel({ chart }: { chart: NatalChart }) {
             </g>
           );
         })}
+
+        {/* Degree tick marks */}
+        {Array.from({ length: 360 }, (_, i) => {
+          if (i % 5 !== 0) return null;
+          const angle = longitudeToAngle(i);
+          const isMajor = i % 10 === 0;
+          const outerP = toXY(center, center, outerRadius, angle);
+          const innerP = toXY(center, center, isMajor ? outerRadius - 6 : outerRadius - 3, angle);
+          return (
+            <line key={`tick-${i}`} x1={outerP.x} y1={outerP.y} x2={innerP.x} y2={innerP.y}
+              stroke="rgba(255,255,255,0.15)" strokeWidth={isMajor ? 0.8 : 0.4} />
+          );
+        })}
+
+        {/* ASC label */}
+        {(() => {
+          const ascAngle = longitudeToAngle(ascLon);
+          const ascPos = toXY(center, center, houseRadius + 28, ascAngle);
+          return <text x={ascPos.x} y={ascPos.y} textAnchor="middle" dominantBaseline="middle"
+            fill="rgba(251,191,36,0.9)" fontSize="9" fontWeight="bold">ASC</text>;
+        })()}
+
+        {/* MC label */}
+        {(() => {
+          const mcAngle = longitudeToAngle(mcLon);
+          const mcPos = toXY(center, center, houseRadius + 28, mcAngle);
+          return <text x={mcPos.x} y={mcPos.y} textAnchor="middle" dominantBaseline="middle"
+            fill="rgba(251,191,36,0.9)" fontSize="9" fontWeight="bold">MC</text>;
+        })()}
 
         {houseCusps.map((house) => {
           const angle = longitudeToAngle(house.longitude);
@@ -258,10 +305,18 @@ function NatalWheel({ chart }: { chart: NatalChart }) {
           const angle = longitudeToAngle(planet.longitude);
           const dotPos = toXY(center, center, planetRadius, angle);
           const textPos = toXY(center, center, planetRadius + 16, angle);
+          const tooltipText = `${planet.planet} in ${planet.sign} ${planet.degrees}${planet.house ? ` · House ${planet.house}` : ''}`;
 
           return (
-            <g key={planet.planet}>
+            <g key={planet.planet} className="cursor-pointer"
+              onMouseEnter={(e) => {
+                const rect = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect();
+                const scaleX = rect.width / 500;
+                setTooltip({ x: textPos.x * scaleX, y: textPos.y * scaleX, text: tooltipText });
+              }}
+              onMouseLeave={() => setTooltip(null)}>
               <circle cx={dotPos.x} cy={dotPos.y} r="4.2" fill="rgba(196,181,253,0.92)" />
+              <circle cx={dotPos.x} cy={dotPos.y} r="14" fill="transparent" />
               <text
                 x={textPos.x}
                 y={textPos.y}
@@ -491,9 +546,14 @@ export default function AdminClientWorkspacePage() {
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr),420px] mb-6">
         <div className="glass-card p-4 sm:p-6">
-          <p className="lumina-label mb-4">Natal Chart Wheel</p>
+          <div className="flex items-center justify-between mb-4">
+            <p className="lumina-label">Natal Chart Wheel</p>
+            <button onClick={() => window.print()} className="rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-[10px] text-cream/60 hover:text-cream hover:border-white/20 transition print:hidden">
+              🖨️ Print
+            </button>
+          </div>
           {data.natalChart ? (
-            <NatalWheel chart={data.natalChart} />
+            <NatalWheel chart={data.natalChart} clientName={data.consultation.name} birthInfo={`${data.consultation.birth_date} ${data.consultation.birth_time} · ${data.consultation.birth_place}`} />
           ) : (
             <p className="text-cream/60 text-sm">{data.chartError || 'Natal chart unavailable.'}</p>
           )}

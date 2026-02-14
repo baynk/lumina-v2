@@ -282,3 +282,22 @@ select.lumina-input {
   background-size: 6px 6px, 6px 6px;
   background-repeat: no-repeat;
 }
+
+/* Print styles for natal chart */
+@media print {
+  body {
+    background: white !important;
+    color: #1a1a1a !important;
+  }
+  .star-field, .celestial-gradient, nav, footer {
+    display: none !important;
+  }
+  [class*="glass-card"] {
+    background: white !important;
+    border: 1px solid #e5e5e5 !important;
+    backdrop-filter: none !important;
+  }
+  svg text {
+    fill: #333 !important;
+  }
+}

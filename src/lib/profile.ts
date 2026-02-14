@@ -28,6 +28,7 @@ export function saveProfile(profile: UserProfileLocal): void {
       locationName: profile.locationName,
       birthData: profile.birthData,
     }));
+    window.dispatchEvent(new Event('lumina-profile-changed'));
   } catch {
     // Silently fail
   }
@@ -72,6 +73,7 @@ export function clearProfile(): void {
   try {
     localStorage.removeItem(PROFILE_KEY);
     localStorage.removeItem(OLD_BIRTH_KEY);
+    window.dispatchEvent(new Event('lumina-profile-changed'));
   } catch {
     // Silently fail
   }

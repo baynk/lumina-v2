@@ -5,6 +5,7 @@ import AppProviders from '@/components/providers/AppProviders';
 import Footer from '@/components/Footer';
 import UserMenu from '@/components/UserMenu';
 import LanguageToggle from '@/components/LanguageToggle';
+import BottomNav from '@/components/BottomNav';
 
 const dmSerif = DM_Serif_Display({
   subsets: ['latin', 'latin-ext'],
@@ -52,7 +53,8 @@ export default function RootLayout({
             <LanguageToggle />
             <UserMenu />
           </nav>
-          <main className="relative z-10 min-h-screen pt-14 sm:pt-16">{children}</main>
+          <main className="relative z-10 min-h-screen pb-24 pt-14 sm:pb-0 sm:pt-16">{children}</main>
+          <BottomNav />
           <Footer />
         </AppProviders>
       </body>

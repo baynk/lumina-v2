@@ -1,51 +1,84 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile } from '@/lib/profile';
 import { translateAspectType, translatePlanet, translateSign } from '@/lib/translations';
-import type { BirthData, TransitAlert, TransitReport } from '@/types';
+import type { BirthData, TransitAlert, TransitReport } from '@/lib/types';
 
-type TransitResponse = TransitReport;
-
-const toneStyles: Record<string, string> = {
-  opportunity: 'border-emerald-300/30 bg-emerald-400/10',
-  awareness: 'border-amber-300/30 bg-amber-300/10',
-  challenge: 'border-rose-300/30 bg-rose-400/10',
+const planetSymbols: Record<string, string> = {
+  Sun: '☉',
+  Moon: '☽',
+  Mercury: '☿',
+  Venus: '♀',
+  Mars: '♂',
+  Jupiter: '♃',
+  Saturn: '♄',
+  Uranus: '♅',
+  Neptune: '♆',
+  Pluto: '♇',
 };
 
-function TransitCard({
-  item,
-  language,
-}: {
-  item: TransitAlert;
-  language: 'en' | 'ru';
-}) {
+function borderByTone(tone: TransitAlert['tone']): string {
+  if (tone === 'opportunity') return 'border-l-emerald-300';
+  if (tone === 'challenge') return 'border-l-rose-300';
+  return 'border-l-amber-300';
+}
+
+function badgeByTone(tone: TransitAlert['tone']): string {
+  if (tone === 'opportunity') return 'bg-emerald-300/15 text-emerald-200';
+  if (tone === 'challenge') return 'bg-rose-300/15 text-rose-200';
+  return 'bg-amber-300/15 text-amber-100';
+}
+
+function useHeadline(item: TransitAlert, language: 'en' | 'ru', template: string): string {
+  return template
+    .replace('{transit}', translatePlanet(item.transitPlanet, language))
+    .replace('{natal}', translatePlanet(item.natalPlanet, language));
+}
+
+function TransitCard({ item }: { item: TransitAlert }) {
+  const { language, t } = useLanguage();
   const [open, setOpen] = useState(false);
 
+  const transitSymbol = planetSymbols[item.transitPlanet] || '✦';
+  const natalSymbol = planetSymbols[item.natalPlanet] || '✦';
+  const headline = useHeadline(item, language, t.transitsHeadlineTemplate);
+
   return (
-    <div className={`rounded-xl border p-4 ${toneStyles[item.tone]}`}>
-      <button type="button" onClick={() => setOpen((prev) => !prev)} className="flex w-full items-center justify-between text-left">
+    <article className={`lumina-card border-l-4 p-4 ${borderByTone(item.tone)}`}>
+      <button type="button" onClick={() => setOpen((prev) => !prev)} className="flex w-full items-start justify-between gap-3 text-left">
         <div>
-          <p className="text-sm font-semibold text-warmWhite">
-            {translatePlanet(item.transitPlanet, language)} {translateAspectType(item.aspect, language).toLowerCase()} {translatePlanet(item.natalPlanet, language)}
-          </p>
-          <p className="mt-1 text-xs text-cream/75">
-            {new Date(item.date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')} · {item.priority} · {item.status}
-          </p>
+          <div className="flex items-center gap-2 text-sm text-lumina-soft">
+            <span>{transitSymbol}</span>
+            <span>{translatePlanet(item.transitPlanet, language)}</span>
+            <span className="text-cream/40">{translateAspectType(item.aspect, language).toLowerCase()}</span>
+            <span>{natalSymbol}</span>
+            <span>{translatePlanet(item.natalPlanet, language)}</span>
+          </div>
+          <p className="mt-2 text-base text-warmWhite">{headline}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-cream/65">
+            <span>{new Date(item.date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}</span>
+            <span className={`rounded-full px-2 py-0.5 ${badgeByTone(item.tone)}`}>{item.priority}</span>
+            <span>{item.status}</span>
+          </div>
         </div>
-        <span className="text-cream">{open ? '−' : '+'}</span>
+        <span className="pt-1 text-lg text-cream/70">{open ? '−' : '+'}</span>
       </button>
+
       {open ? (
-        <div className="mt-3 space-y-2 text-sm leading-relaxed text-cream/90">
-          <p>
-            {translatePlanet(item.transitPlanet, language)} {language === 'ru' ? 'в' : 'in'} {translateSign(item.transitSign, language)} {translateAspectType(item.aspect, language).toLowerCase()} {language === 'ru' ? 'к вашей натальной' : 'your natal'} {translatePlanet(item.natalPlanet, language)} {language === 'ru' ? 'в' : 'in'} {translateSign(item.natalSign, language)}.
-          </p>
+        <div className="mt-4 space-y-2 border-t border-white/10 pt-3 text-sm leading-relaxed text-cream/90">
+          <p className="text-lumina-soft">{t.transitsMeaningQuestion}</p>
           <p>{item.aiInterpretation || item.description}</p>
+          <p className="text-xs text-cream/60">
+            {translatePlanet(item.transitPlanet, language)} {language === 'ru' ? 'в' : 'in'} {translateSign(item.transitSign, language)}{' '}
+            {translateAspectType(item.aspect, language).toLowerCase()} {language === 'ru' ? 'к вашей натальной' : 'to your natal'}{' '}
+            {translatePlanet(item.natalPlanet, language)} {language === 'ru' ? 'в' : 'in'} {translateSign(item.natalSign, language)}.
+          </p>
         </div>
       ) : null}
-    </div>
+    </article>
   );
 }
 
@@ -53,7 +86,8 @@ export default function TransitsPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
   const [birthData, setBirthData] = useState<BirthData | null>(null);
-  const [report, setReport] = useState<TransitResponse | null>(null);
+
+  const [report, setReport] = useState<TransitReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -79,7 +113,7 @@ export default function TransitsPage() {
       });
 
       if (!response.ok) throw new Error('Failed');
-      const payload = (await response.json()) as TransitResponse;
+      const payload = (await response.json()) as TransitReport;
       setReport(payload);
     } catch {
       setError(t.transitsError);
@@ -88,14 +122,22 @@ export default function TransitsPage() {
     }
   };
 
-  const submitBirthData = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await runTransits();
-  };
+  const grouped = useMemo(() => {
+    if (!report) {
+      return { major: [] as TransitAlert[], active: [] as TransitAlert[], background: [] as TransitAlert[] };
+    }
+
+    const all = [...report.activeTransits, ...report.upcomingTransits].sort((a, b) => (a.date > b.date ? 1 : -1));
+    const major = all.filter((item) => item.priority === 'major');
+    const active = all.filter((item) => item.priority !== 'major' && item.status !== 'separating');
+    const background = all.filter((item) => item.priority !== 'major' && item.status === 'separating');
+
+    return { major, active, background };
+  }, [report]);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-12 pt-2 sm:px-6">
-      <header className="mb-6 flex items-center justify-between">
+    <div className="mx-auto max-w-5xl px-4 pb-28 pt-2 sm:px-6">
+      <header className="mb-5 flex items-center justify-between">
         <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-cream hover:text-warmWhite">
           ← {t.back}
         </button>
@@ -103,27 +145,20 @@ export default function TransitsPage() {
         <div className="w-14" />
       </header>
 
-      <p className="mb-6 max-w-3xl text-sm leading-relaxed text-cream/80">{t.transitsSubtitle}</p>
+      <section className="glass-card p-5 sm:p-6">
+        <p className="lumina-section-title">{t.transitsHeroLabel}</p>
+        <h2 className="mt-2 text-xl text-lumina-soft">{t.transitsHeroTitle}</h2>
+        <p className="mt-3 text-sm leading-relaxed text-cream/80">{t.transitsHeroDescription}</p>
+        <button type="button" onClick={runTransits} disabled={loading || !birthData} className="lumina-button mt-5 w-full sm:w-auto">
+          {loading ? t.transitsLoading : t.transitsRun}
+        </button>
+      </section>
 
-      {!birthData ? (
-        <form onSubmit={submitBirthData} className="glass-card p-5">
-          <p className="text-sm text-cream/80">{t.noBirthData}</p>
-          <button type="button" onClick={() => router.push('/')} className="lumina-button mt-4">
-            {t.backToHome}
-          </button>
-        </form>
-      ) : (
-        <div className="mb-5 flex flex-wrap gap-2">
-          <button type="button" onClick={runTransits} disabled={loading} className="lumina-button">
-            {loading ? t.transitsLoading : t.transitsRun}
-          </button>
-        </div>
-      )}
-
-      {error ? <p className="mb-4 text-sm text-rose-300">{error}</p> : null}
+      {!birthData ? <p className="mt-4 text-sm text-rose-200">{t.noBirthData}</p> : null}
+      {error ? <p className="mt-4 text-sm text-rose-200">{error}</p> : null}
 
       {loading ? (
-        <section className="glass-card p-6">
+        <section className="glass-card mt-5 p-6">
           <div className="space-y-3">
             <div className="skeleton h-5 w-1/3" />
             <div className="skeleton h-4 w-full" />
@@ -134,26 +169,25 @@ export default function TransitsPage() {
       ) : null}
 
       {report ? (
-        <div className="space-y-6 animate-fadeInUp">
-          <section className="glass-card p-5 sm:p-6">
-            <p className="lumina-label mb-3">{t.transitsActive}</p>
+        <div className="mt-6 space-y-6 animate-fadeInUp">
+          <section>
+            <p className="lumina-section-title mb-3">{t.transitsGroupMajor}</p>
             <div className="space-y-3">
-              {report.activeTransits.length ? (
-                report.activeTransits.map((item) => <TransitCard key={item.id} item={item} language={language} />)
-              ) : (
-                <p className="text-sm text-cream/80">{t.transitsNoActive}</p>
-              )}
+              {grouped.major.length ? grouped.major.map((item) => <TransitCard key={item.id} item={item} />) : <p className="text-sm text-cream/70">{t.transitsNoMajor}</p>}
             </div>
           </section>
 
-          <section className="glass-card p-5 sm:p-6">
-            <p className="lumina-label mb-3">{t.transitsUpcoming}</p>
+          <section>
+            <p className="lumina-section-title mb-3">{t.transitsGroupActive}</p>
             <div className="space-y-3">
-              {report.upcomingTransits.length ? (
-                report.upcomingTransits.map((item) => <TransitCard key={item.id} item={item} language={language} />)
-              ) : (
-                <p className="text-sm text-cream/80">{t.transitsNoUpcoming}</p>
-              )}
+              {grouped.active.length ? grouped.active.map((item) => <TransitCard key={item.id} item={item} />) : <p className="text-sm text-cream/70">{t.transitsNoActiveGroup}</p>}
+            </div>
+          </section>
+
+          <section>
+            <p className="lumina-section-title mb-3">{t.transitsGroupBackground}</p>
+            <div className="space-y-3">
+              {grouped.background.length ? grouped.background.map((item) => <TransitCard key={item.id} item={item} />) : <p className="text-sm text-cream/70">{t.transitsNoBackground}</p>}
             </div>
           </section>
         </div>

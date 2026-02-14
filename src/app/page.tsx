@@ -482,21 +482,21 @@ export default function LandingPage() {
               {t.viewTodaysReading} ✨
             </button>
 
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => router.push('/synastry')}
-                className="min-h-11 rounded-full border border-white/15 px-3 text-xs text-cream transition hover:text-warmWhite"
-              >
-                {t.synastryTitle}
-              </button>
-              <button
-                type="button"
-                onClick={() => router.push('/transits')}
-                className="min-h-11 rounded-full border border-white/15 px-3 text-xs text-cream transition hover:text-warmWhite"
-              >
-                {t.transitsTitle}
-              </button>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {[
+                { href: '/synastry', icon: '💫', label: t.synastryTitle },
+                { href: '/transits', icon: '🔮', label: t.transitsTitle },
+              ].map((item) => (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={() => router.push(item.href)}
+                  className="flex items-center justify-center gap-2 min-h-11 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-3 text-xs text-cream transition hover:border-lumina-accent/20 hover:text-warmWhite"
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -698,19 +698,24 @@ export default function LandingPage() {
           </button>
         </form>
 
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <button type="button" onClick={() => router.push('/chart')} className="rounded-xl bg-white/5 px-3 py-2 text-xs text-cream hover:text-warmWhite">
-            {t.yourCelestialBlueprint}
-          </button>
-          <button type="button" onClick={() => router.push('/synastry')} className="rounded-xl bg-white/5 px-3 py-2 text-xs text-cream hover:text-warmWhite">
-            {t.synastryTitle}
-          </button>
-          <button type="button" onClick={() => router.push('/transits')} className="rounded-xl bg-white/5 px-3 py-2 text-xs text-cream hover:text-warmWhite">
-            {t.transitsTitle}
-          </button>
-          <button type="button" onClick={() => router.push('/consultation')} className="rounded-xl bg-white/5 px-3 py-2 text-xs text-cream hover:text-warmWhite">
-            {t.consultationTitle}
-          </button>
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          {[
+            { href: '/chart', icon: '✦', label: t.yourCelestialBlueprint, desc: language === 'ru' ? 'Натальная карта' : 'Your natal chart' },
+            { href: '/synastry', icon: '💫', label: t.synastryTitle, desc: language === 'ru' ? 'Совместимость с партнёром' : 'Relationship compatibility' },
+            { href: '/transits', icon: '🔮', label: t.transitsTitle, desc: language === 'ru' ? 'Что влияет на вас сейчас' : "What's affecting you now" },
+            { href: '/consultation', icon: '🌙', label: t.consultationTitle, desc: language === 'ru' ? 'Личная сессия с Ириной' : 'Personal session with Iryna' },
+          ].map((item) => (
+            <button
+              key={item.href}
+              type="button"
+              onClick={() => router.push(item.href)}
+              className="glass-card group p-4 text-left transition hover:border-lumina-accent/20"
+            >
+              <span className="text-lg">{item.icon}</span>
+              <p className="mt-2 text-sm font-medium text-warmWhite group-hover:text-lumina-soft transition">{item.label}</p>
+              <p className="mt-0.5 text-[11px] text-cream/40">{item.desc}</p>
+            </button>
+          ))}
         </div>
       </section>
     </div>

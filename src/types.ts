@@ -51,6 +51,26 @@ export interface BirthData {
     timezone: string; // IANA timezone identifier (e.g., "Europe/Kiev")
 }
 
+export interface AstroLinePoint {
+    lat: number;
+    lon: number;
+}
+
+export interface AstrocartographyPlanetLines {
+    planet: string;
+    symbol: string;
+    color: string;
+    mc: AstroLinePoint[];
+    ic: AstroLinePoint[];
+    asc: AstroLinePoint[];
+    desc: AstroLinePoint[];
+}
+
+export interface AstrocartographyData {
+    birthMomentUtc: string;
+    planets: AstrocartographyPlanetLines[];
+}
+
 // Saved birth chart (from database)
 export interface SavedChart {
     id: string;

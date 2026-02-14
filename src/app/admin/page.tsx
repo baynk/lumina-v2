@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 
@@ -255,7 +256,12 @@ export default function AdminPage() {
                   <div key={c.id} className="glass-card p-5">
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <div>
-                        <p className="font-medium text-warmWhite text-lg">{c.name}</p>
+                        <Link
+                          href={`/admin/client/${c.id}`}
+                          className="font-medium text-warmWhite text-lg hover:text-lumina-accent transition"
+                        >
+                          {c.name}
+                        </Link>
                         <p className="text-xs text-cream/50">{formatDate(c.created_at)}</p>
                       </div>
                       <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-medium border flex-shrink-0 ${STATUS_COLORS[c.status] || STATUS_COLORS.new}`}>

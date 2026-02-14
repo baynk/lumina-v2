@@ -53,7 +53,7 @@ export default function PlanetPage() {
   }, [englishPlanet, house, language, sign, t.explanationFallback]);
 
   return (
-    <div className="mx-auto min-h-screen max-w-3xl px-4 pb-10 pt-6 sm:px-6">
+    <div className="mx-auto min-h-screen max-w-3xl px-4 pb-10 pt-14 sm:pt-6 sm:px-6">
       <header className="mb-6 flex items-center justify-between">
         <button onClick={() => router.push('/chart')} className="min-h-11 rounded-full px-4 text-sm text-cream hover:text-warmWhite">
           ← {t.back}

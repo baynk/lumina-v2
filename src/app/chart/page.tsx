@@ -202,19 +202,14 @@ export default function ChartPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 sm:px-6">
-        {/* Header: back | Lumina | profile */}
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-14 sm:pt-6 sm:px-6">
+        {/* Header */}
         <header className="mb-6 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="min-h-11 rounded-full px-4 text-sm text-cream hover:text-warmWhite">
             ← {t.back}
           </button>
           <p className="font-heading text-xl text-lumina-soft">Lumina</p>
-          <button onClick={() => router.push('/profile')} className="min-h-11 min-w-11 flex items-center justify-center rounded-full text-cream hover:text-warmWhite" aria-label={t.profile}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </button>
+          <div className="w-16" />
         </header>
 
         {/* Tabs */}

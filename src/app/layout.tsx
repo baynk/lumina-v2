@@ -48,11 +48,11 @@ export default function RootLayout({
         <AppProviders>
           <div className="star-field" aria-hidden="true" />
           <div className="celestial-gradient" aria-hidden="true" />
-          <div className="fixed right-3 top-2 z-50 flex items-center gap-2 scale-90 sm:scale-100 sm:right-6 sm:top-6 sm:gap-3">
+          <div className="fixed right-2 top-2 z-50 flex items-center gap-1.5 sm:right-6 sm:top-4 sm:gap-3">
             <LanguageToggle />
             <UserMenu />
           </div>
-          <main className="relative z-10 min-h-screen pt-14 sm:pt-0">{children}</main>
+          <main className="relative z-10 min-h-screen">{children}</main>
           <Footer />
         </AppProviders>
       </body>

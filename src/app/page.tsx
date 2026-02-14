@@ -507,7 +507,6 @@ export default function LandingPage() {
             <label htmlFor="birth-location" className="lumina-label">
               {t.birthLocation}
             </label>
-            <span className="pointer-events-none absolute left-3 top-[2.45rem] text-cream/40">📍</span>
             <input
               id="birth-location"
               type="text"
@@ -518,7 +517,7 @@ export default function LandingPage() {
                 setLatitude(null);
                 setLongitude(null);
               }}
-              className="lumina-input pl-9"
+              className="lumina-input"
               placeholder={t.searchCityOrPlace}
               autoComplete="off"
               required

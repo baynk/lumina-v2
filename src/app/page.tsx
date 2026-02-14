@@ -3,11 +3,12 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-// LanguageToggle moved to layout.tsx
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile, saveProfile, clearProfile, type UserProfileLocal } from '@/lib/profile';
 import { ZodiacImage } from '@/components/icons/ZodiacIcons';
-import type { BirthData } from '@/lib/types';
+import { calculateDailyCelestialData } from '@/lib/astronomyCalculator';
+import { translateMoonPhase } from '@/lib/translations';
+import type { BirthData, MoonRitualResponse } from '@/lib/types';
 
 type LocationResult = {
   place_id: string;
@@ -16,7 +17,9 @@ type LocationResult = {
   lon: string;
 };
 
-// Simple zodiac sign calculation from month/day
+const STORY_SHOWN_PREFIX = 'lumina_story_shown_';
+const JOURNAL_PREFIX = 'lumina_moon_journal_';
+
 function getZodiacSign(month: number, day: number): string {
   const signs = [
     { sign: 'Capricorn', start: [1, 1], end: [1, 19] },
@@ -33,17 +36,124 @@ function getZodiacSign(month: number, day: number): string {
     { sign: 'Sagittarius', start: [11, 22], end: [12, 21] },
     { sign: 'Capricorn', start: [12, 22], end: [12, 31] },
   ];
-  // month is 0-indexed from birthData
+
   const m = month + 1;
   for (const s of signs) {
-    if (
-      (m === s.start[0] && day >= s.start[1]) ||
-      (m === s.end[0] && day <= s.end[1])
-    ) {
+    if ((m === s.start[0] && day >= s.start[1]) || (m === s.end[0] && day <= s.end[1])) {
       return s.sign;
     }
   }
   return 'Aries';
+}
+
+function birthProfileKey(birthData: BirthData): string {
+  return `${birthData.year}-${birthData.month}-${birthData.day}-${birthData.hour}-${birthData.minute}-${birthData.latitude}-${birthData.longitude}`;
+}
+
+function phaseMode(phase: string): 'new' | 'waxing' | 'full' | 'waning' {
+  const normalized = phase.toLowerCase();
+  if (normalized.includes('new')) return 'new';
+  if (normalized.includes('full')) return 'full';
+  if (normalized.includes('waxing') || normalized.includes('first')) return 'waxing';
+  return 'waning';
+}
+
+function phaseFallback(phase: string, language: 'en' | 'ru'): MoonRitualResponse {
+  const mode = phaseMode(phase);
+
+  if (language === 'ru') {
+    if (mode === 'new') {
+      return {
+        title: 'Ритуал Новолуния',
+        summary: 'Время задавать намерение и выбирать новый фокус.',
+        prompts: [
+          'Какое намерение я выбираю на этот лунный цикл?',
+          'Какой маленький шаг сделаю в ближайшие 24 часа?',
+          'Какая поддержка поможет мне держать фокус?',
+        ],
+      };
+    }
+
+    if (mode === 'waxing') {
+      return {
+        title: 'Ритуал Растущей Луны',
+        summary: 'Время действовать, укреплять мотивацию и наращивать темп.',
+        prompts: [
+          'Что уже начинает расти в моей жизни?',
+          'Где мне добавить дисциплины на этой неделе?',
+          'Как я отмечу даже маленький прогресс?',
+        ],
+      };
+    }
+
+    if (mode === 'full') {
+      return {
+        title: 'Ритуал Полнолуния',
+        summary: 'Время увидеть результат, отпраздновать и отпустить лишнее.',
+        prompts: [
+          'Чем я горжусь в этом цикле?',
+          'Что я готов(а) отпустить уже сейчас?',
+          'Какое чувство хочу забрать с собой дальше?',
+        ],
+      };
+    }
+
+    return {
+      title: 'Ритуал Убывающей Луны',
+      summary: 'Время для замедления, рефлексии и восстановления энергии.',
+      prompts: [
+        'Что в моей жизни просит завершения?',
+        'Какой урок этого цикла самый важный?',
+        'Что поможет мне мягко восстановить ресурс?',
+      ],
+    };
+  }
+
+  if (mode === 'new') {
+    return {
+      title: 'New Moon Ritual',
+      summary: 'Set intention and choose one clear focus for this lunar cycle.',
+      prompts: [
+        'What intention do I want to plant right now?',
+        'What small action can I take in the next 24 hours?',
+        'What support helps me stay aligned?',
+      ],
+    };
+  }
+
+  if (mode === 'waxing') {
+    return {
+      title: 'Waxing Moon Ritual',
+      summary: 'Build momentum, take action, and stay consistent with your vision.',
+      prompts: [
+        'What is already growing in my life?',
+        'Where do I need stronger discipline this week?',
+        'How will I celebrate small progress?',
+      ],
+    };
+  }
+
+  if (mode === 'full') {
+    return {
+      title: 'Full Moon Ritual',
+      summary: 'Acknowledge what has bloomed, release what feels heavy.',
+      prompts: [
+        'What result am I ready to celebrate?',
+        'What am I willing to release today?',
+        'What truth feels clear now?',
+      ],
+    };
+  }
+
+  return {
+    title: 'Waning Moon Ritual',
+    summary: 'Slow down, reflect, and clear emotional clutter.',
+    prompts: [
+      'What chapter is ready to close?',
+      'What did this cycle teach me?',
+      'How can I recover energy with intention?',
+    ],
+  };
 }
 
 const months = Array.from({ length: 12 }, (_, idx) => idx + 1);
@@ -77,6 +187,15 @@ export default function LandingPage() {
   const [timezone, setTimezone] = useState('UTC');
   const [submitting, setSubmitting] = useState(false);
 
+  const [moonPhase, setMoonPhase] = useState('New Moon');
+  const [moonIllumination, setMoonIllumination] = useState(0);
+  const [moonRitual, setMoonRitual] = useState<MoonRitualResponse | null>(null);
+  const [ritualLoading, setRitualLoading] = useState(false);
+  const [journalText, setJournalText] = useState('');
+  const [journalSaved, setJournalSaved] = useState(false);
+
+  const todayJournalKey = useMemo(() => `${JOURNAL_PREFIX}${new Date().toISOString().slice(0, 10)}`, []);
+
   const canSubmit = useMemo(
     () =>
       !!day &&
@@ -90,18 +209,28 @@ export default function LandingPage() {
     [day, hour, latitude, longitude, minute, month, selectedLocationName, year],
   );
 
+  const sunSignForRitual = useMemo(() => {
+    if (existingProfile) {
+      return getZodiacSign(existingProfile.birthData.month, existingProfile.birthData.day);
+    }
+
+    if (month && day) {
+      return getZodiacSign(Number.parseInt(month, 10) - 1, Number.parseInt(day, 10));
+    }
+
+    return 'Aries';
+  }, [day, existingProfile, month]);
+
   useEffect(() => {
     if (authStatus === 'loading') return;
 
     async function checkProfile() {
-      // If authenticated, check server-side profile first
       if (session?.user) {
         try {
           const res = await fetch('/api/user');
           if (res.ok) {
             const serverProfile = await res.json();
             if (serverProfile.onboarding_completed && serverProfile.birth_date) {
-              // Parse server birth data into local format
               const [y, m, d] = serverProfile.birth_date.split('-').map(Number);
               const [h, min] = serverProfile.birth_time.split(':').map(Number);
               const localProfile: UserProfileLocal = {
@@ -119,7 +248,6 @@ export default function LandingPage() {
                 locationName: serverProfile.birth_place || '',
                 savedAt: Date.now(),
               };
-              // Sync to localStorage too
               saveProfile(localProfile);
               setExistingProfile(localProfile);
               setCheckingProfile(false);
@@ -127,11 +255,10 @@ export default function LandingPage() {
             }
           }
         } catch {
-          // Fall through to localStorage check
+          // fallback below
         }
       }
 
-      // Fallback: check localStorage
       const profile = loadProfile();
       if (profile) {
         setExistingProfile(profile);
@@ -141,6 +268,22 @@ export default function LandingPage() {
 
     checkProfile();
   }, [session, authStatus]);
+
+  useEffect(() => {
+    try {
+      const daily = calculateDailyCelestialData();
+      setMoonPhase(daily.moon.phase);
+      setMoonIllumination(daily.moon.illumination);
+    } catch {
+      setMoonPhase('New Moon');
+      setMoonIllumination(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    const savedJournal = window.localStorage.getItem(todayJournalKey);
+    if (savedJournal) setJournalText(savedJournal);
+  }, [todayJournalKey]);
 
   useEffect(() => {
     const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -178,6 +321,33 @@ export default function LandingPage() {
     return () => clearTimeout(timeout);
   }, [locationQuery]);
 
+  useEffect(() => {
+    const run = async () => {
+      setRitualLoading(true);
+      try {
+        const response = await fetch('/api/moon-ritual', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ moonPhase, sunSign: sunSignForRitual, language }),
+        });
+
+        if (!response.ok) {
+          setMoonRitual(phaseFallback(moonPhase, language));
+          return;
+        }
+
+        const payload = (await response.json()) as MoonRitualResponse;
+        setMoonRitual(payload);
+      } catch {
+        setMoonRitual(phaseFallback(moonPhase, language));
+      } finally {
+        setRitualLoading(false);
+      }
+    };
+
+    run();
+  }, [language, moonPhase, sunSignForRitual]);
+
   const handleSelectLocation = async (result: LocationResult) => {
     setSelectedLocationName(result.display_name);
     setLocationQuery(result.display_name);
@@ -187,15 +357,13 @@ export default function LandingPage() {
     setLongitude(lon);
     setLocationResults([]);
 
-    // Look up the timezone for the birth LOCATION (not the user's browser)
     try {
       const tzResp = await fetch(`/api/timezone?lat=${lat}&lon=${lon}`);
-      const tzData = await tzResp.json() as { timezone?: string };
+      const tzData = (await tzResp.json()) as { timezone?: string };
       if (tzData.timezone) {
         setTimezone(tzData.timezone);
       }
     } catch {
-      // Fallback to browser timezone if API fails
       const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       if (detectedTimezone) setTimezone(detectedTimezone);
     }
@@ -207,16 +375,15 @@ export default function LandingPage() {
 
     setSubmitting(true);
 
-    // Always resolve timezone from coordinates before saving — don't trust state
     let resolvedTz = timezone;
     try {
       const tzResp = await fetch(`/api/timezone?lat=${latitude}&lon=${longitude}`);
-      const tzData = await tzResp.json() as { timezone?: string };
+      const tzData = (await tzResp.json()) as { timezone?: string };
       if (tzData.timezone) {
         resolvedTz = tzData.timezone;
       }
     } catch {
-      // Fall through with whatever timezone we have
+      // continue
     }
 
     const birthData: BirthData = {
@@ -230,7 +397,6 @@ export default function LandingPage() {
       timezone: resolvedTz,
     };
 
-    // Save to localStorage (works for all users)
     saveProfile({
       birthData,
       name: name.trim(),
@@ -238,7 +404,6 @@ export default function LandingPage() {
       savedAt: Date.now(),
     });
 
-    // If authenticated, also save to server
     if (session?.user) {
       try {
         const pad = (n: number) => n.toString().padStart(2, '0');
@@ -256,11 +421,13 @@ export default function LandingPage() {
           }),
         });
       } catch {
-        // Non-blocking — localStorage is the fallback
+        // non blocking
       }
     }
 
-    router.push('/chart');
+    const key = `${STORY_SHOWN_PREFIX}${birthProfileKey(birthData)}`;
+    const alreadyShown = window.localStorage.getItem(key) === '1';
+    router.push(alreadyShown ? '/chart' : '/story-of-you');
   };
 
   const handleStartFresh = useCallback(() => {
@@ -269,7 +436,12 @@ export default function LandingPage() {
     setShowForm(true);
   }, []);
 
-  // Format today's date
+  const saveJournal = () => {
+    window.localStorage.setItem(todayJournalKey, journalText);
+    setJournalSaved(true);
+    window.setTimeout(() => setJournalSaved(false), 1800);
+  };
+
   const todayFormatted = useMemo(() => {
     const now = new Date();
     if (language === 'ru') {
@@ -286,40 +458,81 @@ export default function LandingPage() {
     );
   }
 
-  // Welcome back screen for returning users
   if (existingProfile && !showForm) {
     const sunSign = getZodiacSign(existingProfile.birthData.month, existingProfile.birthData.day);
 
     return (
       <div className="relative flex min-h-screen items-center justify-center px-4 py-8 sm:px-6">
         <section className="w-full max-w-md text-center animate-fadeInUp">
-          <p className="font-heading text-5xl text-lumina-soft sm:text-6xl mb-2">Lumina</p>
-          <p className="text-sm text-cream/60 mb-8">{todayFormatted}</p>
+          <p className="mb-2 font-heading text-5xl text-lumina-soft sm:text-6xl">Lumina</p>
+          <p className="mb-8 text-sm text-cream/60">{todayFormatted}</p>
 
-          <div className="glass-card p-8 mb-6">
-            <p className="text-lg text-lumina-soft mb-1">{t.welcomeBack}{existingProfile.name ? ',' : ''}</p>
-            {existingProfile.name && (
-              <p className="font-heading text-2xl text-warmWhite mb-6">{existingProfile.name}</p>
-            )}
+          <div className="glass-card mb-6 p-8">
+            <p className="mb-1 text-lg text-lumina-soft">
+              {t.welcomeBack}
+              {existingProfile.name ? ',' : ''}
+            </p>
+            {existingProfile.name ? <p className="mb-6 font-heading text-2xl text-warmWhite">{existingProfile.name}</p> : null}
 
-            <div className="flex justify-center mb-6">
+            <div className="mb-6 flex justify-center">
               <ZodiacImage sign={sunSign} size={120} className="opacity-90" />
             </div>
 
-            <button
-              type="button"
-              onClick={() => router.push('/chart')}
-              className="lumina-button w-full mb-4"
-            >
+            <button type="button" onClick={() => router.push('/chart')} className="lumina-button mb-3 w-full">
               {t.viewTodaysReading} ✨
             </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => router.push('/synastry')}
+                className="min-h-11 rounded-full border border-white/15 px-3 text-xs text-cream transition hover:text-warmWhite"
+              >
+                {t.synastryTitle}
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/transits')}
+                className="min-h-11 rounded-full border border-white/15 px-3 text-xs text-cream transition hover:text-warmWhite"
+              >
+                {t.transitsTitle}
+              </button>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleStartFresh}
-            className="text-sm text-cream/50 hover:text-cream transition"
-          >
+          <section className="glass-card mb-4 p-5 text-left">
+            <p className="lumina-label">{t.moonPhase}</p>
+            <p className="mt-2 text-lg text-lumina-soft">
+              {translateMoonPhase(moonPhase, language)} · {moonIllumination}%
+            </p>
+            {ritualLoading ? (
+              <div className="mt-4 space-y-2">
+                <div className="skeleton h-4 w-full" />
+                <div className="skeleton h-4 w-11/12" />
+                <div className="skeleton h-4 w-9/12" />
+              </div>
+            ) : (
+              <>
+                <p className="mt-3 text-sm text-cream/85">{moonRitual?.summary}</p>
+                <ul className="mt-3 space-y-1 text-sm text-warmWhite">
+                  {(moonRitual?.prompts || []).slice(0, 3).map((prompt, idx) => (
+                    <li key={`${prompt}-${idx}`}>• {prompt}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <textarea
+              value={journalText}
+              onChange={(event) => setJournalText(event.target.value)}
+              className="lumina-input mt-4 min-h-24"
+              placeholder={t.moonJournalPlaceholder}
+            />
+            <button type="button" onClick={saveJournal} className="mt-3 min-h-11 rounded-full border border-white/20 px-4 text-sm text-cream hover:text-warmWhite">
+              {journalSaved ? t.moonJournalSaved : t.moonJournalSave}
+            </button>
+          </section>
+
+          <button type="button" onClick={handleStartFresh} className="text-sm text-cream/50 transition hover:text-cream">
             {t.notYouStartFresh}
           </button>
         </section>
@@ -327,32 +540,53 @@ export default function LandingPage() {
     );
   }
 
-  // Birth data entry form (existing + new users)
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 py-8 sm:px-6">
       <section className="w-full max-w-xl animate-fadeInUp">
         <header className="mb-8 text-center">
           <p className="font-heading text-5xl text-lumina-soft sm:text-6xl">Lumina</p>
           <p className="mt-3 text-base text-cream">{t.tagline}</p>
-          <p className="mt-1.5 text-sm text-cream/50">
-            {language === 'ru' ? 'Твой персональный гид по звёздам' : 'Your personal guide to the stars'}
-          </p>
+          <p className="mt-1.5 text-sm text-cream/50">{language === 'ru' ? 'Твой персональный гид по звёздам' : 'Your personal guide to the stars'}</p>
         </header>
+
+        <section className="glass-card mb-5 p-5 sm:p-6">
+          <p className="lumina-label">{t.moonRitualTitle}</p>
+          <p className="mt-2 text-lg text-lumina-soft">
+            {translateMoonPhase(moonPhase, language)} · {moonIllumination}%
+          </p>
+          {ritualLoading ? (
+            <div className="mt-4 space-y-2">
+              <div className="skeleton h-4 w-full" />
+              <div className="skeleton h-4 w-11/12" />
+              <div className="skeleton h-4 w-9/12" />
+            </div>
+          ) : (
+            <>
+              <p className="mt-2 text-sm text-cream/85">{moonRitual?.summary}</p>
+              <ul className="mt-2 space-y-1 text-sm text-warmWhite">
+                {(moonRitual?.prompts || []).slice(0, 3).map((prompt, idx) => (
+                  <li key={`${prompt}-${idx}`}>• {prompt}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          <textarea
+            value={journalText}
+            onChange={(event) => setJournalText(event.target.value)}
+            className="lumina-input mt-4 min-h-24"
+            placeholder={t.moonJournalPlaceholder}
+          />
+          <button type="button" onClick={saveJournal} className="mt-3 min-h-11 rounded-full border border-white/20 px-4 text-sm text-cream hover:text-warmWhite">
+            {journalSaved ? t.moonJournalSaved : t.moonJournalSave}
+          </button>
+        </section>
 
         <form onSubmit={handleSubmit} className="glass-card space-y-6 p-6 sm:p-8">
           <div>
             <label htmlFor="name" className="lumina-label">
               {t.name} ({t.optional})
             </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="lumina-input"
-              placeholder={t.name}
-              autoComplete="name"
-            />
+            <input id="name" type="text" value={name} onChange={(event) => setName(event.target.value)} className="lumina-input" placeholder={t.name} autoComplete="name" />
           </div>
 
           <div>
@@ -361,19 +595,25 @@ export default function LandingPage() {
               <select className="lumina-input" value={day} onChange={(event) => setDay(event.target.value)} required>
                 <option value="">{t.day}</option>
                 {days.map((item) => (
-                  <option key={item} value={item}>{String(item).padStart(2, '0')}</option>
+                  <option key={item} value={item}>
+                    {String(item).padStart(2, '0')}
+                  </option>
                 ))}
               </select>
               <select className="lumina-input" value={month} onChange={(event) => setMonth(event.target.value)} required>
                 <option value="">{t.month}</option>
                 {months.map((item) => (
-                  <option key={item} value={item}>{String(item).padStart(2, '0')}</option>
+                  <option key={item} value={item}>
+                    {String(item).padStart(2, '0')}
+                  </option>
                 ))}
               </select>
               <select className="lumina-input" value={year} onChange={(event) => setYear(event.target.value)} required>
                 <option value="">{t.year}</option>
                 {years.map((item) => (
-                  <option key={item} value={item}>{item}</option>
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
                 ))}
               </select>
             </div>
@@ -385,13 +625,17 @@ export default function LandingPage() {
               <select className="lumina-input" value={hour} onChange={(event) => setHour(event.target.value)} required>
                 <option value="">{t.hour}</option>
                 {hours.map((item) => (
-                  <option key={item} value={item}>{String(item).padStart(2, '0')}</option>
+                  <option key={item} value={item}>
+                    {String(item).padStart(2, '0')}
+                  </option>
                 ))}
               </select>
               <select className="lumina-input" value={minute} onChange={(event) => setMinute(event.target.value)} required>
                 <option value="">{t.minute}</option>
                 {minutes.map((item) => (
-                  <option key={item} value={item}>{String(item).padStart(2, '0')}</option>
+                  <option key={item} value={item}>
+                    {String(item).padStart(2, '0')}
+                  </option>
                 ))}
               </select>
             </div>
@@ -417,7 +661,7 @@ export default function LandingPage() {
               required
             />
 
-            {locationResults.length > 0 && (
+            {locationResults.length > 0 ? (
               <div className="absolute z-40 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f1433]/95 backdrop-blur-md">
                 {locationResults.map((result) => (
                   <button
@@ -430,52 +674,43 @@ export default function LandingPage() {
                   </button>
                 ))}
               </div>
-            )}
+            ) : null}
 
-            {searchingLocation && <p className="mt-2 text-xs text-cream">...</p>}
+            {searchingLocation ? <p className="mt-2 text-xs text-cream">...</p> : null}
           </div>
 
-          {selectedLocationName && latitude !== null && longitude !== null && (
+          {selectedLocationName && latitude !== null && longitude !== null ? (
             <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-cream">
-              <p className="text-warmWhite">{t.selectedLocation}: {selectedLocationName}</p>
-              <p>{t.latitude}: {latitude.toFixed(4)} | {t.longitude}: {longitude.toFixed(4)}</p>
-              <p>{t.timezone}: {timezone}</p>
+              <p className="text-warmWhite">
+                {t.selectedLocation}: {selectedLocationName}
+              </p>
+              <p>
+                {t.latitude}: {latitude.toFixed(4)} | {t.longitude}: {longitude.toFixed(4)}
+              </p>
+              <p>
+                {t.timezone}: {timezone}
+              </p>
             </div>
-          )}
+          ) : null}
 
           <button type="submit" disabled={!canSubmit || submitting} className="lumina-button w-full">
             {t.discoverYourChart}
           </button>
         </form>
 
-        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-          <div className="rounded-xl bg-white/5 p-3">
-            <p className="text-lg text-lumina-soft">✦</p>
-            <p className="mt-1 text-xs font-semibold text-cream/80">
-              {language === 'ru' ? 'Точность NASA' : 'NASA-Grade Precision'}
-            </p>
-            <p className="mt-0.5 text-[10px] text-cream/40 leading-snug">
-              {language === 'ru' ? 'Эфемериды JPL DE421 · Плацидус' : 'JPL DE421 ephemeris · Placidus houses'}
-            </p>
-          </div>
-          <div className="rounded-xl bg-white/5 p-3">
-            <p className="text-lg text-lumina-soft">✧</p>
-            <p className="mt-1 text-xs font-semibold text-cream/80">
-              {language === 'ru' ? 'AI-интерпретация' : 'AI Interpretation'}
-            </p>
-            <p className="mt-0.5 text-[10px] text-cream/40 leading-snug">
-              {language === 'ru' ? 'Персональные инсайты · Gemini' : 'Personalized natal insights · Gemini'}
-            </p>
-          </div>
-          <div className="rounded-xl bg-white/5 p-3">
-            <p className="text-lg text-lumina-soft">◇</p>
-            <p className="mt-1 text-xs font-semibold text-cream/80">
-              {language === 'ru' ? 'Полный расчёт' : 'Complete Chart'}
-            </p>
-            <p className="mt-0.5 text-[10px] text-cream/40 leading-snug">
-              {language === 'ru' ? '10 планет · 12 домов · аспекты' : '10 planets · 12 houses · aspects'}
-            </p>
-          </div>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <button type="button" onClick={() => router.push('/chart')} className="rounded-xl bg-white/5 px-3 py-2 text-xs text-cream hover:text-warmWhite">
+            {t.yourCelestialBlueprint}
+          </button>
+          <button type="button" onClick={() => router.push('/synastry')} className="rounded-xl bg-white/5 px-3 py-2 text-xs text-cream hover:text-warmWhite">
+            {t.synastryTitle}
+          </button>
+          <button type="button" onClick={() => router.push('/transits')} className="rounded-xl bg-white/5 px-3 py-2 text-xs text-cream hover:text-warmWhite">
+            {t.transitsTitle}
+          </button>
+          <button type="button" onClick={() => router.push('/consultation')} className="rounded-xl bg-white/5 px-3 py-2 text-xs text-cream hover:text-warmWhite">
+            {t.consultationTitle}
+          </button>
         </div>
       </section>
     </div>

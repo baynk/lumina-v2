@@ -17,6 +17,7 @@
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "geo-tz": "^8.1.5",
+    "html2canvas": "^1.4.1",
     "next": "14.2.35",
     "next-auth": "^4.24.13",
     "react": "^18",

@@ -125,6 +125,58 @@ export const translations = {
     ctaPersonalReading: 'Get a personal reading',
     ctaConsultationLabel: 'Personal consultation · Online · 60 min',
     ctaBookSession: 'Book a session',
+    // Synastry
+    synastryTitle: 'Synastry',
+    synastrySubtitle:
+      'Relationship astrology that explains real dynamics, not just raw tables. Enter both birth charts for a clear compatibility narrative.',
+    synastryPersonA: 'Person A',
+    synastryPersonB: 'Person B',
+    synastryPersonALabel: 'You',
+    synastrySearching: 'Searching locations...',
+    synastryRun: 'Run Synastry Reading',
+    synastryLoading: 'Analyzing your relationship dynamics...',
+    synastryError: 'Unable to generate synastry right now. Please try again.',
+    synastryCompatibilityWheel: 'Compatibility Profile',
+    synastryNarrative: 'Relationship Narrative',
+    synastryKeyAspects: 'Key Relationship Aspects',
+    synastryOverallConnection: 'Overall Connection',
+    synastryCommunication: 'Communication Style',
+    synastryEmotional: 'Emotional Compatibility',
+    synastryChemistry: 'Attraction & Chemistry',
+    synastryGrowth: 'Growth & Challenges',
+    synastryLongTerm: 'Long-term Potential',
+    synastryOverallShort: 'Overall',
+    synastryTalkShort: 'Talk',
+    synastryFeelShort: 'Feel',
+    synastrySparkShort: 'Spark',
+    synastryGrowShort: 'Growth',
+    synastryFutureShort: 'Future',
+    // Transits
+    transitsTitle: 'Transit Alerts',
+    transitsSubtitle:
+      'See the transits currently activating your natal chart and the most relevant shifts in the next 30 days.',
+    transitsRun: 'Load Transit Timeline',
+    transitsLoading: 'Calculating active transits...',
+    transitsError: 'Unable to load transits right now. Please try again.',
+    transitsActive: 'Active Now',
+    transitsUpcoming: 'Upcoming (Next 30 Days)',
+    transitsNoActive: 'No major active transits in orb right now.',
+    transitsNoUpcoming: 'No notable upcoming transits found in the next 30 days.',
+    // Moon rituals
+    moonRitualTitle: 'Moon Phase Ritual',
+    moonJournalPlaceholder: 'Write your intention, release, or reflection here...',
+    moonJournalSave: 'Save Journal',
+    moonJournalSaved: 'Saved',
+    // Story of You
+    storyTitle: 'Story of You',
+    storySubtitle: 'A two-minute narrative based on your Sun, Moon, and Rising.',
+    storyContinue: 'Continue to My Chart',
+    storyFallback1:
+      'Your Sun, Moon, and Rising work together like a personal compass: identity, emotional needs, and first impression.',
+    storyFallback2:
+      'You are strongest when you honor both ambition and sensitivity instead of choosing one over the other.',
+    storyFallback3:
+      'Keep returning to grounded daily choices. Your chart becomes most powerful when translated into consistent action.',
   },
   ru: {
     appName: 'Lumina',
@@ -250,6 +302,58 @@ export const translations = {
     ctaPersonalReading: 'Получить личный разбор',
     ctaConsultationLabel: 'Личная консультация · Онлайн · 60 мин',
     ctaBookSession: 'Записаться',
+    // Synastry
+    synastryTitle: 'Синастрия',
+    synastrySubtitle:
+      'Астрология отношений с понятным разбором реальной динамики, а не сухими таблицами. Введите данные двух людей для глубокой интерпретации.',
+    synastryPersonA: 'Человек A',
+    synastryPersonB: 'Человек B',
+    synastryPersonALabel: 'Вы',
+    synastrySearching: 'Ищу локации...',
+    synastryRun: 'Рассчитать синастрию',
+    synastryLoading: 'Анализирую динамику ваших отношений...',
+    synastryError: 'Сейчас не удалось построить синастрию. Попробуйте ещё раз.',
+    synastryCompatibilityWheel: 'Профиль совместимости',
+    synastryNarrative: 'Нарратив отношений',
+    synastryKeyAspects: 'Ключевые аспекты пары',
+    synastryOverallConnection: 'Общая связь',
+    synastryCommunication: 'Стиль общения',
+    synastryEmotional: 'Эмоциональная совместимость',
+    synastryChemistry: 'Притяжение и химия',
+    synastryGrowth: 'Рост и вызовы',
+    synastryLongTerm: 'Потенциал на долгую дистанцию',
+    synastryOverallShort: 'Связь',
+    synastryTalkShort: 'Общение',
+    synastryFeelShort: 'Эмоции',
+    synastrySparkShort: 'Химия',
+    synastryGrowShort: 'Рост',
+    synastryFutureShort: 'Будущее',
+    // Transits
+    transitsTitle: 'Транзитные сигналы',
+    transitsSubtitle:
+      'Смотрите текущие транзиты к вашей натальной карте и самые важные астрологические сдвиги на ближайшие 30 дней.',
+    transitsRun: 'Показать транзитную ленту',
+    transitsLoading: 'Рассчитываю активные транзиты...',
+    transitsError: 'Сейчас не удалось загрузить транзиты. Попробуйте ещё раз.',
+    transitsActive: 'Активно сейчас',
+    transitsUpcoming: 'Скоро (следующие 30 дней)',
+    transitsNoActive: 'Сейчас нет значимых активных транзитов в орбе.',
+    transitsNoUpcoming: 'В ближайшие 30 дней заметных транзитов не найдено.',
+    // Moon rituals
+    moonRitualTitle: 'Лунный ритуал',
+    moonJournalPlaceholder: 'Запишите своё намерение, отпускание или рефлексию...',
+    moonJournalSave: 'Сохранить в дневник',
+    moonJournalSaved: 'Сохранено',
+    // Story of You
+    storyTitle: 'Твоя история',
+    storySubtitle: 'Нарратив на 2 минуты по твоему Солнцу, Луне и Асценденту.',
+    storyContinue: 'Перейти к моей карте',
+    storyFallback1:
+      'Твоё Солнце, Луна и Асцендент работают как личный компас: идентичность, эмоциональная опора и первое впечатление.',
+    storyFallback2:
+      'Ты раскрываешься сильнее всего, когда уважаешь и амбиции, и чувствительность, не подавляя ни одну часть себя.',
+    storyFallback3:
+      'Возвращайся к простым ежедневным действиям. Так энергия карты превращается в устойчивую внутреннюю опору.',
   },
 } as const;
 

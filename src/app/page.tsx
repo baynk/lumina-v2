@@ -2,7 +2,8 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import LanguageToggle from '@/components/LanguageToggle';
+import { useSession } from 'next-auth/react';
+// LanguageToggle moved to layout.tsx
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile, saveProfile, clearProfile, type UserProfileLocal } from '@/lib/profile';
 import { ZodiacImage } from '@/components/icons/ZodiacIcons';
@@ -54,6 +55,7 @@ const minutes = Array.from({ length: 60 }, (_, idx) => idx);
 export default function LandingPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
+  const { data: session, status: authStatus } = useSession();
 
   const [existingProfile, setExistingProfile] = useState<UserProfileLocal | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -89,12 +91,56 @@ export default function LandingPage() {
   );
 
   useEffect(() => {
-    const profile = loadProfile();
-    if (profile) {
-      setExistingProfile(profile);
+    if (authStatus === 'loading') return;
+
+    async function checkProfile() {
+      // If authenticated, check server-side profile first
+      if (session?.user) {
+        try {
+          const res = await fetch('/api/user');
+          if (res.ok) {
+            const serverProfile = await res.json();
+            if (serverProfile.onboarding_completed && serverProfile.birth_date) {
+              // Parse server birth data into local format
+              const [y, m, d] = serverProfile.birth_date.split('-').map(Number);
+              const [h, min] = serverProfile.birth_time.split(':').map(Number);
+              const localProfile: UserProfileLocal = {
+                birthData: {
+                  year: y,
+                  month: m - 1,
+                  day: d,
+                  hour: h,
+                  minute: min,
+                  latitude: serverProfile.birth_latitude,
+                  longitude: serverProfile.birth_longitude,
+                  timezone: serverProfile.birth_timezone,
+                },
+                name: serverProfile.name || '',
+                locationName: serverProfile.birth_place || '',
+                savedAt: Date.now(),
+              };
+              // Sync to localStorage too
+              saveProfile(localProfile);
+              setExistingProfile(localProfile);
+              setCheckingProfile(false);
+              return;
+            }
+          }
+        } catch {
+          // Fall through to localStorage check
+        }
+      }
+
+      // Fallback: check localStorage
+      const profile = loadProfile();
+      if (profile) {
+        setExistingProfile(profile);
+      }
+      setCheckingProfile(false);
     }
-    setCheckingProfile(false);
-  }, []);
+
+    checkProfile();
+  }, [session, authStatus]);
 
   useEffect(() => {
     const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -184,12 +230,35 @@ export default function LandingPage() {
       timezone: resolvedTz,
     };
 
+    // Save to localStorage (works for all users)
     saveProfile({
       birthData,
       name: name.trim(),
       locationName: selectedLocationName,
       savedAt: Date.now(),
     });
+
+    // If authenticated, also save to server
+    if (session?.user) {
+      try {
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        await fetch('/api/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            birth_date: `${year}-${pad(Number(month))}-${pad(Number(day))}`,
+            birth_time: `${pad(Number(hour))}:${pad(Number(minute))}`,
+            birth_place: selectedLocationName,
+            birth_latitude: latitude,
+            birth_longitude: longitude,
+            birth_timezone: resolvedTz,
+            name: name.trim() || undefined,
+          }),
+        });
+      } catch {
+        // Non-blocking — localStorage is the fallback
+      }
+    }
 
     router.push('/chart');
   };
@@ -261,10 +330,6 @@ export default function LandingPage() {
   // Birth data entry form (existing + new users)
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 py-8 sm:px-6">
-      <div className="absolute right-4 top-4 z-30 sm:right-6 sm:top-6">
-        <LanguageToggle />
-      </div>
-
       <section className="w-full max-w-xl animate-fadeInUp">
         <header className="mb-8 text-center">
           <p className="font-heading text-5xl text-lumina-soft sm:text-6xl">Lumina</p>
@@ -387,23 +452,29 @@ export default function LandingPage() {
           <div className="rounded-xl bg-white/5 p-3">
             <p className="text-lg text-lumina-soft">✦</p>
             <p className="mt-1 text-xs font-semibold text-cream/80">
-              {language === 'ru' ? 'Точные расчёты' : 'Precise Calculations'}
+              {language === 'ru' ? 'Точность NASA' : 'NASA-Grade Precision'}
             </p>
-            <p className="mt-0.5 text-[10px] text-cream/40">astronomy-engine</p>
+            <p className="mt-0.5 text-[10px] text-cream/40 leading-snug">
+              {language === 'ru' ? 'Эфемериды JPL DE421 · Плацидус' : 'JPL DE421 ephemeris · Placidus houses'}
+            </p>
           </div>
           <div className="rounded-xl bg-white/5 p-3">
             <p className="text-lg text-lumina-soft">✧</p>
             <p className="mt-1 text-xs font-semibold text-cream/80">
-              {language === 'ru' ? 'AI-инсайты' : 'AI Insights'}
+              {language === 'ru' ? 'AI-интерпретация' : 'AI Interpretation'}
             </p>
-            <p className="mt-0.5 text-[10px] text-cream/40">Gemini</p>
+            <p className="mt-0.5 text-[10px] text-cream/40 leading-snug">
+              {language === 'ru' ? 'Персональные инсайты · Gemini' : 'Personalized natal insights · Gemini'}
+            </p>
           </div>
           <div className="rounded-xl bg-white/5 p-3">
             <p className="text-lg text-lumina-soft">◇</p>
             <p className="mt-1 text-xs font-semibold text-cream/80">
-              {language === 'ru' ? 'Приватность' : 'Your Data Stays Private'}
+              {language === 'ru' ? 'Полный расчёт' : 'Complete Chart'}
             </p>
-            <p className="mt-0.5 text-[10px] text-cream/40">localStorage</p>
+            <p className="mt-0.5 text-[10px] text-cream/40 leading-snug">
+              {language === 'ru' ? '10 планет · 12 домов · аспекты' : '10 planets · 12 houses · aspects'}
+            </p>
           </div>
         </div>
       </section>

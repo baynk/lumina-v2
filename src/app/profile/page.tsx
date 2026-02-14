@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import LanguageToggle from '@/components/LanguageToggle';
+import { useSession } from 'next-auth/react';
+// LanguageToggle moved to layout.tsx
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile, saveProfile, clearProfile, type UserProfileLocal, type RelationshipStatus, type Interest, type Gender } from '@/lib/profile';
 
@@ -12,6 +13,7 @@ const GENDER_OPTIONS: Gender[] = ['female', 'male', 'non-binary', 'prefer-not-to
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const { language, t } = useLanguage();
 
   const [profile, setProfile] = useState<UserProfileLocal | null>(null);
@@ -22,17 +24,36 @@ export default function ProfilePage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    const p = loadProfile();
-    if (!p) {
-      router.replace('/');
-      return;
+    async function loadData() {
+      const p = loadProfile();
+      if (!p) {
+        router.replace('/');
+        return;
+      }
+      setProfile(p);
+      setDisplayName(p.name || '');
+      setRelationshipStatus(p.relationshipStatus || '');
+      setInterests(p.interests || []);
+      setGender(p.gender || '');
+
+      // If authenticated, also load server-side profile fields
+      if (session?.user) {
+        try {
+          const res = await fetch('/api/user');
+          if (res.ok) {
+            const serverProfile = await res.json();
+            if (serverProfile.gender) setGender(serverProfile.gender);
+            if (serverProfile.relationship_status) setRelationshipStatus(serverProfile.relationship_status);
+            if (serverProfile.interests?.length) setInterests(serverProfile.interests);
+            if (serverProfile.name) setDisplayName(serverProfile.name);
+          }
+        } catch {
+          // Fall through with localStorage data
+        }
+      }
     }
-    setProfile(p);
-    setDisplayName(p.name || '');
-    setRelationshipStatus(p.relationshipStatus || '');
-    setInterests(p.interests || []);
-    setGender(p.gender || '');
-  }, [router]);
+    loadData();
+  }, [router, session]);
 
   const toggleInterest = (interest: Interest) => {
     setInterests((prev) =>
@@ -41,7 +62,7 @@ export default function ProfilePage() {
     setSaved(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!profile) return;
     const updated: UserProfileLocal = {
       ...profile,
@@ -52,6 +73,25 @@ export default function ProfilePage() {
     };
     saveProfile(updated);
     setProfile(updated);
+
+    // Also save to server if authenticated
+    if (session?.user) {
+      try {
+        await fetch('/api/user', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gender: gender || null,
+            relationship_status: relationshipStatus || null,
+            interests: interests.length > 0 ? interests : null,
+            name: displayName.trim() || null,
+          }),
+        });
+      } catch {
+        // Non-blocking
+      }
+    }
+
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -100,7 +140,7 @@ export default function ProfilePage() {
           ← {t.back}
         </button>
         <p className="font-heading text-xl text-lumina-soft">{t.profile}</p>
-        <LanguageToggle />
+        <div className="w-20" />
       </header>
 
       {/* Birth Data (read-only) */}

@@ -3,6 +3,8 @@ import { DM_Serif_Display, Inter } from 'next/font/google';
 import './globals.css';
 import AppProviders from '@/components/providers/AppProviders';
 import Footer from '@/components/Footer';
+import UserMenu from '@/components/UserMenu';
+import LanguageToggle from '@/components/LanguageToggle';
 
 const dmSerif = DM_Serif_Display({
   subsets: ['latin', 'latin-ext'],
@@ -18,8 +20,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Lumina V2',
+  title: 'Lumina — Astrology & Celestial Guidance',
   description: 'Premium astrology insights with natal chart precision and daily celestial guidance.',
+  openGraph: {
+    title: 'Lumina — Astrology & Celestial Guidance',
+    description: 'Premium astrology insights with natal chart precision and daily celestial guidance.',
+    url: 'https://luminastrology.com',
+    siteName: 'Lumina',
+    type: 'website',
+  },
 };
 
 export const viewport: Viewport = {
@@ -39,7 +48,11 @@ export default function RootLayout({
         <AppProviders>
           <div className="star-field" aria-hidden="true" />
           <div className="celestial-gradient" aria-hidden="true" />
-          <main className="relative z-10 min-h-screen">{children}</main>
+          <div className="fixed right-3 top-2 z-50 flex items-center gap-2 scale-90 sm:scale-100 sm:right-6 sm:top-6 sm:gap-3">
+            <LanguageToggle />
+            <UserMenu />
+          </div>
+          <main className="relative z-10 min-h-screen pt-14 sm:pt-0">{children}</main>
           <Footer />
         </AppProviders>
       </body>

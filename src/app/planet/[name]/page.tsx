@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import LanguageToggle from '@/components/LanguageToggle';
+// LanguageToggle moved to layout.tsx
 import { useLanguage } from '@/context/LanguageContext';
 import { planetNames, translatePlanet, translateSign } from '@/lib/translations';
 import { getZodiacIcon } from '@/components/icons/ZodiacIcons';
@@ -58,7 +58,7 @@ export default function PlanetPage() {
         <button onClick={() => router.push('/chart')} className="min-h-11 rounded-full px-4 text-sm text-cream hover:text-warmWhite">
           ← {t.back}
         </button>
-        <LanguageToggle />
+        <div className="w-20" />
       </header>
 
       <section className="glass-card p-6 sm:p-8">

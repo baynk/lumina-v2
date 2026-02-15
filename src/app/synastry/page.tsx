@@ -867,7 +867,29 @@ export default function SynastryPage() {
 
       {/* Form */}
       <form onSubmit={submit} className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-        <div className="grid gap-4 lg:grid-cols-2">
+        {/* Partner quick-select (above forms, full width) */}
+        {session?.user && savedPartners.length > 1 && (
+          <section className="glass-card p-4 sm:p-5 mb-4">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wider text-cream/40">
+              {language === 'ru' ? 'Выбрать партнёра' : 'Select saved partner'}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {savedPartners.map((partner) => (
+                <button
+                  key={partner.id}
+                  type="button"
+                  onClick={() => fillPersonBFromPartner(partner)}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-left transition hover:border-lumina-accent/35 hover:bg-white/[0.06]"
+                >
+                  <p className="text-sm font-medium text-warmWhite">{partner.partner_name}</p>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Two forms side-by-side on desktop */}
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
           <PersonCard
             title={t.synastryPersonA}
             subtitle={language === 'ru' ? 'Автозаполнение из профиля' : 'Auto-filled from your profile'}
@@ -878,86 +900,57 @@ export default function SynastryPage() {
             selectLocation={selectLocation}
             t={t}
           />
-          <div className="space-y-4">
-            {/* Show partner selector only when multiple saved partners */}
-            {session?.user && savedPartners.length > 1 && (
-              <section className="glass-card p-4 sm:p-5">
-                <p className="mb-3 text-xs font-medium uppercase tracking-wider text-cream/40">
-                  {language === 'ru' ? 'Выбрать партнёра' : 'Select partner'}
-                </p>
-                <div className="space-y-2">
-                  {savedPartners.map((partner) => {
-                    const place = partner.is_linked
-                      ? (partner.linked_birth_place || partner.partner_birth_place)
-                      : partner.partner_birth_place;
-                    return (
-                      <button
-                        key={partner.id}
-                        type="button"
-                        onClick={() => fillPersonBFromPartner(partner)}
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3 text-left transition hover:border-lumina-accent/35 hover:bg-white/[0.06]"
-                      >
-                        <p className="text-sm font-medium text-warmWhite">{partner.partner_name}</p>
-                        <p className="text-xs text-cream/50">{place || ''}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
+          <PersonCard
+            title={t.synastryPersonB}
+            subtitle={language === 'ru' ? 'Партнёр, друг, коллега — кто угодно' : "Partner, friend, crush — anyone you're curious about"}
+            personKey="B"
+            state={personB}
+            setState={setPersonB}
+            searchLocation={searchLocation}
+            selectLocation={selectLocation}
+            t={t}
+          />
+        </div>
 
-            {/* Connect with code — collapsed behind a link */}
-            {session?.user && (
-              <div className="text-center">
-                {!showConnectCode && (
-                  <button
-                    type="button"
-                    onClick={() => setShowConnectCode(true)}
-                    className="text-xs text-lumina-accent/50 hover:text-lumina-accent/80 transition"
-                  >
-                    {language === 'ru' ? 'Подключить по коду партнёра' : 'Connect with partner code'}
-                  </button>
-                )}
-                {showConnectCode && (
-                  <div className="flex gap-2 mt-1">
-                    <input
-                      className="lumina-input text-center"
-                      value={connectCodeInput}
-                      onChange={(e) => setConnectCodeInput(e.target.value.toUpperCase())}
-                      placeholder="LUNA-XXXX"
-                      autoFocus
-                    />
-                    <button
-                      type="button"
-                      onClick={handleConnectWithCode}
-                      disabled={connectCodeLoading || !connectCodeInput.trim()}
-                      className="lumina-button min-w-20 px-4 disabled:opacity-60"
-                    >
-                      {connectCodeLoading ? '...' : 'OK'}
-                    </button>
-                  </div>
-                )}
-                {connectionsError && <p className="mt-2 text-xs text-rose-300">{connectionsError}</p>}
+        {/* Connect with code — compact, below forms */}
+        {session?.user && (
+          <div className="mt-3 text-center">
+            {!showConnectCode && (
+              <button
+                type="button"
+                onClick={() => setShowConnectCode(true)}
+                className="text-xs text-lumina-accent/50 hover:text-lumina-accent/80 transition"
+              >
+                {language === 'ru' ? 'Подключить по коду партнёра' : 'Connect with partner code'}
+              </button>
+            )}
+            {showConnectCode && (
+              <div className="mx-auto flex max-w-xs gap-2 mt-1">
+                <input
+                  className="lumina-input text-center"
+                  value={connectCodeInput}
+                  onChange={(e) => setConnectCodeInput(e.target.value.toUpperCase())}
+                  placeholder="LUNA-XXXX"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={handleConnectWithCode}
+                  disabled={connectCodeLoading || !connectCodeInput.trim()}
+                  className="lumina-button min-w-20 px-4 disabled:opacity-60"
+                >
+                  {connectCodeLoading ? '...' : 'OK'}
+                </button>
               </div>
             )}
-
-            <PersonCard
-              title={t.synastryPersonB}
-              subtitle={language === 'ru' ? 'Партнёр, друг, коллега — кто угодно' : "Partner, friend, crush — anyone you're curious about"}
-              personKey="B"
-              state={personB}
-              setState={setPersonB}
-              searchLocation={searchLocation}
-              selectLocation={selectLocation}
-              t={t}
-            />
+            {connectionsError && <p className="mt-2 text-xs text-rose-300">{connectionsError}</p>}
           </div>
-        </div>
+        )}
 
         <button
           type="submit"
           disabled={!canSubmit || loading}
-          className="mt-6 w-full rounded-2xl bg-gradient-to-r from-lumina-accent-bright to-lumina-accent px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white shadow-lg shadow-lumina-accent/20 transition hover:shadow-lumina-accent/40 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="mt-6 w-full rounded-2xl bg-gradient-to-r from-lumina-accent-bright to-lumina-accent px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white shadow-lg shadow-lumina-accent/20 transition hover:shadow-lumina-accent/40 disabled:opacity-40 disabled:cursor-not-allowed lg:max-w-md lg:mx-auto"
         >
           {loading ? t.synastryLoading : t.synastryRun}
         </button>

@@ -309,6 +309,7 @@ export default function SynastryPage() {
   const [connectCodeInput, setConnectCodeInput] = useState('');
   const [connectCodeLoading, setConnectCodeLoading] = useState(false);
   const [savePartnerLoading, setSavePartnerLoading] = useState(false);
+  const [partnerSaved, setPartnerSaved] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
@@ -535,14 +536,16 @@ export default function SynastryPage() {
       });
       const payload = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(payload.error || 'failed');
+      setPartnerSaved(true);
       setToastMessage(
         language === 'ru'
-          ? `Сохранено: ${personB.name || 'Партнер'}`
-          : `Saved: ${personB.name || 'Partner'}`
+          ? `✓ Сохранено: ${personB.name || 'Партнер'}`
+          : `✓ Saved: ${personB.name || 'Partner'}`
       );
       await loadConnections();
-    } catch {
-      setError(language === 'ru' ? 'Не удалось сохранить партнера' : 'Unable to save partner');
+    } catch (err) {
+      console.error('Save partner error:', err);
+      setToastMessage(language === 'ru' ? '❌ Не удалось сохранить' : '❌ Unable to save');
     } finally {
       setSavePartnerLoading(false);
     }
@@ -713,12 +716,18 @@ export default function SynastryPage() {
           <button
             type="button"
             onClick={handleSavePartner}
-            disabled={savePartnerLoading}
-            className="mb-6 lumina-button w-full disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={savePartnerLoading || partnerSaved}
+            className={`mb-6 w-full rounded-2xl px-5 py-3.5 text-sm font-medium transition ${
+              partnerSaved
+                ? 'border border-green-500/30 bg-green-500/10 text-green-300 cursor-default'
+                : 'lumina-button disabled:cursor-not-allowed disabled:opacity-60'
+            }`}
           >
             {savePartnerLoading
               ? (language === 'ru' ? 'Сохраняем...' : 'Saving...')
-              : `${language === 'ru' ? 'Сохранить' : 'Save'} ${nameB}`}
+              : partnerSaved
+                ? `✓ ${language === 'ru' ? 'Сохранено' : 'Saved'}`
+                : `${language === 'ru' ? 'Сохранить' : 'Save'} ${nameB}`}
           </button>
         )}
 
@@ -733,7 +742,7 @@ export default function SynastryPage() {
         {/* Back to form */}
         <button
           type="button"
-          onClick={() => setResult(null)}
+          onClick={() => { setResult(null); setPartnerSaved(false); }}
           className="mt-6 w-full rounded-2xl border border-white/10 bg-white/[0.03] py-3 text-sm text-cream/70 transition hover:bg-white/[0.06] hover:text-warmWhite"
         >
           {language === 'ru' ? '← Новый расчёт' : '← New Reading'}

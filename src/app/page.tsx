@@ -316,10 +316,14 @@ export default function LandingPage() {
   };
 
   const handleStartFresh = useCallback(() => {
+    const msg = language === 'ru'
+      ? 'Вы уверены? Текущие данные профиля будут удалены.'
+      : 'Are you sure? Your current profile data will be cleared.';
+    if (!window.confirm(msg)) return;
     clearProfile();
     setExistingProfile(null);
     setShowForm(true);
-  }, []);
+  }, [language]);
 
   const todayFormatted = useMemo(() => {
     const now = new Date();

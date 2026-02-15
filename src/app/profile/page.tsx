@@ -203,7 +203,15 @@ export default function ProfilePage() {
   };
 
   const handleClearAll = () => {
+    const msg = language === 'ru'
+      ? 'Вы уверены? Все ваши данные (профиль, сохранённые партнёры, результаты) будут удалены.'
+      : 'Are you sure? All your data (profile, saved partners, results) will be permanently deleted.';
+    if (!window.confirm(msg)) return;
     clearProfile();
+    try {
+      localStorage.removeItem('lumina_synastry_result');
+      localStorage.removeItem('lumina_synastry_names');
+    } catch {}
     router.replace('/');
   };
 
@@ -429,6 +437,10 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={() => {
+            const msg = language === 'ru'
+              ? 'Это сбросит ваши данные рождения. Продолжить?'
+              : 'This will reset your birth data. Continue?';
+            if (!window.confirm(msg)) return;
             clearProfile();
             router.push('/');
           }}

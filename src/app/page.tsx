@@ -184,7 +184,7 @@ export default function LandingPage() {
       try {
         setSearchingLocation(true);
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`,
+          `/api/geocode?q=${encodeURIComponent(query)}`,
         );
         if (!response.ok) {
           setLocationResults([]);

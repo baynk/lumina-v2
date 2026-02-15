@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ShareCard from '@/components/ShareCard';
 import { useLanguage } from '@/context/LanguageContext';
@@ -234,7 +234,9 @@ function PersonCard({
                 latitude: null,
                 longitude: null,
               }));
-              window.setTimeout(() => searchLocation(query, personKey), 240);
+              const timer = personKey === 'A' ? debounceTimerA : debounceTimerB;
+              if (timer.current) clearTimeout(timer.current);
+              timer.current = setTimeout(() => searchLocation(query, personKey), 350);
             }}
             placeholder={t.searchCityOrPlace}
             required
@@ -304,7 +306,10 @@ export default function SynastryPage() {
     }));
   }, []);
 
-  const searchLocation = async (query: string, target: 'A' | 'B') => {
+  const debounceTimerA = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimerB = useRef<NodeJS.Timeout | null>(null);
+
+  const searchLocation = useCallback(async (query: string, target: 'A' | 'B') => {
     const update = target === 'A' ? setPersonA : setPersonB;
     if (query.trim().length < 2) {
       update((prev) => ({ ...prev, searchResults: [] }));
@@ -312,13 +317,13 @@ export default function SynastryPage() {
     }
     update((prev) => ({ ...prev, searching: true }));
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`);
+      const response = await fetch(`/api/geocode?q=${encodeURIComponent(query.trim())}`);
       const payload = (await response.json()) as LocationResult[];
       update((prev) => ({ ...prev, searchResults: payload, searching: false }));
     } catch {
       update((prev) => ({ ...prev, searchResults: [], searching: false }));
     }
-  };
+  }, []);
 
   const selectLocation = async (item: LocationResult, target: 'A' | 'B') => {
     const update = target === 'A' ? setPersonA : setPersonB;

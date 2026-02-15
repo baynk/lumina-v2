@@ -20,9 +20,9 @@ type BigThree = { sun: string; moon: string; rising: string };
 function getBigThree(birthData: BirthData): BigThree | null {
   try {
     const chart = calculateNatalChart(birthData);
-    const sun = chart.planets.find((p: { name: string }) => p.name === 'Sun')?.sign || '';
-    const moon = chart.planets.find((p: { name: string }) => p.name === 'Moon')?.sign || '';
-    const rising = chart.planets.find((p: { name: string }) => p.name === 'Ascendant')?.sign || chart.houses?.[0]?.sign || '';
+    const sun = chart.planets.find((p: { planet: string }) => p.planet === 'Sun')?.sign || '';
+    const moon = chart.planets.find((p: { planet: string }) => p.planet === 'Moon')?.sign || '';
+    const rising = (chart as unknown as { risingSign?: string }).risingSign || chart.houses?.[0]?.sign || '';
     return { sun, moon, rising };
   } catch {
     return null;
@@ -275,18 +275,23 @@ export default function ProfilePage() {
         <div className="w-20" />
       </header>
 
-      {/* Big Three */}
+      {/* Big Three — Sun, Moon, Rising */}
       {bigThree && (
         <section className="glass-card mb-6 p-5 animate-fadeInUp">
-          <p className="lumina-label mb-3">{language === 'ru' ? 'Ваша большая тройка' : 'Your Big Three'}</p>
+          <p className="lumina-label mb-1">{language === 'ru' ? 'Ваш знак' : 'Your Signs'}</p>
+          <p className="mb-4 text-xs text-cream/40">
+            {language === 'ru'
+              ? 'Солнце — кто вы. Луна — что вы чувствуете. Восходящий — как вас видят.'
+              : 'Sun — who you are. Moon — how you feel. Rising — how others see you.'}
+          </p>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: language === 'ru' ? 'Солнце' : 'Sun', sign: bigThree.sun },
-              { label: language === 'ru' ? 'Луна' : 'Moon', sign: bigThree.moon },
-              { label: language === 'ru' ? 'Восходящий' : 'Rising', sign: bigThree.rising },
+              { label: language === 'ru' ? 'Солнце' : 'Sun', sign: bigThree.sun, icon: '☀️' },
+              { label: language === 'ru' ? 'Луна' : 'Moon', sign: bigThree.moon, icon: '🌙' },
+              { label: language === 'ru' ? 'Восходящий' : 'Rising', sign: bigThree.rising, icon: '⬆️' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center">
-                <p className="text-2xl">{ZODIAC_SYMBOLS[item.sign] || '✦'}</p>
+                <p className="text-lg">{ZODIAC_SYMBOLS[item.sign] || item.icon}</p>
                 <p className="mt-1 text-sm font-medium text-warmWhite">{language === 'ru' ? translateSign(item.sign, 'ru') : item.sign}</p>
                 <p className="text-[10px] uppercase tracking-wider text-cream/40">{item.label}</p>
               </div>
@@ -320,12 +325,12 @@ export default function ProfilePage() {
               {partnerBigThree && (
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   {[
-                    { label: language === 'ru' ? 'Солнце' : 'Sun', sign: partnerBigThree.sun },
-                    { label: language === 'ru' ? 'Луна' : 'Moon', sign: partnerBigThree.moon },
-                    { label: language === 'ru' ? 'Восходящий' : 'Rising', sign: partnerBigThree.rising },
+                    { label: language === 'ru' ? 'Солнце' : 'Sun', sign: partnerBigThree.sun, icon: '☀️' },
+                    { label: language === 'ru' ? 'Луна' : 'Moon', sign: partnerBigThree.moon, icon: '🌙' },
+                    { label: language === 'ru' ? 'Восходящий' : 'Rising', sign: partnerBigThree.rising, icon: '⬆️' },
                   ].map((item) => (
                     <div key={item.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-2.5 text-center">
-                      <p className="text-xl">{ZODIAC_SYMBOLS[item.sign] || '✦'}</p>
+                      <p className="text-lg">{ZODIAC_SYMBOLS[item.sign] || item.icon}</p>
                       <p className="mt-0.5 text-xs font-medium text-warmWhite">{language === 'ru' ? translateSign(item.sign, 'ru') : item.sign}</p>
                       <p className="text-[9px] uppercase tracking-wider text-cream/40">{item.label}</p>
                     </div>

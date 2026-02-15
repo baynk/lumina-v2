@@ -36,44 +36,54 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
     }
   };
 
-  const share = async () => {
-    setStatus('Creating...');
+  // Pre-render image on mount / when data changes so share is instant
+  const [readyBlob, setReadyBlob] = useState<Blob | null>(null);
+  const preRender = async () => {
+    // Small delay to ensure card is painted
+    await new Promise((r) => setTimeout(r, 300));
     const blob = await generateImage();
-    if (!blob) { setStatus('Error'); setTimeout(() => setStatus(''), 2000); return; }
+    setReadyBlob(blob);
+  };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const mounted = useRef(false);
+  if (!mounted.current && typeof window !== 'undefined') {
+    mounted.current = true;
+    setTimeout(preRender, 500);
+  }
+
+  const share = async () => {
+    // If image not ready yet, generate now and use two-tap flow
+    let blob = readyBlob;
+    if (!blob) {
+      setStatus('Preparing image...');
+      blob = await generateImage();
+      if (blob) setReadyBlob(blob);
+      setStatus('Tap Share again');
+      setTimeout(() => setStatus(''), 3000);
+      return;
+    }
+
+    // This runs synchronously from user tap — gesture chain intact
     const file = new File([blob], 'lumina-compatibility.png', { type: 'image/png' });
-    const shareText = `✦ ${title}\n${bullets.join(' · ')}`;
+    const shareText = `✦ ${title}\n${bullets.join(' · ')}\nluminastrology.com`;
 
-    // Attempt 1: share with files + text + url (full share sheet)
     if (navigator.share) {
-      const shareData: ShareData = {
-        files: [file],
-        title: 'Lumina',
-        text: shareText,
-        url: 'https://luminastrology.com',
-      };
-
-      // Check if this device supports file sharing
-      const canShareFiles = typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] });
-
-      if (canShareFiles) {
-        try {
-          await navigator.share(shareData);
+      try {
+        // Try with file first
+        const canFiles = typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] });
+        if (canFiles) {
+          await navigator.share({ files: [file], title: 'Lumina', text: shareText });
           setStatus('');
           return;
-        } catch (e) {
-          if ((e as Error).name === 'AbortError') { setStatus(''); return; }
         }
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') { setStatus(''); return; }
       }
 
-      // Attempt 2: share text + url only (still opens share sheet on iOS!)
+      // Text + URL share (still opens native share sheet on iOS)
       try {
         await navigator.share({ title: 'Lumina', text: shareText, url: 'https://luminastrology.com' });
-        // Also save image so they have it in downloads
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'lumina-compatibility.png'; a.click();
-        URL.revokeObjectURL(url);
         setStatus('');
         return;
       } catch (e) {
@@ -81,18 +91,12 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
       }
     }
 
-    // Attempt 3: save image + copy text
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'lumina-compatibility.png'; a.click();
-    URL.revokeObjectURL(url);
+    // Absolute fallback
     try {
-      await navigator.clipboard.writeText(`${shareText}\nluminastrology.com`);
-      setStatus('Image saved + text copied ✓');
-    } catch {
-      setStatus('Image saved ✓');
-    }
-    setTimeout(() => setStatus(''), 3000);
+      await navigator.clipboard.writeText(shareText);
+      setStatus('Copied ✓');
+    } catch { setStatus(''); }
+    setTimeout(() => setStatus(''), 2500);
   };
 
   const download = async () => {

@@ -640,6 +640,11 @@ export default function SynastryPage() {
     try { cachedNames = JSON.parse(localStorage.getItem('lumina_synastry_names') || '{}'); } catch {}
     const nameA = personA.name || cachedNames.a || t.synastryPersonA;
     const nameB = personB.name || cachedNames.b || t.synastryPersonB;
+
+    // Check if partner B is already saved
+    const isAlreadySaved = partnerSaved || savedPartners.some(
+      (p) => p.partner_name?.toLowerCase().trim() === nameB.toLowerCase().trim()
+    );
     const sunA = result.synastry.personAChart.planets.find((p) => p.planet === 'Sun');
     const moonA = result.synastry.personAChart.planets.find((p) => p.planet === 'Moon');
     const sunB = result.synastry.personBChart.planets.find((p) => p.planet === 'Sun');
@@ -754,22 +759,16 @@ export default function SynastryPage() {
           </div>
         </section>
 
-        {session?.user && (
+        {session?.user && !isAlreadySaved && (
           <button
             type="button"
             onClick={handleSavePartner}
-            disabled={savePartnerLoading || partnerSaved}
-            className={`mb-6 w-full rounded-2xl px-5 py-3.5 text-sm font-medium transition ${
-              partnerSaved
-                ? 'border border-green-500/30 bg-green-500/10 text-green-300 cursor-default'
-                : 'lumina-button disabled:cursor-not-allowed disabled:opacity-60'
-            }`}
+            disabled={savePartnerLoading}
+            className="mb-6 w-full rounded-2xl px-5 py-3.5 text-sm font-medium transition lumina-button disabled:cursor-not-allowed disabled:opacity-60"
           >
             {savePartnerLoading
               ? (language === 'ru' ? 'Сохраняем...' : 'Saving...')
-              : partnerSaved
-                ? `✓ ${language === 'ru' ? 'Сохранено' : 'Saved'}`
-                : `${language === 'ru' ? 'Сохранить' : 'Save'} ${nameB}`}
+              : `${language === 'ru' ? 'Сохранить' : 'Save'} ${nameB}`}
           </button>
         )}
 

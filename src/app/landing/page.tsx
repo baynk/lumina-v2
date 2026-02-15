@@ -281,8 +281,8 @@ export default function LandingPage() {
             backgroundPosition: 'center',
           }}
         />
-        {/* Gradient overlay for depth */}
-        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[#080C1F]/60 via-transparent to-[#080C1F]" />
+        {/* Gradient overlay — extra tall to bleed into next section */}
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[#080C1F]/70 via-[#080C1F]/20 to-[#080C1F]" style={{ bottom: '-20vh' }} />
 
         <div className="relative z-10 max-w-2xl">
           {/* Zodiac wheel */}
@@ -326,7 +326,7 @@ export default function LandingPage() {
       </section>
 
       {/* ═══ CREDIBILITY ═══ */}
-      <section className="relative z-10 border-y border-[#A78BFA]/[0.06]">
+      <section className="relative z-10">
         <div className="mx-auto max-w-4xl px-4 py-14 grid grid-cols-1 sm:grid-cols-3 gap-10 text-center">
           {[
             { a: t.cred1, b: t.cred1b, d: t.cred1d },
@@ -351,7 +351,7 @@ export default function LandingPage() {
         { tag: t.ben2Tag, title: t.ben2Title, p: t.ben2P },
         { tag: t.ben3Tag, title: t.ben3Title, p: t.ben3P },
       ].map((ben, i) => (
-        <section key={i} className={`relative z-10 py-20 sm:py-24 px-4 ${i % 2 === 1 ? 'bg-white/[0.01]' : ''}`}>
+        <section key={i} className={`relative z-10 py-20 sm:py-24 px-4 ${i % 2 === 1 ? '' : ''}`}>
           <div className="mx-auto max-w-2xl">
             <p className="text-[10px] tracking-[0.3em] uppercase text-[#A78BFA]/40 font-medium">{ben.tag}</p>
             <h2 className="mt-3 font-heading text-2xl sm:text-3xl text-cream/90 leading-snug">
@@ -395,7 +395,7 @@ export default function LandingPage() {
       </section>
 
       {/* ═══ PRECISION ═══ */}
-      <section className="relative z-10 py-20 px-4 bg-white/[0.01]">
+      <section className="relative z-10 py-20 px-4 ">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-[10px] tracking-[0.3em] uppercase text-[#A78BFA]/30">✦</p>
           <h2 className="mt-4 font-heading text-2xl text-cream/70">{t.precTitle}</h2>
@@ -403,33 +403,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ CONSULTATIONS ═══ */}
-      <section className="relative z-10 py-24 px-4">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="font-heading text-3xl text-cream/80">{t.consultTitle}</h2>
-          <p className="mx-auto mt-4 max-w-lg text-[14px] leading-relaxed text-cream/35">{t.consultP}</p>
+      {/* ═══ MID-PAGE CTA ═══ */}
+      <section className="relative z-10 py-20 px-5 text-center">
+        <div className="mx-auto max-w-md">
+          <button
+            onClick={goToApp}
+            className="w-full rounded-full bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6] px-10 py-4 text-[15px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
+          >
+            {t.heroCta}
+          </button>
+          <p className="mt-3 text-[11px] text-cream/25 tracking-wider">{t.heroSub}</p>
+        </div>
+      </section>
 
-          <div className="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {[
-              { t: t.consultWritten, p: t.consultWrittenPrice, d: t.consultWrittenD },
-              { t: t.consultVideo, p: t.consultVideoPrice, d: t.consultVideoD },
-              { t: t.consultDeep, p: t.consultDeepPrice, d: t.consultDeepD },
-            ].map((tier) => (
-              <button
-                key={tier.t}
-                onClick={goToConsultation}
-                className="group rounded-2xl border border-white/[0.05] bg-white/[0.02] p-7 text-center transition hover:border-[#A78BFA]/20 hover:bg-white/[0.03]"
-              >
-                <p className="text-3xl font-heading text-[#A78BFA]/60 group-hover:text-[#A78BFA]/80 transition">{tier.p}</p>
-                <p className="mt-3 text-[13px] font-medium text-cream/70">{tier.t}</p>
-                <p className="mt-2 text-[11px] text-cream/30 leading-relaxed">{tier.d}</p>
-              </button>
-            ))}
-          </div>
-
+      {/* ═══ PRACTITIONER (soft mention, not a hard sell) ═══ */}
+      <section className="relative z-10 py-16 px-4">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-[13px] text-cream/30 leading-relaxed">{t.consultP}</p>
           <button
             onClick={goToConsultation}
-            className="mt-8 text-[12px] text-[#A78BFA]/40 hover:text-[#A78BFA]/70 transition tracking-wider"
+            className="mt-4 text-[12px] text-[#A78BFA]/40 hover:text-[#A78BFA]/70 transition tracking-wider"
           >
             {t.consultCta} →
           </button>
@@ -437,10 +430,8 @@ export default function LandingPage() {
       </section>
 
       {/* ═══ FINAL CTA ═══ */}
-      <section className="relative z-10 py-32 px-4 text-center">
-        {/* Subtle glow */}
+      <section className="relative z-10 py-28 px-4 text-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#A78BFA]/[0.02] blur-[80px] pointer-events-none" />
-
         <div className="relative">
           <p className="font-heading text-xl sm:text-2xl text-cream/40 italic max-w-lg mx-auto leading-relaxed">
             {t.finalTitle}
@@ -448,7 +439,7 @@ export default function LandingPage() {
           <p className="mt-4 text-[14px] text-cream/25">{t.finalP}</p>
           <button
             onClick={goToApp}
-            className="mt-10 rounded-full bg-gradient-to-r from-[#A78BFA]/90 to-[#8B5CF6]/90 px-10 py-4 text-[15px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
+            className="mt-10 rounded-full bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6] px-10 py-4 text-[15px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
           >
             {t.finalCta}
           </button>
@@ -456,9 +447,9 @@ export default function LandingPage() {
       </section>
 
       {/* ═══ FOOTER ═══ */}
-      <footer className="relative z-10 border-t border-white/[0.03] py-10 text-center">
-        <p className="font-heading text-lg tracking-[0.15em] text-[#A78BFA]/20">LUMINA</p>
-        <p className="mt-2 text-[10px] text-cream/15 tracking-wider">JPL DE421 · Equal House System</p>
+      <footer className="relative z-10 py-10 text-center">
+        <p className="font-heading text-lg tracking-[0.15em] text-[#A78BFA]/15">LUMINA</p>
+        <p className="mt-2 text-[10px] text-cream/10 tracking-wider">JPL DE421 · Equal House System</p>
       </footer>
     </div>
   );

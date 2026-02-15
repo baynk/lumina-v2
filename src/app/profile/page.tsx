@@ -240,41 +240,25 @@ export default function ProfilePage() {
 
   const [shareStatus, setShareStatus] = useState('');
   const shareCompatCard = async () => {
-    if (!compatCardRef.current) return;
-    setShareStatus(language === 'ru' ? 'Создаём...' : 'Creating...');
-    try {
-      const el = compatCardRef.current;
-      const canvas = await html2canvas(el, {
-        backgroundColor: '#0f1338',
-        scale: 2,
-        width: el.scrollWidth,
-        height: el.scrollHeight,
-        useCORS: true,
-      });
-      const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/png', 1));
-      if (!blob) { setShareStatus(''); return; }
-      const file = new File([blob], 'lumina-compatibility.png', { type: 'image/png' });
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ title: 'Lumina', files: [file] });
+    const mySign = ZODIAC_SYMBOLS[bigThree?.sun || ''] || '';
+    const theirSign = ZODIAC_SYMBOLS[partnerBigThree?.sun || ''] || '';
+    const text = `${mySign} ${displayName} + ${partner?.partner_name} ${theirSign}\n✦ luminastrology.com`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Lumina', text, url: 'https://luminastrology.com/synastry' });
         setShareStatus('');
-      } else {
-        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-        setShareStatus(language === 'ru' ? '✓ Скопировано' : '✓ Copied');
-        setTimeout(() => setShareStatus(''), 2000);
-      }
-    } catch (err) {
-      console.error('Share error:', err);
-      // Fallback: share as text
-      const text = `${displayName} ${ZODIAC_SYMBOLS[bigThree?.sun || ''] || ''} + ${partner?.partner_name} ${ZODIAC_SYMBOLS[partnerBigThree?.sun || ''] || ''} — luminastrology.com`;
-      if (navigator.share) {
-        await navigator.share({ title: 'Lumina', text });
-        setShareStatus('');
-      } else {
-        await navigator.clipboard.writeText(text);
-        setShareStatus(language === 'ru' ? '✓ Скопировано' : '✓ Copied');
-        setTimeout(() => setShareStatus(''), 2000);
+        return;
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') { setShareStatus(''); return; }
       }
     }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setShareStatus(language === 'ru' ? '✓ Скопировано' : '✓ Copied');
+    } catch { setShareStatus(''); }
+    setTimeout(() => setShareStatus(''), 2000);
   };
 
   if (!profile) {

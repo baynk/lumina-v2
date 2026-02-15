@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import RadarChart from '@/components/RadarChart';
 
 // Types (same as synastry page)
 type SynastryNarrative = {
@@ -133,7 +134,7 @@ export default function PublicCompatibilityPage() {
   const risingB = result.synastry.personBChart.risingSign;
 
   return (
-    <div className="min-h-screen bg-[#080c1f]">
+    <div className="min-h-screen" style={{ background: '#080c1f' }}>
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
         {/* Header */}
         <div className="mb-10 text-center">
@@ -185,6 +186,12 @@ export default function PublicCompatibilityPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Radar Chart */}
+        <section className="glass-card mb-6 p-6">
+          <p className="text-center text-xs uppercase tracking-[0.15em] text-cream/50 mb-4">Compatibility Wheel</p>
+          <RadarChart values={scoreItems.map((s) => ({ label: s.label, value: s.value }))} />
         </section>
 
         {/* Score Bars */}

@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 're
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import ShareCard from '@/components/ShareCard';
+import RadarChart from '@/components/RadarChart';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile } from '@/lib/profile';
 import { translateAspectType, translatePlanet, translateSign } from '@/lib/translations';
@@ -80,71 +81,7 @@ const initialPerson = (): PersonFormState => ({
 });
 
 /* ─── Radar Chart ─── */
-function RadarChart({ values }: { values: { label: string; value: number }[] }) {
-  const center = 140;
-  const radius = 105;
-  const points = values
-    .map((item, index) => {
-      const angle = (Math.PI * 2 * index) / values.length - Math.PI / 2;
-      const x = center + Math.cos(angle) * radius * (item.value / 100);
-      const y = center + Math.sin(angle) * radius * (item.value / 100);
-      return `${x},${y}`;
-    })
-    .join(' ');
-
-  return (
-    <svg viewBox="0 0 280 280" className="mx-auto w-full max-w-[320px]">
-      {/* Grid rings */}
-      {[25, 50, 75, 100].map((level) => (
-        <polygon
-          key={level}
-          points={values
-            .map((_, index) => {
-              const angle = (Math.PI * 2 * index) / values.length - Math.PI / 2;
-              const x = center + Math.cos(angle) * radius * (level / 100);
-              const y = center + Math.sin(angle) * radius * (level / 100);
-              return `${x},${y}`;
-            })
-            .join(' ')}
-          fill="none"
-          stroke="rgba(255,255,255,0.08)"
-          strokeWidth="1"
-        />
-      ))}
-      {/* Axis lines + labels */}
-      {values.map((item, index) => {
-        const angle = (Math.PI * 2 * index) / values.length - Math.PI / 2;
-        const x = center + Math.cos(angle) * radius;
-        const y = center + Math.sin(angle) * radius;
-        const lx = center + Math.cos(angle) * (radius + 22);
-        const ly = center + Math.sin(angle) * (radius + 22);
-        return (
-          <g key={item.label}>
-            <line x1={center} y1={center} x2={x} y2={y} stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-            <text x={lx} y={ly} fill="rgba(245,240,235,0.7)" fontSize="10" fontWeight="500" textAnchor="middle" dominantBaseline="middle">
-              {item.label}
-            </text>
-          </g>
-        );
-      })}
-      {/* Filled area */}
-      <polygon points={points} fill="url(#radarGradient)" stroke="rgba(196,181,253,0.8)" strokeWidth="2" />
-      {/* Dots on vertices */}
-      {values.map((item, index) => {
-        const angle = (Math.PI * 2 * index) / values.length - Math.PI / 2;
-        const x = center + Math.cos(angle) * radius * (item.value / 100);
-        const y = center + Math.sin(angle) * radius * (item.value / 100);
-        return <circle key={item.label} cx={x} cy={y} r="3.5" fill="#c4b5fd" stroke="#080c1f" strokeWidth="1.5" />;
-      })}
-      <defs>
-        <linearGradient id="radarGradient" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="rgba(167,139,250,0.3)" />
-          <stop offset="100%" stopColor="rgba(196,181,253,0.15)" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
+// RadarChart extracted to @/components/RadarChart
 
 /* ─── Benefit Card ─── */
 function BenefitCard({ icon, text }: { icon: string; text: string }) {
@@ -671,22 +608,32 @@ export default function SynastryPage() {
     return '';
   };
 
+  const [shareLinkStatus, setShareLinkStatus] = useState('');
   const handleShareLink = async () => {
     const url = shareUrl || await generateShareUrl();
     if (!url) return;
+    // Always copy to clipboard first
+    try { await navigator.clipboard.writeText(url); } catch {}
     if (navigator.share) {
       try {
         let cachedNames = { a: '', b: '' };
         try { cachedNames = JSON.parse(localStorage.getItem('lumina_synastry_names') || '{}'); } catch {}
-        const nameA = personA.name || cachedNames.a || '';
-        const nameB = personB.name || cachedNames.b || '';
-        await navigator.share({ title: 'Lumina Compatibility', text: `✦ ${nameA} & ${nameB}`, url });
+        const nA = personA.name || cachedNames.a || '';
+        const nB = personB.name || cachedNames.b || '';
+        await navigator.share({ title: 'Lumina Compatibility', text: `✦ ${nA} & ${nB}`, url });
+        setShareLinkStatus(language === 'ru' ? '✓ Ссылка скопирована' : '✓ Link copied');
+        setTimeout(() => setShareLinkStatus(''), 3000);
         return;
-      } catch (e) { if ((e as Error).name === 'AbortError') return; }
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') {
+          setShareLinkStatus(language === 'ru' ? '✓ Ссылка скопирована' : '✓ Link copied');
+          setTimeout(() => setShareLinkStatus(''), 3000);
+          return;
+        }
+      }
     }
-    await navigator.clipboard.writeText(url);
-    setToastMessage(language === 'ru' ? 'Ссылка скопирована ✓' : 'Link copied ✓');
-    setTimeout(() => setToastMessage(''), 2500);
+    setShareLinkStatus(language === 'ru' ? '✓ Ссылка скопирована' : '✓ Link copied');
+    setTimeout(() => setShareLinkStatus(''), 3000);
   };
 
   const sections: { key: keyof SynastryNarrative; title: string; icon: string; text: string }[] = result
@@ -854,11 +801,13 @@ export default function SynastryPage() {
           type="button"
           onClick={handleShareLink}
           disabled={shareLinkLoading}
-          className="mb-4 w-full rounded-2xl border border-purple-400/20 bg-purple-400/[0.06] py-3.5 text-sm font-medium text-purple-300 transition hover:bg-purple-400/10 disabled:opacity-50"
+          className={`mb-4 w-full rounded-2xl border py-3.5 text-sm font-medium transition disabled:opacity-50 ${
+            shareLinkStatus ? 'border-green-400/30 bg-green-400/[0.06] text-green-300' : 'border-purple-400/20 bg-purple-400/[0.06] text-purple-300 hover:bg-purple-400/10'
+          }`}
         >
           {shareLinkLoading
             ? (language === 'ru' ? 'Создаём ссылку...' : 'Creating link...')
-            : (language === 'ru' ? '🔗 Поделиться ссылкой' : '🔗 Share Link')}
+            : shareLinkStatus || (language === 'ru' ? '🔗 Поделиться ссылкой' : '🔗 Share Link')}
         </button>
         {shareUrl && (
           <p className="mb-4 -mt-2 text-center text-[11px] text-cream/30 break-all">{shareUrl}</p>

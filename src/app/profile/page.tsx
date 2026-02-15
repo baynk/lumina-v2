@@ -238,19 +238,43 @@ export default function ProfilePage() {
     }
   };
 
+  const [shareStatus, setShareStatus] = useState('');
   const shareCompatCard = async () => {
     if (!compatCardRef.current) return;
+    setShareStatus(language === 'ru' ? 'Создаём...' : 'Creating...');
     try {
-      const canvas = await html2canvas(compatCardRef.current, { backgroundColor: '#080c1f', scale: 2 });
+      const el = compatCardRef.current;
+      const canvas = await html2canvas(el, {
+        backgroundColor: '#0f1338',
+        scale: 2,
+        width: el.scrollWidth,
+        height: el.scrollHeight,
+        useCORS: true,
+      });
       const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/png', 1));
-      if (!blob) return;
+      if (!blob) { setShareStatus(''); return; }
       const file = new File([blob], 'lumina-compatibility.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ title: 'Lumina', files: [file] });
+        setShareStatus('');
       } else {
         await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        setShareStatus(language === 'ru' ? '✓ Скопировано' : '✓ Copied');
+        setTimeout(() => setShareStatus(''), 2000);
       }
-    } catch { /* silent */ }
+    } catch (err) {
+      console.error('Share error:', err);
+      // Fallback: share as text
+      const text = `${displayName} ${ZODIAC_SYMBOLS[bigThree?.sun || ''] || ''} + ${partner?.partner_name} ${ZODIAC_SYMBOLS[partnerBigThree?.sun || ''] || ''} — luminastrology.com`;
+      if (navigator.share) {
+        await navigator.share({ title: 'Lumina', text });
+        setShareStatus('');
+      } else {
+        await navigator.clipboard.writeText(text);
+        setShareStatus(language === 'ru' ? '✓ Скопировано' : '✓ Copied');
+        setTimeout(() => setShareStatus(''), 2000);
+      }
+    }
   };
 
   if (!profile) {
@@ -367,9 +391,10 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={shareCompatCard}
-                    className="mt-3 w-full rounded-xl border border-white/10 bg-white/[0.03] py-2.5 text-xs text-cream/60 hover:text-warmWhite hover:bg-white/[0.06] transition"
+                    disabled={!!shareStatus && shareStatus.includes('...')}
+                    className="mt-3 w-full rounded-xl border border-white/10 bg-white/[0.03] py-2.5 text-xs text-cream/60 hover:text-warmWhite hover:bg-white/[0.06] transition disabled:opacity-50"
                   >
-                    {language === 'ru' ? '📤 Поделиться' : '📤 Share'}
+                    {shareStatus || (language === 'ru' ? '📤 Поделиться' : '📤 Share')}
                   </button>
                 </>
               )}

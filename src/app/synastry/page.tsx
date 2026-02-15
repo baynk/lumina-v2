@@ -301,7 +301,13 @@ export default function SynastryPage() {
   const [personB, setPersonB] = useState<PersonFormState>(initialPerson);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [result, setResult] = useState<SynastryResponse | null>(null);
+  const [result, setResult] = useState<SynastryResponse | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const cached = localStorage.getItem('lumina_synastry_result');
+      return cached ? JSON.parse(cached) : null;
+    } catch { return null; }
+  });
   const [openSection, setOpenSection] = useState<keyof SynastryNarrative>('overallConnection');
   const [savedPartners, setSavedPartners] = useState<SavedPartner[]>([]);
   const [connectionsLoading, setConnectionsLoading] = useState(false);
@@ -595,6 +601,10 @@ export default function SynastryPage() {
       if (!response.ok) throw new Error('failed');
       const payload = (await response.json()) as SynastryResponse;
       setResult(payload);
+      try {
+        localStorage.setItem('lumina_synastry_result', JSON.stringify(payload));
+        localStorage.setItem('lumina_synastry_names', JSON.stringify({ a: personA.name, b: personB.name }));
+      } catch {}
     } catch {
       setError(t.synastryError);
     } finally {
@@ -626,8 +636,10 @@ export default function SynastryPage() {
 
   // ─── RESULTS VIEW ───
   if (result) {
-    const nameA = personA.name || t.synastryPersonA;
-    const nameB = personB.name || t.synastryPersonB;
+    let cachedNames = { a: '', b: '' };
+    try { cachedNames = JSON.parse(localStorage.getItem('lumina_synastry_names') || '{}'); } catch {}
+    const nameA = personA.name || cachedNames.a || t.synastryPersonA;
+    const nameB = personB.name || cachedNames.b || t.synastryPersonB;
     const sunA = result.synastry.personAChart.planets.find((p) => p.planet === 'Sun');
     const moonA = result.synastry.personAChart.planets.find((p) => p.planet === 'Moon');
     const sunB = result.synastry.personBChart.planets.find((p) => p.planet === 'Sun');
@@ -772,7 +784,7 @@ export default function SynastryPage() {
         {/* Back to form */}
         <button
           type="button"
-          onClick={() => { setResult(null); setPartnerSaved(false); }}
+          onClick={() => { setResult(null); setPartnerSaved(false); try { localStorage.removeItem('lumina_synastry_result'); localStorage.removeItem('lumina_synastry_names'); } catch {} }}
           className="mt-6 w-full rounded-2xl border border-white/10 bg-white/[0.03] py-3 text-sm text-cream/70 transition hover:bg-white/[0.06] hover:text-warmWhite"
         >
           {language === 'ru' ? '← Новый расчёт' : '← New Reading'}

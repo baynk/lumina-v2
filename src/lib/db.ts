@@ -100,6 +100,19 @@ export async function initDB() {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_partner_connections_pair
     ON partner_connections(user_id, COALESCE(partner_user_id, partner_name))
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS synastry_results (
+      id TEXT PRIMARY KEY,
+      user_id TEXT REFERENCES users(id),
+      person_a_name TEXT NOT NULL,
+      person_b_name TEXT NOT NULL,
+      person_a_sun TEXT,
+      person_b_sun TEXT,
+      overall_score INTEGER,
+      result_json JSONB NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )
+  `;
 }
 
 // Get or create user profile from NextAuth session
@@ -449,4 +462,37 @@ export async function deletePartnerConnection(userId: string, connectionId: numb
     RETURNING id
   `;
   return result.rows.length > 0;
+}
+
+// ─── Synastry Results ───
+
+function generateShortId(): string {
+  const chars = 'abcdefghijkmnpqrstuvwxyz23456789'; // no ambiguous chars
+  let id = '';
+  for (let i = 0; i < 8; i++) id += chars[Math.floor(Math.random() * chars.length)];
+  return id;
+}
+
+export async function saveSynastryResult(
+  userId: string | null,
+  personAName: string,
+  personBName: string,
+  personASun: string,
+  personBSun: string,
+  overallScore: number,
+  resultJson: unknown,
+) {
+  const id = generateShortId();
+  await sql`
+    INSERT INTO synastry_results (id, user_id, person_a_name, person_b_name, person_a_sun, person_b_sun, overall_score, result_json)
+    VALUES (${id}, ${userId}, ${personAName}, ${personBName}, ${personASun}, ${personBSun}, ${overallScore}, ${JSON.stringify(resultJson)})
+  `;
+  return id;
+}
+
+export async function getSynastryResult(id: string) {
+  const result = await sql`
+    SELECT * FROM synastry_results WHERE id = ${id}
+  `;
+  return result.rows[0] || null;
 }

@@ -250,11 +250,12 @@ export default function ProfilePage() {
   const shareCompatCard = async () => {
     const mySign = ZODIAC_SYMBOLS[bigThree?.sun || ''] || '';
     const theirSign = ZODIAC_SYMBOLS[partnerBigThree?.sun || ''] || '';
-    const text = `${mySign} ${displayName} + ${partner?.partner_name} ${theirSign}\n✦ luminastrology.com`;
+    const shareUrl = typeof window !== 'undefined' ? localStorage.getItem('lumina_synastry_share_url') || 'https://luminastrology.com/synastry' : 'https://luminastrology.com/synastry';
+    const text = `${mySign} ${displayName} & ${partner?.partner_name} ${theirSign} — See our compatibility:`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Lumina', text, url: 'https://luminastrology.com/synastry' });
+        await navigator.share({ title: 'Lumina Compatibility', text, url: shareUrl });
         setShareStatus('');
         return;
       } catch (e) {
@@ -263,7 +264,7 @@ export default function ProfilePage() {
     }
 
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(`${text}\n${shareUrl}`);
       setShareStatus(language === 'ru' ? '✓ Скопировано' : '✓ Copied');
     } catch { setShareStatus(''); }
     setTimeout(() => setShareStatus(''), 2000);

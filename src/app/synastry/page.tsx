@@ -605,6 +605,27 @@ export default function SynastryPage() {
         localStorage.setItem('lumina_synastry_result', JSON.stringify(payload));
         localStorage.setItem('lumina_synastry_names', JSON.stringify({ a: personA.name, b: personB.name }));
       } catch {}
+      // Save result to DB for shareable URL
+      try {
+        const sunA = payload.synastry.personAChart.planets.find((p: { planet: string }) => p.planet === 'Sun')?.sign || '';
+        const sunB = payload.synastry.personBChart.planets.find((p: { planet: string }) => p.planet === 'Sun')?.sign || '';
+        const saveRes = await fetch('/api/synastry-result', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            personAName: personA.name,
+            personBName: personB.name,
+            personASun: sunA,
+            personBSun: sunB,
+            overallScore: payload.synastry.categoryScores.overallConnection,
+            result: payload,
+          }),
+        });
+        if (saveRes.ok) {
+          const { id: resultId } = await saveRes.json();
+          localStorage.setItem('lumina_synastry_share_url', `https://luminastrology.com/compatibility/${resultId}`);
+        }
+      } catch {}
     } catch {
       setError(t.synastryError);
     } finally {
@@ -775,9 +796,10 @@ export default function SynastryPage() {
         {/* Share Card */}
         <ShareCard
           type="synastry-summary"
-          title={language === 'ru' ? `${nameA} & ${nameB}` : `${nameA} & ${nameB}`}
+          title={`${nameA} & ${nameB}`}
           subtitle={result.interpretation.overallConnection}
           bullets={radarValues.map((v) => `${v.label}: ${v.value}%`)}
+          shareUrl={typeof window !== 'undefined' ? localStorage.getItem('lumina_synastry_share_url') || undefined : undefined}
         />
 
         {/* Back to form */}

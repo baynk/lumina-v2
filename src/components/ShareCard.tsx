@@ -10,9 +10,10 @@ type ShareCardProps = {
   subtitle: string;
   bullets: string[];
   cta?: string;
+  shareUrl?: string;
 };
 
-export default function ShareCard({ type, title, subtitle, bullets, cta = 'luminastrology.com' }: ShareCardProps) {
+export default function ShareCard({ type, title, subtitle, bullets, cta = 'luminastrology.com', shareUrl }: ShareCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [status, setStatus] = useState('');
@@ -66,7 +67,8 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
 
     // This runs synchronously from user tap — gesture chain intact
     const file = new File([blob], 'lumina-compatibility.png', { type: 'image/png' });
-    const shareText = `✦ ${title}\n${bullets.join(' · ')}\nluminastrology.com`;
+    const url = shareUrl || 'https://luminastrology.com/synastry';
+    const shareText = `✦ ${title}\n${bullets.join(' · ')}`;
 
     if (navigator.share) {
       try {
@@ -83,7 +85,7 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
 
       // Text + URL share (still opens native share sheet on iOS)
       try {
-        await navigator.share({ title: 'Lumina', text: shareText, url: 'https://luminastrology.com' });
+        await navigator.share({ title: 'Lumina', text: shareText, url });
         setStatus('');
         return;
       } catch (e) {
@@ -93,7 +95,7 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
 
     // Absolute fallback
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(`${shareText}\n${url}`);
       setStatus('Copied ✓');
     } catch { setStatus(''); }
     setTimeout(() => setStatus(''), 2500);

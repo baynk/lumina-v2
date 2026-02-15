@@ -288,22 +288,45 @@ export default function SynastryPage() {
   }, []);
 
   useEffect(() => {
+    const applyProfile = (name: string, birthData: { day: number; month: number; year: number; hour: number; minute: number; latitude: number; longitude: number; timezone: string }, locationName: string) => {
+      setPersonA((prev) => ({
+        ...prev,
+        name: name || '',
+        day: String(birthData.day).padStart(2, '0'),
+        month: String(birthData.month + 1).padStart(2, '0'),
+        year: String(birthData.year),
+        hour: String(birthData.hour).padStart(2, '0'),
+        minute: String(birthData.minute).padStart(2, '0'),
+        locationQuery: locationName,
+        selectedLocationName: locationName,
+        latitude: birthData.latitude,
+        longitude: birthData.longitude,
+        timezone: birthData.timezone,
+      }));
+    };
+
+    // Try localStorage first
     const profile = loadProfile();
-    if (!profile) return;
-    setPersonA((prev) => ({
-      ...prev,
-      name: profile.name || '',
-      day: String(profile.birthData.day).padStart(2, '0'),
-      month: String(profile.birthData.month + 1).padStart(2, '0'),
-      year: String(profile.birthData.year),
-      hour: String(profile.birthData.hour).padStart(2, '0'),
-      minute: String(profile.birthData.minute).padStart(2, '0'),
-      locationQuery: profile.locationName,
-      selectedLocationName: profile.locationName,
-      latitude: profile.birthData.latitude,
-      longitude: profile.birthData.longitude,
-      timezone: profile.birthData.timezone,
-    }));
+    if (profile?.birthData?.latitude) {
+      applyProfile(profile.name, profile.birthData, profile.locationName);
+      return;
+    }
+
+    // Fall back to server-side profile
+    fetch('/api/user')
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data?.birth_latitude && data?.birth_date) {
+          const [y, m, d] = (data.birth_date as string).split('-').map(Number);
+          const [hr, min] = (data.birth_time || '12:00').split(':').map(Number);
+          applyProfile(data.name || '', {
+            day: d, month: m - 1, year: y, hour: hr, minute: min,
+            latitude: data.birth_latitude, longitude: data.birth_longitude,
+            timezone: data.birth_timezone || 'UTC',
+          }, data.birth_place || '');
+        }
+      })
+      .catch(() => { /* silent */ });
   }, []);
 
   const debounceTimerA = useRef<NodeJS.Timeout | null>(null);

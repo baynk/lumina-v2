@@ -22,6 +22,10 @@ export default function ProfilePage() {
   const [interests, setInterests] = useState<Interest[]>([]);
   const [gender, setGender] = useState<Gender | ''>('');
   const [saved, setSaved] = useState(false);
+  const [connectionCode, setConnectionCode] = useState('');
+  const [connectionCodeLoading, setConnectionCodeLoading] = useState(false);
+  const [connectionCodeError, setConnectionCodeError] = useState('');
+  const [copiedCode, setCopiedCode] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -54,6 +58,33 @@ export default function ProfilePage() {
     }
     loadData();
   }, [router, session]);
+
+  useEffect(() => {
+    async function loadConnectionCode() {
+      if (!session?.user) return;
+      setConnectionCodeLoading(true);
+      setConnectionCodeError('');
+      try {
+        const response = await fetch('/api/connections', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'get-code' }),
+        });
+        if (!response.ok) throw new Error('failed');
+        const payload = (await response.json()) as { code?: string };
+        setConnectionCode(payload.code || '');
+      } catch {
+        setConnectionCodeError(
+          language === 'ru'
+            ? 'Не удалось загрузить код подключения'
+            : 'Unable to load connection code'
+        );
+      } finally {
+        setConnectionCodeLoading(false);
+      }
+    }
+    loadConnectionCode();
+  }, [language, session?.user]);
 
   const toggleInterest = (interest: Interest) => {
     setInterests((prev) =>
@@ -119,6 +150,17 @@ export default function ProfilePage() {
       'prefer-not-to-say': t.genderPreferNot,
     };
     return map[g] || g;
+  };
+
+  const copyCode = async () => {
+    if (!connectionCode) return;
+    try {
+      await navigator.clipboard.writeText(connectionCode);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch {
+      setConnectionCodeError(language === 'ru' ? 'Не удалось скопировать код' : 'Unable to copy code');
+    }
   };
 
   if (!profile) {
@@ -243,6 +285,37 @@ export default function ProfilePage() {
           {saved ? t.profileSaved : t.saveProfileBtn}
         </button>
       </section>
+
+      {session?.user && (
+        <section className="glass-card mb-6 p-5 animate-fadeInUp">
+          <p className="lumina-label mb-3">{language === 'ru' ? 'Код подключения' : 'Connection Code'}</p>
+          <p className="mb-4 text-sm text-cream/70">
+            {language === 'ru'
+              ? 'Поделитесь этим кодом с партнером, чтобы он мог подключиться к вам в Lumina'
+              : 'Share this code with your partner so they can connect with you on Lumina'}
+          </p>
+
+          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+            <p className="flex-1 font-heading text-xl tracking-[0.08em] text-lumina-soft">
+              {connectionCodeLoading ? 'LUNA-....' : (connectionCode || 'LUNA-....')}
+            </p>
+            <button
+              type="button"
+              onClick={copyCode}
+              disabled={!connectionCode || connectionCodeLoading}
+              className="min-h-11 rounded-full border border-lumina-accent/30 px-4 text-sm text-cream transition hover:border-lumina-accent/60 hover:text-warmWhite disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {copiedCode
+                ? (language === 'ru' ? 'Скопировано' : 'Copied')
+                : (language === 'ru' ? 'Копировать' : 'Copy')}
+            </button>
+          </div>
+
+          {connectionCodeError && (
+            <p className="mt-3 text-sm text-rose-300">{connectionCodeError}</p>
+          )}
+        </section>
+      )}
 
       {/* Clear All Data */}
       <div className="text-center">

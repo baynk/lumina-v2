@@ -1,12 +1,13 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import ShareCard from '@/components/ShareCard';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile } from '@/lib/profile';
 import { translateAspectType, translatePlanet, translateSign } from '@/lib/translations';
-import type { BirthData, SynastryAspect, SynastryData, SynastryNarrative } from '@/types';
+import type { BirthData, SynastryData, SynastryNarrative } from '@/types';
 
 type LocationResult = {
   place_id: string;
@@ -34,6 +35,26 @@ type PersonFormState = {
 type SynastryResponse = {
   synastry: SynastryData;
   interpretation: SynastryNarrative;
+};
+
+type SavedPartner = {
+  id: number;
+  partner_name: string;
+  partner_birth_date: string | null;
+  partner_birth_time: string | null;
+  partner_birth_place: string | null;
+  partner_birth_latitude: number | null;
+  partner_birth_longitude: number | null;
+  partner_birth_timezone: string | null;
+  is_linked: boolean;
+  linked_user_name: string | null;
+  linked_user_email: string | null;
+  linked_birth_date: string | null;
+  linked_birth_time: string | null;
+  linked_birth_place: string | null;
+  linked_birth_latitude: number | null;
+  linked_birth_longitude: number | null;
+  linked_birth_timezone: string | null;
 };
 
 const months = Array.from({ length: 12 }, (_, idx) => idx + 1);
@@ -274,6 +295,7 @@ function PersonCard({
 export default function SynastryPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
+  const { data: session, status: sessionStatus } = useSession();
 
   const [personA, setPersonA] = useState<PersonFormState>(initialPerson);
   const [personB, setPersonB] = useState<PersonFormState>(initialPerson);
@@ -281,6 +303,13 @@ export default function SynastryPage() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<SynastryResponse | null>(null);
   const [openSection, setOpenSection] = useState<keyof SynastryNarrative>('overallConnection');
+  const [savedPartners, setSavedPartners] = useState<SavedPartner[]>([]);
+  const [connectionsLoading, setConnectionsLoading] = useState(false);
+  const [connectionsError, setConnectionsError] = useState('');
+  const [connectCodeInput, setConnectCodeInput] = useState('');
+  const [connectCodeLoading, setConnectCodeLoading] = useState(false);
+  const [savePartnerLoading, setSavePartnerLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   useEffect(() => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -329,6 +358,43 @@ export default function SynastryPage() {
       })
       .catch(() => { /* silent */ });
   }, []);
+
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timeout = setTimeout(() => setToastMessage(''), 2500);
+    return () => clearTimeout(timeout);
+  }, [toastMessage]);
+
+  const loadConnections = useCallback(async () => {
+    if (!session?.user) return;
+    setConnectionsLoading(true);
+    setConnectionsError('');
+    try {
+      const response = await fetch('/api/connections');
+      if (!response.ok) throw new Error('failed');
+      const payload = (await response.json()) as { connections?: SavedPartner[] };
+      setSavedPartners(payload.connections || []);
+    } catch {
+      setConnectionsError(
+        language === 'ru'
+          ? 'Не удалось загрузить сохраненных партнеров'
+          : 'Unable to load saved partners'
+      );
+    } finally {
+      setConnectionsLoading(false);
+    }
+  }, [language, session?.user]);
+
+  useEffect(() => {
+    if (sessionStatus === 'authenticated') {
+      loadConnections();
+      return;
+    }
+    if (sessionStatus === 'unauthenticated') {
+      setSavedPartners([]);
+      setConnectionsError('');
+    }
+  }, [loadConnections, sessionStatus]);
 
   const searchLocation = useCallback(async (query: string, target: 'A' | 'B') => {
     const update = target === 'A' ? setPersonA : setPersonB;
@@ -383,6 +449,104 @@ export default function SynastryPage() {
     longitude: p.longitude ?? 0,
     timezone: p.timezone,
   });
+
+  const fillPersonBFromPartner = (partner: SavedPartner) => {
+    const birthDate = partner.is_linked ? (partner.linked_birth_date || partner.partner_birth_date) : partner.partner_birth_date;
+    const birthTime = partner.is_linked ? (partner.linked_birth_time || partner.partner_birth_time) : partner.partner_birth_time;
+    const birthPlace = partner.is_linked ? (partner.linked_birth_place || partner.partner_birth_place) : partner.partner_birth_place;
+    const birthLatitude = partner.is_linked ? (partner.linked_birth_latitude ?? partner.partner_birth_latitude) : partner.partner_birth_latitude;
+    const birthLongitude = partner.is_linked ? (partner.linked_birth_longitude ?? partner.partner_birth_longitude) : partner.partner_birth_longitude;
+    const birthTimezone = partner.is_linked ? (partner.linked_birth_timezone || partner.partner_birth_timezone) : partner.partner_birth_timezone;
+
+    const [year = '', month = '', day = ''] = (birthDate || '').split('-');
+    const [hour = '', minute = ''] = (birthTime || '').split(':');
+
+    setPersonB((prev) => ({
+      ...prev,
+      name: partner.partner_name || partner.linked_user_name || '',
+      day,
+      month,
+      year,
+      hour,
+      minute,
+      locationQuery: birthPlace || '',
+      selectedLocationName: birthPlace || '',
+      latitude: birthLatitude ?? null,
+      longitude: birthLongitude ?? null,
+      timezone: birthTimezone || prev.timezone || 'UTC',
+      searchResults: [],
+    }));
+  };
+
+  const handleConnectWithCode = async () => {
+    const code = connectCodeInput.trim().toUpperCase();
+    if (!code) {
+      setConnectionsError(language === 'ru' ? 'Введите код подключения' : 'Please enter a connection code');
+      return;
+    }
+    setConnectCodeLoading(true);
+    setConnectionsError('');
+    try {
+      const response = await fetch('/api/connections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'connect-code', code }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(payload.error || 'failed');
+      setConnectCodeInput('');
+      await loadConnections();
+      setToastMessage(language === 'ru' ? 'Партнер подключен' : 'Partner connected');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'failed';
+      setConnectionsError(
+        language === 'ru'
+          ? `Ошибка подключения: ${message}`
+          : `Connection failed: ${message}`
+      );
+    } finally {
+      setConnectCodeLoading(false);
+    }
+  };
+
+  const handleSavePartner = async () => {
+    if (!session?.user) return;
+    setSavePartnerLoading(true);
+    setError('');
+    try {
+      const birthDate = `${personB.year}-${personB.month}-${personB.day}`;
+      const birthTime = `${personB.hour}:${personB.minute}`;
+      const response = await fetch('/api/connections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save-partner',
+          partnerData: {
+            partner_name: personB.name || (language === 'ru' ? 'Партнер' : 'Partner'),
+            birth_date: birthDate,
+            birth_time: birthTime,
+            birth_place: personB.selectedLocationName,
+            birth_latitude: personB.latitude,
+            birth_longitude: personB.longitude,
+            birth_timezone: personB.timezone,
+            relationship_type: 'partner',
+          },
+        }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(payload.error || 'failed');
+      setToastMessage(
+        language === 'ru'
+          ? `Сохранено: ${personB.name || 'Партнер'}`
+          : `Saved: ${personB.name || 'Partner'}`
+      );
+      await loadConnections();
+    } catch {
+      setError(language === 'ru' ? 'Не удалось сохранить партнера' : 'Unable to save partner');
+    } finally {
+      setSavePartnerLoading(false);
+    }
+  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -545,6 +709,19 @@ export default function SynastryPage() {
           </div>
         </section>
 
+        {session?.user && (
+          <button
+            type="button"
+            onClick={handleSavePartner}
+            disabled={savePartnerLoading}
+            className="mb-6 lumina-button w-full disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {savePartnerLoading
+              ? (language === 'ru' ? 'Сохраняем...' : 'Saving...')
+              : `${language === 'ru' ? 'Сохранить' : 'Save'} ${nameB}`}
+          </button>
+        )}
+
         {/* Share Card */}
         <ShareCard
           type="synastry-summary"
@@ -561,6 +738,12 @@ export default function SynastryPage() {
         >
           {language === 'ru' ? '← Новый расчёт' : '← New Reading'}
         </button>
+
+        {toastMessage && (
+          <div className="fixed bottom-6 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-xl border border-lumina-accent/30 bg-[#111633]/95 px-4 py-3 text-center text-sm text-warmWhite shadow-xl backdrop-blur">
+            {toastMessage}
+          </div>
+        )}
       </div>
     );
   }
@@ -603,16 +786,83 @@ export default function SynastryPage() {
             selectLocation={selectLocation}
             t={t}
           />
-          <PersonCard
-            title={t.synastryPersonB}
-            subtitle={language === 'ru' ? 'Партнёр, друг, коллега — кто угодно' : "Partner, friend, crush — anyone you're curious about"}
-            personKey="B"
-            state={personB}
-            setState={setPersonB}
-            searchLocation={searchLocation}
-            selectLocation={selectLocation}
-            t={t}
-          />
+          <div className="space-y-4">
+            {session?.user && (
+              <section className="glass-card p-5 sm:p-6">
+                <div className="mb-4">
+                  <h3 className="font-heading text-lg text-warmWhite">
+                    {language === 'ru' ? 'Сохраненные партнеры' : 'Saved Partners'}
+                  </h3>
+                  <p className="mt-1 text-xs text-cream/60">
+                    {language === 'ru'
+                      ? 'Выберите партнера для быстрого заполнения формы'
+                      : 'Select a partner to auto-fill the form'}
+                  </p>
+                </div>
+
+                <div className="mb-4 flex gap-2">
+                  <input
+                    className="lumina-input"
+                    value={connectCodeInput}
+                    onChange={(e) => setConnectCodeInput(e.target.value.toUpperCase())}
+                    placeholder={language === 'ru' ? 'Код LUNA-XXXX' : 'LUNA-XXXX code'}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleConnectWithCode}
+                    disabled={connectCodeLoading}
+                    className="lumina-button min-w-28 px-4 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {connectCodeLoading
+                      ? (language === 'ru' ? '...' : '...')
+                      : (language === 'ru' ? 'Подключить' : 'Connect')}
+                  </button>
+                </div>
+
+                {connectionsLoading && (
+                  <p className="text-sm text-cream/60">{language === 'ru' ? 'Загрузка...' : 'Loading...'}</p>
+                )}
+                {!connectionsLoading && savedPartners.length === 0 && !connectionsError && (
+                  <p className="text-sm text-cream/50">
+                    {language === 'ru' ? 'Пока нет сохраненных партнеров' : 'No saved partners yet'}
+                  </p>
+                )}
+                {connectionsError && (
+                  <p className="text-sm text-rose-300">{connectionsError}</p>
+                )}
+
+                <div className="mt-3 space-y-2">
+                  {savedPartners.map((partner) => {
+                    const place = partner.is_linked
+                      ? (partner.linked_birth_place || partner.partner_birth_place)
+                      : partner.partner_birth_place;
+                    return (
+                      <button
+                        key={partner.id}
+                        type="button"
+                        onClick={() => fillPersonBFromPartner(partner)}
+                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3 text-left transition hover:border-lumina-accent/35 hover:bg-white/[0.06]"
+                      >
+                        <p className="text-sm font-medium text-warmWhite">{partner.partner_name}</p>
+                        <p className="text-xs text-cream/60">{place || (language === 'ru' ? 'Место не указано' : 'No place set')}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            <PersonCard
+              title={t.synastryPersonB}
+              subtitle={language === 'ru' ? 'Партнёр, друг, коллега — кто угодно' : "Partner, friend, crush — anyone you're curious about"}
+              personKey="B"
+              state={personB}
+              setState={setPersonB}
+              searchLocation={searchLocation}
+              selectLocation={selectLocation}
+              t={t}
+            />
+          </div>
         </div>
 
         <button
@@ -635,6 +885,12 @@ export default function SynastryPage() {
           </div>
           <p className="text-center text-sm text-cream/50">{t.synastryLoading}</p>
         </section>
+      )}
+
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-xl border border-lumina-accent/30 bg-[#111633]/95 px-4 py-3 text-center text-sm text-warmWhite shadow-xl backdrop-blur">
+          {toastMessage}
+        </div>
       )}
     </div>
   );

@@ -34,6 +34,7 @@ export async function initDB() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_tier TEXT DEFAULT 'free'`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS connection_code TEXT UNIQUE`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS saved_charts (
@@ -77,6 +78,28 @@ export async function initDB() {
   await sql`ALTER TABLE consultations ADD COLUMN IF NOT EXISTS contact_preference TEXT DEFAULT 'email'`;
   await sql`CREATE INDEX IF NOT EXISTS idx_consultations_status ON consultations(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_consultations_created ON consultations(created_at DESC)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS partner_connections (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id),
+      partner_user_id TEXT REFERENCES users(id),
+      partner_name TEXT NOT NULL,
+      partner_birth_date TEXT,
+      partner_birth_time TEXT,
+      partner_birth_place TEXT,
+      partner_birth_latitude DOUBLE PRECISION,
+      partner_birth_longitude DOUBLE PRECISION,
+      partner_birth_timezone TEXT,
+      relationship_type TEXT DEFAULT 'partner',
+      is_linked BOOLEAN DEFAULT false,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )
+  `;
+  await sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_partner_connections_pair
+    ON partner_connections(user_id, COALESCE(partner_user_id, partner_name))
+  `;
 }
 
 // Get or create user profile from NextAuth session
@@ -229,4 +252,201 @@ export async function getStats() {
     newConsultations: Number(consultations.rows[0].new_count),
     signupsLast7Days: Number(recent.rows[0].count),
   };
+}
+
+export async function generateConnectionCode(userId: string): Promise<string> {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const createCode = () =>
+    `LUNA-${Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')}`;
+
+  // First return existing code if already present.
+  const existing = await sql<{ connection_code: string | null }>`
+    SELECT connection_code FROM users WHERE id = ${userId} LIMIT 1
+  `;
+  if (existing.rows[0]?.connection_code) return existing.rows[0].connection_code;
+
+  for (let attempts = 0; attempts < 20; attempts += 1) {
+    const candidate = createCode();
+    const collision = await sql`SELECT 1 FROM users WHERE connection_code = ${candidate} LIMIT 1`;
+    if (collision.rows.length > 0) continue;
+
+    const updated = await sql<{ connection_code: string | null }>`
+      UPDATE users
+      SET connection_code = ${candidate}, updated_at = now()
+      WHERE id = ${userId}
+      RETURNING connection_code
+    `;
+    if (updated.rows[0]?.connection_code) return updated.rows[0].connection_code;
+  }
+
+  throw new Error('Unable to generate a unique connection code');
+}
+
+export async function getConnectionCode(userId: string): Promise<string> {
+  const result = await sql<{ connection_code: string | null }>`
+    SELECT connection_code FROM users WHERE id = ${userId} LIMIT 1
+  `;
+  if (result.rows[0]?.connection_code) return result.rows[0].connection_code;
+  return generateConnectionCode(userId);
+}
+
+type ConnectionCodeUser = {
+  id: string;
+  name: string | null;
+  email: string;
+  birth_date: string | null;
+  birth_time: string | null;
+  birth_place: string | null;
+  birth_latitude: number | null;
+  birth_longitude: number | null;
+  birth_timezone: string | null;
+};
+
+export async function getUserByConnectionCode(code: string): Promise<ConnectionCodeUser | null> {
+  const normalizedCode = code.trim().toUpperCase();
+  const result = await sql<ConnectionCodeUser>`
+    SELECT id, name, email, birth_date, birth_time, birth_place, birth_latitude, birth_longitude, birth_timezone
+    FROM users
+    WHERE connection_code = ${normalizedCode}
+    LIMIT 1
+  `;
+  return result.rows[0] ?? null;
+}
+
+type SavePartnerData = {
+  partner_user_id?: string;
+  partner_name: string;
+  birth_date?: string;
+  birth_time?: string;
+  birth_place?: string;
+  birth_latitude?: number;
+  birth_longitude?: number;
+  birth_timezone?: string;
+  relationship_type?: string;
+};
+
+export async function savePartnerConnection(userId: string, partnerData: SavePartnerData) {
+  const isLinked = Boolean(partnerData.partner_user_id);
+  const relationshipType = partnerData.relationship_type || 'partner';
+  const partnerName = partnerData.partner_name.trim();
+
+  if (!partnerName) {
+    throw new Error('partner_name is required');
+  }
+
+  if (partnerData.partner_user_id) {
+    const existingLinked = await sql<{ id: number }>`
+      SELECT id
+      FROM partner_connections
+      WHERE user_id = ${userId} AND partner_user_id = ${partnerData.partner_user_id}
+      LIMIT 1
+    `;
+
+    if (existingLinked.rows.length > 0) {
+      const updated = await sql`
+        UPDATE partner_connections
+        SET
+          partner_name = ${partnerName},
+          partner_birth_date = COALESCE(${partnerData.birth_date ?? null}, partner_birth_date),
+          partner_birth_time = COALESCE(${partnerData.birth_time ?? null}, partner_birth_time),
+          partner_birth_place = COALESCE(${partnerData.birth_place ?? null}, partner_birth_place),
+          partner_birth_latitude = COALESCE(${partnerData.birth_latitude ?? null}, partner_birth_latitude),
+          partner_birth_longitude = COALESCE(${partnerData.birth_longitude ?? null}, partner_birth_longitude),
+          partner_birth_timezone = COALESCE(${partnerData.birth_timezone ?? null}, partner_birth_timezone),
+          relationship_type = ${relationshipType},
+          is_linked = true
+        WHERE id = ${existingLinked.rows[0].id}
+        RETURNING *
+      `;
+      return updated.rows[0];
+    }
+  } else {
+    const existingManual = await sql<{ id: number }>`
+      SELECT id
+      FROM partner_connections
+      WHERE user_id = ${userId}
+        AND partner_user_id IS NULL
+        AND partner_name = ${partnerName}
+      LIMIT 1
+    `;
+
+    if (existingManual.rows.length > 0) {
+      const updated = await sql`
+        UPDATE partner_connections
+        SET
+          partner_birth_date = ${partnerData.birth_date ?? null},
+          partner_birth_time = ${partnerData.birth_time ?? null},
+          partner_birth_place = ${partnerData.birth_place ?? null},
+          partner_birth_latitude = ${partnerData.birth_latitude ?? null},
+          partner_birth_longitude = ${partnerData.birth_longitude ?? null},
+          partner_birth_timezone = ${partnerData.birth_timezone ?? null},
+          relationship_type = ${relationshipType},
+          is_linked = false
+        WHERE id = ${existingManual.rows[0].id}
+        RETURNING *
+      `;
+      return updated.rows[0];
+    }
+  }
+
+  const inserted = await sql`
+    INSERT INTO partner_connections (
+      user_id,
+      partner_user_id,
+      partner_name,
+      partner_birth_date,
+      partner_birth_time,
+      partner_birth_place,
+      partner_birth_latitude,
+      partner_birth_longitude,
+      partner_birth_timezone,
+      relationship_type,
+      is_linked
+    )
+    VALUES (
+      ${userId},
+      ${partnerData.partner_user_id ?? null},
+      ${partnerName},
+      ${partnerData.birth_date ?? null},
+      ${partnerData.birth_time ?? null},
+      ${partnerData.birth_place ?? null},
+      ${partnerData.birth_latitude ?? null},
+      ${partnerData.birth_longitude ?? null},
+      ${partnerData.birth_timezone ?? null},
+      ${relationshipType},
+      ${isLinked}
+    )
+    RETURNING *
+  `;
+  return inserted.rows[0];
+}
+
+export async function getPartnerConnections(userId: string) {
+  const result = await sql`
+    SELECT
+      pc.*,
+      u.id AS linked_user_id,
+      u.name AS linked_user_name,
+      u.email AS linked_user_email,
+      u.birth_date AS linked_birth_date,
+      u.birth_time AS linked_birth_time,
+      u.birth_place AS linked_birth_place,
+      u.birth_latitude AS linked_birth_latitude,
+      u.birth_longitude AS linked_birth_longitude,
+      u.birth_timezone AS linked_birth_timezone
+    FROM partner_connections pc
+    LEFT JOIN users u ON pc.partner_user_id = u.id AND pc.is_linked = true
+    WHERE pc.user_id = ${userId}
+    ORDER BY pc.created_at DESC
+  `;
+  return result.rows;
+}
+
+export async function deletePartnerConnection(userId: string, connectionId: number) {
+  const result = await sql`
+    DELETE FROM partner_connections
+    WHERE id = ${connectionId} AND user_id = ${userId}
+    RETURNING id
+  `;
+  return result.rows.length > 0;
 }

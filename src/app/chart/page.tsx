@@ -529,7 +529,7 @@ export default function ChartPage() {
                 </p>
               </div>
             </div>
-            <p className="mt-6 text-xs tracking-[0.18em] text-cream/70">lumina-v2-five.vercel.app</p>
+            <p className="mt-6 text-xs tracking-[0.18em] text-cream/70">luminastrology.com</p>
 
             {/* Share buttons */}
             <div className="mt-5 flex gap-3">
@@ -537,10 +537,10 @@ export default function ChartPage() {
                 type="button"
                 className="lumina-button flex-1 text-sm"
                 onClick={async () => {
-                  const shareText = `✨ My Lumina Chart ✨\n☉ ${t.sun}: ${translateSign(natalChart.zodiacSign, language)}\n☽ ${t.moon}: ${translateSign(moonSign || '', language)}\n↑ ${t.rising}: ${translateSign(natalChart.risingSign, language)}\n\nDiscover yours → lumina-v2-five.vercel.app`;
+                  const shareText = `✨ My Lumina Chart ✨\n☉ ${t.sun}: ${translateSign(natalChart.zodiacSign, language)}\n☽ ${t.moon}: ${translateSign(moonSign || '', language)}\n↑ ${t.rising}: ${translateSign(natalChart.risingSign, language)}\n\nDiscover yours → luminastrology.com`;
                   if (navigator.share) {
                     try {
-                      await navigator.share({ title: 'My Lumina Chart', text: shareText, url: 'https://lumina-v2-five.vercel.app' });
+                      await navigator.share({ title: 'My Lumina Chart', text: shareText, url: 'https://luminastrology.com' });
                     } catch { /* user cancelled */ }
                   } else {
                     await navigator.clipboard.writeText(shareText);

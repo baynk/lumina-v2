@@ -264,7 +264,7 @@ function PersonCard({
             required
           />
           {state.searchResults.length > 0 && (
-            <div className="absolute z-40 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f1433]/95 backdrop-blur-md shadow-xl">
+            <div className="absolute z-40 bottom-full mb-1 w-full max-h-48 overflow-y-auto overflow-hidden rounded-xl border border-white/10 bg-[#0f1433]/95 backdrop-blur-md shadow-xl">
               {state.searchResults.map((item) => (
                 <button
                   key={item.place_id}

@@ -524,7 +524,7 @@ export default function LandingPage() {
             />
 
             {locationResults.length > 0 ? (
-              <div className="absolute z-40 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f1433]/95 backdrop-blur-md">
+              <div className="absolute z-40 bottom-full mb-1 w-full max-h-48 overflow-y-auto rounded-xl border border-white/10 bg-[#0f1433]/95 backdrop-blur-md">
                 {locationResults.map((result) => (
                   <button
                     key={result.place_id}

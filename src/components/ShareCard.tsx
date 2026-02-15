@@ -15,10 +15,10 @@ type ShareCardProps = {
 const typeLabel: Record<ShareCardType, string> = {
   'big-three': 'Big Three',
   'daily-reading': 'Daily Reading',
-  'synastry-summary': 'Synastry Summary',
+  'synastry-summary': 'Compatibility',
 };
 
-export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumina astrology' }: ShareCardProps) {
+export default function ShareCard({ type, title, subtitle, bullets, cta = 'luminastrology.com' }: ShareCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [status, setStatus] = useState('');
@@ -31,10 +31,11 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
     try {
       const el = cardRef.current;
       const canvas = await html2canvas(el, {
-        backgroundColor: '#080c1f',
+        backgroundColor: '#0c0f2b',
         scale: 2,
         width: el.scrollWidth,
         height: el.scrollHeight,
+        useCORS: true,
       });
 
       const blob = await new Promise<Blob | null>((resolve) => {
@@ -47,6 +48,9 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
       }
 
       return blob;
+    } catch {
+      setStatus('Unable to generate image.');
+      return null;
     } finally {
       setIsExporting(false);
     }
@@ -54,25 +58,39 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
 
   const share = async () => {
     const blob = await exportCard();
-    if (!blob) return;
+    if (!blob) {
+      // Fallback: share as text
+      const text = `${title}\n${bullets.join(' · ')}\n${cta}`;
+      if (navigator.share) {
+        await navigator.share({ title: 'Lumina', text });
+      } else {
+        await navigator.clipboard.writeText(text);
+        setStatus('Copied to clipboard.');
+        setTimeout(() => setStatus(''), 2000);
+      }
+      return;
+    }
 
     const file = new File([blob], 'lumina-share-card.png', { type: 'image/png' });
 
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      await navigator.share({
-        title: 'Lumina',
-        text: title,
-        files: [file],
-      });
+      await navigator.share({ title: 'Lumina', text: title, files: [file] });
       return;
     }
 
-    await navigator.clipboard.write([
-      new ClipboardItem({
-        [blob.type]: blob,
-      }),
-    ]);
-    setStatus('Image copied to clipboard.');
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      setStatus('Image copied to clipboard.');
+    } catch {
+      // Final fallback: download
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'lumina-share-card.png';
+      anchor.click();
+      URL.revokeObjectURL(url);
+    }
+    setTimeout(() => setStatus(''), 2000);
   };
 
   const download = async () => {
@@ -87,44 +105,70 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
     URL.revokeObjectURL(url);
   };
 
-  // Truncate subtitle to ~120 chars for the card so it fits
-  const shortSubtitle = subtitle.length > 120 ? subtitle.slice(0, 117).replace(/\s+\S*$/, '') + '…' : subtitle;
+  // Parse bullets into label/value pairs for bar chart
+  const parsedBullets = bullets.map((b) => {
+    const match = b.match(/^(.+?):\s*(\d+)%$/);
+    return match ? { label: match[1], value: parseInt(match[2]) } : { label: b, value: 0 };
+  });
+
+  // Truncate subtitle
+  const shortSub = subtitle.length > 100 ? subtitle.slice(0, 97).replace(/\s+\S*$/, '') + '…' : subtitle;
 
   return (
     <div className="glass-card p-4 sm:p-5">
+      {/* The card itself — clean, dark, minimal */}
       <div
         ref={cardRef}
-        className="relative mx-auto w-full max-w-[360px] overflow-hidden rounded-[32px] border border-white/20 bg-midnight p-6 sm:p-8"
+        style={{
+          background: 'linear-gradient(180deg, #0c0f2b 0%, #151940 100%)',
+          width: '340px',
+          padding: '28px 24px',
+          borderRadius: '24px',
+          margin: '0 auto',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+        }}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(167,139,250,0.28),transparent_45%),radial-gradient(circle_at_90%_25%,rgba(196,181,253,0.2),transparent_40%),linear-gradient(180deg,#080c1f_0%,#111738_100%)]" />
-        <div className="absolute left-[-30px] top-[240px] h-44 w-44 rounded-full bg-lumina-accent/15 blur-3xl" />
-        <div className="absolute right-[-20px] top-[70px] h-32 w-32 rounded-full bg-lumina-soft/10 blur-2xl" />
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <span style={{ fontSize: '22px', fontWeight: 600, color: '#C4B5FD', letterSpacing: '0.04em' }}>Lumina</span>
+          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', letterSpacing: '0.15em', textTransform: 'uppercase' as const }}>{typeLabel[type]}</span>
+        </div>
 
-        <div className="relative z-10 flex flex-col text-warmWhite">
-          <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
-          <p className="mt-2 inline-flex w-fit rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.18em] text-cream">
-            {typeLabel[type]}
-          </p>
+        {/* Names */}
+        <div style={{ fontSize: '20px', fontWeight: 600, color: '#f0ece4', lineHeight: 1.3, marginBottom: '8px' }}>
+          {title}
+        </div>
 
-          <div className="mt-6">
-            <h3 className="font-heading text-2xl sm:text-3xl leading-tight text-lumina-soft">{title}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-cream">{shortSubtitle}</p>
-          </div>
+        {/* Summary */}
+        <div style={{ fontSize: '12px', color: 'rgba(240,236,228,0.45)', lineHeight: 1.7, marginBottom: '20px' }}>
+          {shortSub}
+        </div>
 
-          <div className="mt-5 space-y-2">
-            {bullets.slice(0, 6).map((bullet, idx) => (
-              <div key={`${bullet}-${idx}`} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm leading-relaxed text-warmWhite">
-                {bullet}
+        {/* Score bars */}
+        <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '6px', marginBottom: '20px' }}>
+          {parsedBullets.slice(0, 6).map((item, idx) => (
+            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '11px', color: 'rgba(240,236,228,0.5)', width: '52px', textAlign: 'right' as const, flexShrink: 0 }}>{item.label}</span>
+              <div style={{ flex: 1, height: '6px', borderRadius: '3px', background: 'rgba(255,255,255,0.06)' }}>
+                <div style={{
+                  width: `${item.value}%`,
+                  height: '100%',
+                  borderRadius: '3px',
+                  background: item.value >= 70 ? 'linear-gradient(90deg, #8B5CF6, #A78BFA)' : item.value >= 40 ? 'linear-gradient(90deg, #6D5AAE, #8B73C8)' : 'linear-gradient(90deg, #4A3F7A, #6B5FA0)',
+                }} />
               </div>
-            ))}
-          </div>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#C4B5FD', width: '30px' }}>{item.value}%</span>
+            </div>
+          ))}
+        </div>
 
-          <div className="mt-6 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-center text-xs uppercase tracking-[0.18em] text-cream">
-            {cta}
-          </div>
+        {/* Footer */}
+        <div style={{ textAlign: 'center' as const, fontSize: '9px', color: 'rgba(255,255,255,0.15)', letterSpacing: '0.2em', textTransform: 'uppercase' as const }}>
+          {cta}
         </div>
       </div>
 
+      {/* Action buttons */}
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         <button type="button" onClick={share} disabled={isExporting} className="lumina-button w-full sm:w-auto">
           {isExporting ? 'Rendering...' : 'Share'}

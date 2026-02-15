@@ -11,6 +11,7 @@ export type UserProfileLocal = {
   name: string;
   locationName: string;
   savedAt: number;
+  timeAccuracy?: 'exact' | 'approximate' | 'unknown';
   relationshipStatus?: RelationshipStatus;
   interests?: Interest[];
   gender?: Gender;

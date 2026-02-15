@@ -79,6 +79,7 @@ export default function LandingPage() {
   const [year, setYear] = useState('');
   const [hour, setHour] = useState('');
   const [minute, setMinute] = useState('');
+  const [timeAccuracy, setTimeAccuracy] = useState<'exact' | 'approximate' | 'unknown'>('exact');
 
   const [locationQuery, setLocationQuery] = useState('');
   const [locationResults, setLocationResults] = useState<LocationResult[]>([]);
@@ -99,12 +100,11 @@ export default function LandingPage() {
       !!day &&
       !!month &&
       !!year &&
-      !!hour &&
-      !!minute &&
+      (timeAccuracy === 'unknown' || (!!hour && !!minute)) &&
       selectedLocationName.length > 0 &&
       latitude !== null &&
       longitude !== null,
-    [day, hour, latitude, longitude, minute, month, selectedLocationName, year],
+    [day, hour, latitude, longitude, minute, month, selectedLocationName, timeAccuracy, year],
   );
 
   useEffect(() => {
@@ -275,8 +275,8 @@ export default function LandingPage() {
       year: Number.parseInt(year, 10),
       month: Number.parseInt(month, 10) - 1,
       day: Number.parseInt(day, 10),
-      hour: Number.parseInt(hour, 10),
-      minute: Number.parseInt(minute, 10),
+      hour: timeAccuracy === 'unknown' ? 12 : Number.parseInt(hour, 10),
+      minute: timeAccuracy === 'unknown' ? 0 : Number.parseInt(minute, 10),
       latitude,
       longitude,
       timezone: resolvedTz,
@@ -286,6 +286,7 @@ export default function LandingPage() {
       birthData,
       name: name.trim(),
       locationName: selectedLocationName,
+      timeAccuracy,
       savedAt: Date.now(),
     });
 
@@ -297,7 +298,7 @@ export default function LandingPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             birth_date: `${year}-${pad(Number(month))}-${pad(Number(day))}`,
-            birth_time: `${pad(Number(hour))}:${pad(Number(minute))}`,
+            birth_time: timeAccuracy === 'unknown' ? '12:00' : `${pad(Number(hour))}:${pad(Number(minute))}`,
             birth_place: selectedLocationName,
             birth_latitude: latitude,
             birth_longitude: longitude,
@@ -487,7 +488,7 @@ export default function LandingPage() {
             <div className="sm:col-span-2">
               <p className="lumina-label mb-2">{t.timeOfBirth}</p>
               <div className="grid grid-cols-2 gap-2">
-                <select className="lumina-input" value={hour} onChange={(event) => setHour(event.target.value)} required>
+                <select className="lumina-input" value={hour} onChange={(event) => setHour(event.target.value)} required={timeAccuracy !== 'unknown'} disabled={timeAccuracy === 'unknown'}>
                   <option value="">{t.hour}</option>
                   {hours.map((item) => (
                     <option key={item} value={item}>
@@ -495,7 +496,7 @@ export default function LandingPage() {
                     </option>
                   ))}
                 </select>
-                <select className="lumina-input" value={minute} onChange={(event) => setMinute(event.target.value)} required>
+                <select className="lumina-input" value={minute} onChange={(event) => setMinute(event.target.value)} required={timeAccuracy !== 'unknown'} disabled={timeAccuracy === 'unknown'}>
                   <option value="">{t.minute}</option>
                   {minutes.map((item) => (
                     <option key={item} value={item}>
@@ -504,6 +505,41 @@ export default function LandingPage() {
                   ))}
                 </select>
               </div>
+              {/* Time accuracy */}
+              <div className="mt-2 flex gap-1.5">
+                {([
+                  { value: 'exact' as const, en: 'Exact', ru: 'Точное' },
+                  { value: 'approximate' as const, en: '~Approximate', ru: '~Примерное' },
+                  { value: 'unknown' as const, en: 'Unknown', ru: 'Не знаю' },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setTimeAccuracy(opt.value)}
+                    className={`flex-1 rounded-lg py-1.5 text-[11px] transition ${
+                      timeAccuracy === opt.value
+                        ? 'bg-purple-400/20 text-purple-300 border border-purple-400/30'
+                        : 'bg-white/[0.03] text-cream/40 border border-white/[0.06] hover:text-cream/60'
+                    }`}
+                  >
+                    {language === 'ru' ? opt.ru : opt.en}
+                  </button>
+                ))}
+              </div>
+              {timeAccuracy === 'unknown' && (
+                <p className="mt-1.5 text-[10px] text-amber-300/60">
+                  {language === 'ru'
+                    ? '⚠ Без точного времени восходящий знак и дома будут неточными'
+                    : '⚠ Without exact time, Rising sign and houses will be inaccurate'}
+                </p>
+              )}
+              {timeAccuracy === 'approximate' && (
+                <p className="mt-1.5 text-[10px] text-cream/30">
+                  {language === 'ru'
+                    ? 'Укажите ближайшее время — Rising может отличаться на 1-2 знака'
+                    : 'Enter your closest estimate — Rising may be off by 1-2 signs'}
+                </p>
+              )}
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { useRouter } from 'next/navigation';
 import ShareCard from '@/components/ShareCard';
 import { useLanguage } from '@/context/LanguageContext';
@@ -155,6 +155,8 @@ function PersonCard({
   selectLocation: (item: LocationResult, target: 'A' | 'B') => void;
   t: Record<string, string>;
 }) {
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
   return (
     <section className="glass-card overflow-hidden">
       {/* Card header with gradient accent */}
@@ -234,9 +236,8 @@ function PersonCard({
                 latitude: null,
                 longitude: null,
               }));
-              const timer = personKey === 'A' ? debounceTimerA : debounceTimerB;
-              if (timer.current) clearTimeout(timer.current);
-              timer.current = setTimeout(() => searchLocation(query, personKey), 350);
+              if (debounceTimer.current) clearTimeout(debounceTimer.current);
+              debounceTimer.current = setTimeout(() => searchLocation(query, personKey), 350);
             }}
             placeholder={t.searchCityOrPlace}
             required
@@ -328,9 +329,6 @@ export default function SynastryPage() {
       })
       .catch(() => { /* silent */ });
   }, []);
-
-  const debounceTimerA = useRef<NodeJS.Timeout | null>(null);
-  const debounceTimerB = useRef<NodeJS.Timeout | null>(null);
 
   const searchLocation = useCallback(async (query: string, target: 'A' | 'B') => {
     const update = target === 'A' ? setPersonA : setPersonB;

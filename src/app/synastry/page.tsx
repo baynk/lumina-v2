@@ -307,6 +307,7 @@ export default function SynastryPage() {
   const [connectionsLoading, setConnectionsLoading] = useState(false);
   const [connectionsError, setConnectionsError] = useState('');
   const [connectCodeInput, setConnectCodeInput] = useState('');
+  const [showConnectCode, setShowConnectCode] = useState(false);
   const [connectCodeLoading, setConnectCodeLoading] = useState(false);
   const [savePartnerLoading, setSavePartnerLoading] = useState(false);
   const [partnerSaved, setPartnerSaved] = useState(false);
@@ -855,20 +856,20 @@ export default function SynastryPage() {
             {/* Connect with code — collapsed behind a link */}
             {session?.user && (
               <div className="text-center">
-                {!connectCodeInput.trim() && (
+                {!showConnectCode && (
                   <button
                     type="button"
-                    onClick={() => setConnectCodeInput(' ')}
+                    onClick={() => setShowConnectCode(true)}
                     className="text-xs text-lumina-accent/50 hover:text-lumina-accent/80 transition"
                   >
                     {language === 'ru' ? 'Подключить по коду партнёра' : 'Connect with partner code'}
                   </button>
                 )}
-                {connectCodeInput.trim() && (
+                {showConnectCode && (
                   <div className="flex gap-2 mt-1">
                     <input
                       className="lumina-input text-center"
-                      value={connectCodeInput.trim()}
+                      value={connectCodeInput}
                       onChange={(e) => setConnectCodeInput(e.target.value.toUpperCase())}
                       placeholder="LUNA-XXXX"
                       autoFocus
@@ -876,7 +877,7 @@ export default function SynastryPage() {
                     <button
                       type="button"
                       onClick={handleConnectWithCode}
-                      disabled={connectCodeLoading}
+                      disabled={connectCodeLoading || !connectCodeInput.trim()}
                       className="lumina-button min-w-20 px-4 disabled:opacity-60"
                     >
                       {connectCodeLoading ? '...' : 'OK'}

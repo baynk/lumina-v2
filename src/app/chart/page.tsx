@@ -36,6 +36,64 @@ type ExplainState = {
 
 const STORAGE_KEY = 'lumina_birth_data';
 
+/* ─── Daily Tip (rotates based on day + sign) ─── */
+const DAILY_TIPS: Record<string, { en: string; ru: string }[]> = {
+  fire: [
+    { en: 'Channel your energy into one bold action today — scattered fire burns out fast.', ru: 'Направь энергию на одно смелое действие — разбросанный огонь быстро гаснет.' },
+    { en: 'Your enthusiasm is magnetic today. Use it to inspire, not to overwhelm.', ru: 'Твой энтузиазм сегодня магнетичен. Используй его, чтобы вдохновлять, а не подавлять.' },
+    { en: 'Impatience is your shadow today. The thing you want most needs one more day of patience.', ru: 'Нетерпение — твоя тень сегодня. То, чего ты хочешь больше всего, требует ещё дня терпения.' },
+    { en: 'Trust your instincts over analysis today — your gut knows something your mind hasn\'t caught up to.', ru: 'Доверяй инстинктам больше, чем анализу — твоё чутьё знает то, до чего разум ещё не дошёл.' },
+    { en: 'Movement unlocks answers today. Walk, stretch, dance — let your body think.', ru: 'Движение откроет ответы сегодня. Прогулка, растяжка, танец — позволь телу думать.' },
+  ],
+  earth: [
+    { en: 'Small, consistent actions beat grand plans today. Build one brick at a time.', ru: 'Маленькие последовательные действия побеждают грандиозные планы. Кирпичик за кирпичиком.' },
+    { en: 'Your body is asking for attention today. Listen to what it needs before pushing through.', ru: 'Твоё тело просит внимания сегодня. Послушай, что ему нужно, прежде чем напрягаться.' },
+    { en: 'Something you\'ve been building quietly is about to show results. Keep going.', ru: 'То, что ты тихо строил, скоро покажет результат. Продолжай.' },
+    { en: 'Ground yourself before making financial decisions today. Emotion and money don\'t mix well.', ru: 'Заземлись перед финансовыми решениями. Эмоции и деньги плохо сочетаются.' },
+    { en: 'Nature recharges you faster than screens today. Even five minutes outside shifts everything.', ru: 'Природа заряжает тебя быстрее экранов сегодня. Даже пять минут на улице всё меняют.' },
+  ],
+  air: [
+    { en: 'Your words carry extra weight today. Choose them with care — they\'ll be remembered.', ru: 'Твои слова имеют особый вес сегодня. Выбирай их аккуратно — их запомнят.' },
+    { en: 'Too many open tabs in your mind? Pick three priorities and close the rest.', ru: 'Слишком много открытых вкладок в голове? Выбери три приоритета и закрой остальные.' },
+    { en: 'A conversation today could change your perspective on something you thought was settled.', ru: 'Разговор сегодня может изменить твой взгляд на то, что казалось решённым.' },
+    { en: 'Write down the idea that keeps circling your mind. It\'s more important than it seems.', ru: 'Запиши идею, которая крутится в голове. Она важнее, чем кажется.' },
+    { en: 'Social energy is high but your alone-time battery is low. Protect your boundaries.', ru: 'Социальная энергия высока, но батарея одиночества разряжена. Защити свои границы.' },
+  ],
+  water: [
+    { en: 'Pay attention to your emotions today — they\'re carrying information your logic can\'t access.', ru: 'Обрати внимание на эмоции сегодня — они несут информацию, недоступную логике.' },
+    { en: 'Someone close to you needs to feel heard more than advised. Just listen.', ru: 'Кому-то близкому нужно быть услышанным, а не получить совет. Просто слушай.' },
+    { en: 'Your intuition about a person or situation is correct. Trust it.', ru: 'Твоя интуиция насчёт человека или ситуации верна. Доверься ей.' },
+    { en: 'Creative energy is unusually strong today. Make something — even if it\'s messy.', ru: 'Творческая энергия сегодня необычно сильна. Создай что-то — даже если выйдет неидеально.' },
+    { en: 'Release what you\'ve been holding. Journaling, crying, or a long shower — pick your release valve.', ru: 'Отпусти то, что держишь. Дневник, слёзы или долгий душ — выбери свой клапан.' },
+  ],
+};
+
+const SIGN_ELEMENTS: Record<string, string> = {
+  Aries: 'fire', Leo: 'fire', Sagittarius: 'fire',
+  Taurus: 'earth', Virgo: 'earth', Capricorn: 'earth',
+  Gemini: 'air', Libra: 'air', Aquarius: 'air',
+  Cancer: 'water', Scorpio: 'water', Pisces: 'water',
+};
+
+function DailyTip({ sunSign, moonSign, language }: { sunSign: string; moonSign: string; language: string }) {
+  const t = language === 'ru' ? 'Совет дня' : 'Daily Tip';
+  // Rotate based on day of year + combine sun and moon elements for variety
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+  const sunElement = SIGN_ELEMENTS[sunSign] || 'water';
+  const moonElement = SIGN_ELEMENTS[moonSign] || 'water';
+  // Alternate between sun and moon element tips
+  const element = dayOfYear % 2 === 0 ? sunElement : moonElement;
+  const tips = DAILY_TIPS[element] || DAILY_TIPS.water;
+  const tip = tips[dayOfYear % tips.length];
+
+  return (
+    <section className="glass-card p-5 sm:p-6 animate-stagger-4">
+      <p className="lumina-label mb-3">{t}</p>
+      <p className="text-sm leading-relaxed text-cream">{language === 'ru' ? tip.ru : tip.en}</p>
+    </section>
+  );
+}
+
 export default function ChartPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
@@ -303,14 +361,7 @@ export default function ChartPage() {
               </div>
 
               {/* Daily Tip */}
-              <section className="glass-card p-5 sm:p-6 animate-stagger-4">
-                <p className="lumina-label mb-3">{t.dailyTip}</p>
-                <p className="text-sm leading-relaxed text-cream">
-                  {language === 'ru'
-                    ? 'Сегодня обрати внимание на свои эмоции — Луна подсказывает, что интуиция сильнее логики. Найди 10 минут для тишины.'
-                    : 'Pay attention to your emotions today — the Moon suggests intuition is stronger than logic. Find 10 minutes of quiet time.'}
-                </p>
-              </section>
+              <DailyTip sunSign={natalChart.zodiacSign} moonSign={moonSign || ''} language={language} />
             </>
           )}
 

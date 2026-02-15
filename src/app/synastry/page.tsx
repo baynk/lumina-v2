@@ -309,6 +309,11 @@ export default function SynastryPage() {
     } catch { return null; }
   });
   const [openSection, setOpenSection] = useState<keyof SynastryNarrative>('overallConnection');
+  const [shareUrl, setShareUrl] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('lumina_synastry_share_url') || '';
+  });
+  const [shareLinkLoading, setShareLinkLoading] = useState(false);
   const [savedPartners, setSavedPartners] = useState<SavedPartner[]>([]);
   const [connectionsLoading, setConnectionsLoading] = useState(false);
   const [connectionsError, setConnectionsError] = useState('');
@@ -623,7 +628,9 @@ export default function SynastryPage() {
         });
         if (saveRes.ok) {
           const { id: resultId } = await saveRes.json();
-          localStorage.setItem('lumina_synastry_share_url', `https://luminastrology.com/compatibility/${resultId}`);
+          const url = `https://luminastrology.com/compatibility/${resultId}`;
+          localStorage.setItem('lumina_synastry_share_url', url);
+          setShareUrl(url);
         }
       } catch {}
     } catch {
@@ -631,6 +638,55 @@ export default function SynastryPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const generateShareUrl = async () => {
+    if (!result || shareUrl) return shareUrl;
+    setShareLinkLoading(true);
+    try {
+      let cachedNames = { a: '', b: '' };
+      try { cachedNames = JSON.parse(localStorage.getItem('lumina_synastry_names') || '{}'); } catch {}
+      const nameA = personA.name || cachedNames.a || 'Person A';
+      const nameB = personB.name || cachedNames.b || 'Person B';
+      const sunA = result.synastry.personAChart.planets.find((p: { planet: string }) => p.planet === 'Sun')?.sign || '';
+      const sunB = result.synastry.personBChart.planets.find((p: { planet: string }) => p.planet === 'Sun')?.sign || '';
+      const res = await fetch('/api/synastry-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          personAName: nameA, personBName: nameB,
+          personASun: sunA, personBSun: sunB,
+          overallScore: result.synastry.categoryScores.overallConnection,
+          result,
+        }),
+      });
+      if (res.ok) {
+        const { id } = await res.json();
+        const url = `https://luminastrology.com/compatibility/${id}`;
+        localStorage.setItem('lumina_synastry_share_url', url);
+        setShareUrl(url);
+        return url;
+      }
+    } catch {} finally { setShareLinkLoading(false); }
+    return '';
+  };
+
+  const handleShareLink = async () => {
+    const url = shareUrl || await generateShareUrl();
+    if (!url) return;
+    if (navigator.share) {
+      try {
+        let cachedNames = { a: '', b: '' };
+        try { cachedNames = JSON.parse(localStorage.getItem('lumina_synastry_names') || '{}'); } catch {}
+        const nameA = personA.name || cachedNames.a || '';
+        const nameB = personB.name || cachedNames.b || '';
+        await navigator.share({ title: 'Lumina Compatibility', text: `✦ ${nameA} & ${nameB}`, url });
+        return;
+      } catch (e) { if ((e as Error).name === 'AbortError') return; }
+    }
+    await navigator.clipboard.writeText(url);
+    setToastMessage(language === 'ru' ? 'Ссылка скопирована ✓' : 'Link copied ✓');
+    setTimeout(() => setToastMessage(''), 2500);
   };
 
   const sections: { key: keyof SynastryNarrative; title: string; icon: string; text: string }[] = result
@@ -793,13 +849,28 @@ export default function SynastryPage() {
           </button>
         )}
 
-        {/* Share Card */}
+        {/* Share Link Button */}
+        <button
+          type="button"
+          onClick={handleShareLink}
+          disabled={shareLinkLoading}
+          className="mb-4 w-full rounded-2xl border border-purple-400/20 bg-purple-400/[0.06] py-3.5 text-sm font-medium text-purple-300 transition hover:bg-purple-400/10 disabled:opacity-50"
+        >
+          {shareLinkLoading
+            ? (language === 'ru' ? 'Создаём ссылку...' : 'Creating link...')
+            : (language === 'ru' ? '🔗 Поделиться ссылкой' : '🔗 Share Link')}
+        </button>
+        {shareUrl && (
+          <p className="mb-4 -mt-2 text-center text-[11px] text-cream/30 break-all">{shareUrl}</p>
+        )}
+
+        {/* Share Card (image) */}
         <ShareCard
           type="synastry-summary"
           title={`${nameA} & ${nameB}`}
           subtitle={result.interpretation.overallConnection}
           bullets={radarValues.map((v) => `${v.label}: ${v.value}%`)}
-          shareUrl={typeof window !== 'undefined' ? localStorage.getItem('lumina_synastry_share_url') || undefined : undefined}
+          shareUrl={shareUrl || undefined}
         />
 
         {/* Back to form */}

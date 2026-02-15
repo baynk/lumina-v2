@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     const instruction =
       body.language === 'ru'
-        ? 'Write in warm, modern Russian.'
+        ? 'IMPORTANT: Write ALL text in Russian (Cyrillic script). Every string value must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid jargon unless you immediately explain it.'
         : 'Write in warm modern English.';
 
     const prompt = [

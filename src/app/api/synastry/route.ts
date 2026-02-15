@@ -53,7 +53,7 @@ async function generateNarrative(body: RequestBody, synastryData: ReturnType<typ
 
   const languageInstruction =
     body.language === 'ru'
-      ? 'Write in natural conversational Russian. Avoid heavy jargon unless you immediately explain it.'
+      ? 'IMPORTANT: Write ALL text values in Russian (Cyrillic script). Every single string value in the JSON must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid heavy jargon unless you immediately explain it.'
       : 'Write in modern premium English. Avoid jargon unless you immediately explain it.';
 
   const prompt = [

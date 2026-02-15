@@ -30,7 +30,7 @@ async function generateAiDetails(alerts: TransitAlert[], language: 'en' | 'ru'):
 
   const languageInstruction =
     language === 'ru'
-      ? 'Write in natural conversational Russian.'
+      ? 'IMPORTANT: Write ALL text in Russian (Cyrillic script). Every string value must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid jargon unless you immediately explain it.'
       : 'Write in clear practical English.';
 
   const prompt = [

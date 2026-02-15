@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     const languageInstruction =
       body.language === 'ru'
-        ? 'Write in natural, conversational Russian as a native speaker. Use informal form and authentic astrological terms.'
+        ? 'IMPORTANT: Write ALL text in Russian (Cyrillic script). Every string value must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid jargon unless you immediately explain it.'
         : 'Write in natural modern English with a premium astrology tone.';
 
     const prompt = [

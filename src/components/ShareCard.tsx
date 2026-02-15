@@ -29,11 +29,12 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
     setStatus('');
 
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: null,
+      const el = cardRef.current;
+      const canvas = await html2canvas(el, {
+        backgroundColor: '#080c1f',
         scale: 2,
-        width: 360,
-        height: 640,
+        width: el.scrollWidth,
+        height: el.scrollHeight,
       });
 
       const blob = await new Promise<Blob | null>((resolve) => {
@@ -86,36 +87,39 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
     URL.revokeObjectURL(url);
   };
 
+  // Truncate subtitle to ~120 chars for the card so it fits
+  const shortSubtitle = subtitle.length > 120 ? subtitle.slice(0, 117).replace(/\s+\S*$/, '') + '…' : subtitle;
+
   return (
     <div className="glass-card p-4 sm:p-5">
       <div
         ref={cardRef}
-        className="relative mx-auto h-[640px] w-[360px] overflow-hidden rounded-[32px] border border-white/20 bg-midnight p-8"
+        className="relative mx-auto w-full max-w-[360px] overflow-hidden rounded-[32px] border border-white/20 bg-midnight p-6 sm:p-8"
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(167,139,250,0.28),transparent_45%),radial-gradient(circle_at_90%_25%,rgba(196,181,253,0.2),transparent_40%),linear-gradient(180deg,#080c1f_0%,#111738_100%)]" />
         <div className="absolute left-[-30px] top-[240px] h-44 w-44 rounded-full bg-lumina-accent/15 blur-3xl" />
         <div className="absolute right-[-20px] top-[70px] h-32 w-32 rounded-full bg-lumina-soft/10 blur-2xl" />
 
-        <div className="relative z-10 flex h-full flex-col text-warmWhite">
-          <p className="font-heading text-4xl text-lumina-soft">Lumina</p>
+        <div className="relative z-10 flex flex-col text-warmWhite">
+          <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
           <p className="mt-2 inline-flex w-fit rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.18em] text-cream">
             {typeLabel[type]}
           </p>
 
-          <div className="mt-10">
-            <h3 className="font-heading text-4xl leading-tight text-lumina-soft">{title}</h3>
-            <p className="mt-3 text-base leading-relaxed text-cream">{subtitle}</p>
+          <div className="mt-6">
+            <h3 className="font-heading text-2xl sm:text-3xl leading-tight text-lumina-soft">{title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-cream">{shortSubtitle}</p>
           </div>
 
-          <div className="mt-8 space-y-3">
-            {bullets.slice(0, 5).map((bullet, idx) => (
-              <div key={`${bullet}-${idx}`} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-relaxed text-warmWhite">
+          <div className="mt-5 space-y-2">
+            {bullets.slice(0, 6).map((bullet, idx) => (
+              <div key={`${bullet}-${idx}`} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm leading-relaxed text-warmWhite">
                 {bullet}
               </div>
             ))}
           </div>
 
-          <div className="mt-auto rounded-full border border-white/20 bg-white/5 px-4 py-2 text-center text-xs uppercase tracking-[0.18em] text-cream">
+          <div className="mt-6 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-center text-xs uppercase tracking-[0.18em] text-cream">
             {cta}
           </div>
         </div>

@@ -366,6 +366,8 @@ export default function SynastryPage() {
     return () => clearTimeout(timeout);
   }, [toastMessage]);
 
+  const autoFilledRef = useRef(false);
+
   const loadConnections = useCallback(async () => {
     if (!session?.user) return;
     setConnectionsLoading(true);
@@ -374,7 +376,34 @@ export default function SynastryPage() {
       const response = await fetch('/api/connections');
       if (!response.ok) throw new Error('failed');
       const payload = (await response.json()) as { connections?: SavedPartner[] };
-      setSavedPartners(payload.connections || []);
+      const partners = payload.connections || [];
+      setSavedPartners(partners);
+
+      // Auto-fill Person B if exactly one saved partner and haven't auto-filled yet
+      if (partners.length >= 1 && !autoFilledRef.current) {
+        autoFilledRef.current = true;
+        // Use the first/primary partner
+        const partner = partners[0];
+        const birthDate = partner.is_linked ? (partner.linked_birth_date || partner.partner_birth_date) : partner.partner_birth_date;
+        const birthTime = partner.is_linked ? (partner.linked_birth_time || partner.partner_birth_time) : partner.partner_birth_time;
+        const birthPlace = partner.is_linked ? (partner.linked_birth_place || partner.partner_birth_place) : partner.partner_birth_place;
+        const birthLatitude = partner.is_linked ? (partner.linked_birth_latitude ?? partner.partner_birth_latitude) : partner.partner_birth_latitude;
+        const birthLongitude = partner.is_linked ? (partner.linked_birth_longitude ?? partner.partner_birth_longitude) : partner.partner_birth_longitude;
+        const birthTimezone = partner.is_linked ? (partner.linked_birth_timezone || partner.partner_birth_timezone) : partner.partner_birth_timezone;
+        const [year = '', month = '', day = ''] = (birthDate || '').split('-');
+        const [hour = '', minute = ''] = (birthTime || '').split(':');
+        setPersonB((prev) => ({
+          ...prev,
+          name: partner.partner_name || partner.linked_user_name || '',
+          day, month, year, hour, minute,
+          locationQuery: birthPlace || '',
+          selectedLocationName: birthPlace || '',
+          latitude: birthLatitude ?? null,
+          longitude: birthLongitude ?? null,
+          timezone: birthTimezone || prev.timezone || 'UTC',
+          searchResults: [],
+        }));
+      }
     } catch {
       setConnectionsError(
         language === 'ru'
@@ -796,51 +825,13 @@ export default function SynastryPage() {
             t={t}
           />
           <div className="space-y-4">
-            {session?.user && (
-              <section className="glass-card p-5 sm:p-6">
-                <div className="mb-4">
-                  <h3 className="font-heading text-lg text-warmWhite">
-                    {language === 'ru' ? 'Сохраненные партнеры' : 'Saved Partners'}
-                  </h3>
-                  <p className="mt-1 text-xs text-cream/60">
-                    {language === 'ru'
-                      ? 'Выберите партнера для быстрого заполнения формы'
-                      : 'Select a partner to auto-fill the form'}
-                  </p>
-                </div>
-
-                <div className="mb-4 flex gap-2">
-                  <input
-                    className="lumina-input"
-                    value={connectCodeInput}
-                    onChange={(e) => setConnectCodeInput(e.target.value.toUpperCase())}
-                    placeholder={language === 'ru' ? 'Код LUNA-XXXX' : 'LUNA-XXXX code'}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleConnectWithCode}
-                    disabled={connectCodeLoading}
-                    className="lumina-button min-w-28 px-4 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {connectCodeLoading
-                      ? (language === 'ru' ? '...' : '...')
-                      : (language === 'ru' ? 'Подключить' : 'Connect')}
-                  </button>
-                </div>
-
-                {connectionsLoading && (
-                  <p className="text-sm text-cream/60">{language === 'ru' ? 'Загрузка...' : 'Loading...'}</p>
-                )}
-                {!connectionsLoading && savedPartners.length === 0 && !connectionsError && (
-                  <p className="text-sm text-cream/50">
-                    {language === 'ru' ? 'Пока нет сохраненных партнеров' : 'No saved partners yet'}
-                  </p>
-                )}
-                {connectionsError && (
-                  <p className="text-sm text-rose-300">{connectionsError}</p>
-                )}
-
-                <div className="mt-3 space-y-2">
+            {/* Show partner selector only when multiple saved partners */}
+            {session?.user && savedPartners.length > 1 && (
+              <section className="glass-card p-4 sm:p-5">
+                <p className="mb-3 text-xs font-medium uppercase tracking-wider text-cream/40">
+                  {language === 'ru' ? 'Выбрать партнёра' : 'Select partner'}
+                </p>
+                <div className="space-y-2">
                   {savedPartners.map((partner) => {
                     const place = partner.is_linked
                       ? (partner.linked_birth_place || partner.partner_birth_place)
@@ -853,12 +844,47 @@ export default function SynastryPage() {
                         className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3 text-left transition hover:border-lumina-accent/35 hover:bg-white/[0.06]"
                       >
                         <p className="text-sm font-medium text-warmWhite">{partner.partner_name}</p>
-                        <p className="text-xs text-cream/60">{place || (language === 'ru' ? 'Место не указано' : 'No place set')}</p>
+                        <p className="text-xs text-cream/50">{place || ''}</p>
                       </button>
                     );
                   })}
                 </div>
               </section>
+            )}
+
+            {/* Connect with code — collapsed behind a link */}
+            {session?.user && (
+              <div className="text-center">
+                {!connectCodeInput.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => setConnectCodeInput(' ')}
+                    className="text-xs text-lumina-accent/50 hover:text-lumina-accent/80 transition"
+                  >
+                    {language === 'ru' ? 'Подключить по коду партнёра' : 'Connect with partner code'}
+                  </button>
+                )}
+                {connectCodeInput.trim() && (
+                  <div className="flex gap-2 mt-1">
+                    <input
+                      className="lumina-input text-center"
+                      value={connectCodeInput.trim()}
+                      onChange={(e) => setConnectCodeInput(e.target.value.toUpperCase())}
+                      placeholder="LUNA-XXXX"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={handleConnectWithCode}
+                      disabled={connectCodeLoading}
+                      className="lumina-button min-w-20 px-4 disabled:opacity-60"
+                    >
+                      {connectCodeLoading ? '...' : 'OK'}
+                    </button>
+                  </div>
+                )}
+                {connectionsError && <p className="mt-2 text-xs text-rose-300">{connectionsError}</p>}
+              </div>
             )}
 
             <PersonCard

@@ -40,30 +40,17 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
     setStatus('Creating...');
     const blob = await generateImage();
     
-    if (blob) {
+    if (blob && navigator.share) {
       const file = new File([blob], 'lumina-compatibility.png', { type: 'image/png' });
       
-      // Check if we can share files
+      // Just try sharing with file directly — don't pre-check canShare (buggy on iOS Safari)
       try {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file] });
-          setStatus('');
-          return;
-        }
+        await navigator.share({ files: [file] });
+        setStatus('');
+        return;
       } catch (e) {
         if ((e as Error).name === 'AbortError') { setStatus(''); return; }
-      }
-
-      // If file share not supported, save to downloads and open text share
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'lumina-compatibility.png';
-      a.click();
-      URL.revokeObjectURL(url);
-
-      // Then open share sheet with text + link
-      if (navigator.share) {
+        // File share failed — try text+url share
         try {
           await navigator.share({
             title: 'Lumina — Compatibility',
@@ -72,16 +59,12 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
           });
           setStatus('');
           return;
-        } catch { /* fall through */ }
+        } catch (e2) {
+          if ((e2 as Error).name === 'AbortError') { setStatus(''); return; }
+        }
       }
-
-      setStatus('Image saved ✓');
-      setTimeout(() => setStatus(''), 2500);
-      return;
-    }
-    
-    // No image — share text only
-    if (navigator.share) {
+    } else if (navigator.share) {
+      // No image but have share API
       try {
         await navigator.share({
           title: 'Lumina — Compatibility',
@@ -90,13 +73,17 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
         });
         setStatus('');
         return;
-      } catch { /* fall through */ }
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') { setStatus(''); return; }
+      }
     }
 
-    // Final fallback
+    // Final fallback — clipboard
     const text = `✦ ${title}\n${bullets.join('\n')}\nluminastrology.com`;
-    await navigator.clipboard.writeText(text);
-    setStatus('Copied ✓');
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus('Copied ✓');
+    } catch { setStatus(''); }
     setTimeout(() => setStatus(''), 2500);
   };
 

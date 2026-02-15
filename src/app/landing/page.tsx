@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 /* ─── Translations ────────────────────────────── */
 const T = {
@@ -130,7 +130,7 @@ function StarCanvas() {
 
     const resize = () => {
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight * 3; // covers multiple sections
+      canvas.height = document.documentElement.scrollHeight || window.innerHeight * 6;
     };
 
     const init = () => {
@@ -167,21 +167,21 @@ function StarCanvas() {
     return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
   }, []);
 
-  return <canvas ref={ref} className="pointer-events-none fixed inset-0 z-0 opacity-60" />;
+  return <canvas ref={ref} className="pointer-events-none absolute inset-x-0 top-0 z-0 opacity-60" />;
 }
 
 /* ─── Zodiac wheel SVG (hero illustration) ────── */
 function ZodiacWheel() {
   const signs = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
   return (
-    <div className="relative w-72 h-72 sm:w-96 sm:h-96 mx-auto">
+    <div className="relative w-56 h-56 sm:w-72 sm:h-72 lg:w-96 lg:h-96 mx-auto">
       {/* Glow */}
       <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(196,181,253,0.08)_0%,transparent_70%)]" />
 
-      <svg viewBox="0 0 400 400" className="w-full h-full animate-[spin_120s_linear_infinite]">
+      <svg viewBox="0 0 400 400" className="w-full h-full animate-[spin_300s_linear_infinite]">
         {/* Outer ring */}
-        <circle cx="200" cy="200" r="185" fill="none" stroke="rgba(212,175,55,0.15)" strokeWidth="0.5" />
-        <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(212,175,55,0.1)" strokeWidth="0.5" />
+        <circle cx="200" cy="200" r="185" fill="none" stroke="rgba(168,139,250,0.15)" strokeWidth="0.5" />
+        <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(168,139,250,0.1)" strokeWidth="0.5" />
         <circle cx="200" cy="200" r="130" fill="none" stroke="rgba(196,181,253,0.06)" strokeWidth="0.5" />
 
         {/* Sign divisions */}
@@ -191,7 +191,7 @@ function ZodiacWheel() {
           const y1 = 200 + 160 * Math.sin(angle);
           const x2 = 200 + 185 * Math.cos(angle);
           const y2 = 200 + 185 * Math.sin(angle);
-          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(212,175,55,0.12)" strokeWidth="0.5" />;
+          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(168,139,250,0.12)" strokeWidth="0.5" />;
         })}
 
         {/* Zodiac symbols */}
@@ -199,7 +199,7 @@ function ZodiacWheel() {
           const angle = ((i * 30) + 15 - 90) * Math.PI / 180;
           const x = 200 + 172 * Math.cos(angle);
           const y = 200 + 172 * Math.sin(angle);
-          return <text key={s} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fill="rgba(212,175,55,0.4)" fontSize="16" className="font-heading">{s}</text>;
+          return <text key={s} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fill="rgba(168,139,250,0.4)" fontSize="16" className="font-heading">{s}</text>;
         })}
 
         {/* Inner decorative elements */}
@@ -218,20 +218,22 @@ function ZodiacWheel() {
 
       {/* Center text */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <p className="font-heading text-3xl sm:text-4xl text-[rgba(212,175,55,0.5)] tracking-[0.15em]">✦</p>
+        <p className="font-heading text-3xl sm:text-4xl text-[rgba(168,139,250,0.5)] tracking-[0.15em]">✦</p>
       </div>
     </div>
   );
 }
 
-/* ─── Moon Phase Divider ──────────────────────── */
-function MoonDivider() {
-  const phases = ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌑'];
+/* ─── Decorative Divider ──────────────────────── */
+function CelestialDivider() {
   return (
-    <div className="flex items-center justify-center gap-4 py-2">
-      {phases.map((p, i) => (
-        <span key={i} className="text-lg opacity-20">{p}</span>
-      ))}
+    <div className="flex items-center justify-center gap-3 py-2">
+      <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#A78BFA]/15" />
+      <svg width="20" height="20" viewBox="0 0 20 20" className="text-[#A78BFA]/20">
+        <circle cx="10" cy="10" r="3" fill="currentColor" />
+        <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="0.5" />
+      </svg>
+      <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#A78BFA]/15" />
     </div>
   );
 }
@@ -241,10 +243,21 @@ export default function LandingPage() {
   const router = useRouter();
   const { language } = useLanguage();
   const t = T[language] || T.en;
-  const [scrollY, setScrollY] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
+    const el = heroRef.current;
+    if (!el) return;
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          if (el) el.style.transform = `translateY(${window.scrollY * 0.25}px)`;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -257,15 +270,15 @@ export default function LandingPage() {
       <StarCanvas />
 
       {/* ═══ HERO ═══ */}
-      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 text-center">
+      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-5 sm:px-6 text-center">
         {/* Parallax background image */}
         <div
-          className="absolute inset-0 z-0 opacity-30"
+          ref={heroRef}
+          className="absolute inset-0 z-0 opacity-30 will-change-transform"
           style={{
             backgroundImage: 'url(/images/brand/deep-space.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            transform: `translateY(${scrollY * 0.3}px)`,
           }}
         />
         {/* Gradient overlay for depth */}
@@ -276,14 +289,14 @@ export default function LandingPage() {
           <ZodiacWheel />
 
           {/* Eyebrow */}
-          <p className="mt-6 text-[11px] tracking-[0.35em] uppercase text-[#D4AF37]/50 font-medium">
+          <p className="mt-6 text-[11px] tracking-[0.35em] uppercase text-[#A78BFA]/50 font-medium">
             {t.heroEyebrow}
           </p>
 
           {/* Title */}
           <h1 className="mt-4 font-heading text-4xl sm:text-5xl lg:text-[3.5rem] leading-[1.1] text-cream">
             {t.heroTitle1}<br />
-            <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D58D] to-[#D4AF37] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#A78BFA] via-[#C4B5FD] to-[#A78BFA] bg-clip-text text-transparent">
               {t.heroTitle2}
             </span>
           </h1>
@@ -296,7 +309,7 @@ export default function LandingPage() {
           {/* CTA */}
           <button
             onClick={goToApp}
-            className="mt-10 rounded-full bg-gradient-to-r from-[#D4AF37]/90 to-[#C49B30]/90 px-10 py-4 text-[15px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(212,175,55,0.15)] transition hover:shadow-[0_0_40px_rgba(212,175,55,0.25)] hover:from-[#D4AF37] hover:to-[#C49B30]"
+            className="mt-10 rounded-full bg-gradient-to-r from-[#A78BFA]/90 to-[#8B5CF6]/90 px-10 py-4 text-[15px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)] hover:from-[#A78BFA] hover:to-[#8B5CF6]"
           >
             {t.heroCta}
           </button>
@@ -306,14 +319,14 @@ export default function LandingPage() {
         {/* Scroll indicator */}
         <div className="absolute bottom-8 z-10 animate-bounce opacity-30">
           <svg width="18" height="28" viewBox="0 0 18 28" fill="none">
-            <rect x="1" y="1" width="16" height="26" rx="8" stroke="rgba(212,175,55,0.4)" strokeWidth="1" />
-            <circle cx="9" cy="8" r="1.5" fill="rgba(212,175,55,0.5)" className="animate-pulse" />
+            <rect x="1" y="1" width="16" height="26" rx="8" stroke="rgba(168,139,250,0.4)" strokeWidth="1" />
+            <circle cx="9" cy="8" r="1.5" fill="rgba(168,139,250,0.5)" className="animate-pulse" />
           </svg>
         </div>
       </section>
 
       {/* ═══ CREDIBILITY ═══ */}
-      <section className="relative z-10 border-y border-[#D4AF37]/[0.06]">
+      <section className="relative z-10 border-y border-[#A78BFA]/[0.06]">
         <div className="mx-auto max-w-4xl px-4 py-14 grid grid-cols-1 sm:grid-cols-3 gap-10 text-center">
           {[
             { a: t.cred1, b: t.cred1b, d: t.cred1d },
@@ -322,7 +335,7 @@ export default function LandingPage() {
           ].map((item) => (
             <div key={item.a}>
               <p className="text-[13px] font-heading">
-                <span className="text-[#D4AF37]/70">{item.a}</span>
+                <span className="text-[#A78BFA]/70">{item.a}</span>
                 <span className="text-cream/30"> · </span>
                 <span className="text-cream/50">{item.b}</span>
               </p>
@@ -334,17 +347,17 @@ export default function LandingPage() {
 
       {/* ═══ BENEFITS ═══ */}
       {[
-        { tag: t.ben1Tag, title: t.ben1Title, p: t.ben1P, align: 'left' as const },
-        { tag: t.ben2Tag, title: t.ben2Title, p: t.ben2P, align: 'right' as const },
-        { tag: t.ben3Tag, title: t.ben3Title, p: t.ben3P, align: 'left' as const },
+        { tag: t.ben1Tag, title: t.ben1Title, p: t.ben1P },
+        { tag: t.ben2Tag, title: t.ben2Title, p: t.ben2P },
+        { tag: t.ben3Tag, title: t.ben3Title, p: t.ben3P },
       ].map((ben, i) => (
-        <section key={i} className={`relative z-10 py-24 px-4 ${i % 2 === 1 ? 'bg-white/[0.01]' : ''}`}>
-          <div className={`mx-auto max-w-3xl ${ben.align === 'right' ? 'text-right' : ''}`}>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-[#D4AF37]/40 font-medium">{ben.tag}</p>
-            <h2 className="mt-3 font-heading text-2xl sm:text-3xl text-cream/90 leading-snug max-w-lg" style={ben.align === 'right' ? { marginLeft: 'auto' } : {}}>
+        <section key={i} className={`relative z-10 py-20 sm:py-24 px-4 ${i % 2 === 1 ? 'bg-white/[0.01]' : ''}`}>
+          <div className="mx-auto max-w-2xl">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-[#A78BFA]/40 font-medium">{ben.tag}</p>
+            <h2 className="mt-3 font-heading text-2xl sm:text-3xl text-cream/90 leading-snug">
               {ben.title}
             </h2>
-            <p className="mt-4 text-[14px] leading-[1.85] text-cream/40 max-w-md" style={ben.align === 'right' ? { marginLeft: 'auto' } : {}}>
+            <p className="mt-4 text-[14px] leading-[1.85] text-cream/40 max-w-md">
               {ben.p}
             </p>
           </div>
@@ -353,7 +366,7 @@ export default function LandingPage() {
 
       {/* ═══ DIVIDER ═══ */}
       <div className="relative z-10 py-6">
-        <MoonDivider />
+        <CelestialDivider />
       </div>
 
       {/* ═══ HOW IT WORKS ═══ */}
@@ -368,8 +381,8 @@ export default function LandingPage() {
               { n: '03', title: t.step3, desc: t.step3d },
             ].map((step) => (
               <div key={step.n} className="flex gap-6">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full border border-[#D4AF37]/20 flex items-center justify-center">
-                  <span className="text-[13px] font-heading text-[#D4AF37]/50">{step.n}</span>
+                <div className="flex-shrink-0 w-12 h-12 rounded-full border border-[#A78BFA]/20 flex items-center justify-center">
+                  <span className="text-[13px] font-heading text-[#A78BFA]/50">{step.n}</span>
                 </div>
                 <div>
                   <h3 className="text-[15px] font-semibold text-cream/80">{step.title}</h3>
@@ -384,7 +397,7 @@ export default function LandingPage() {
       {/* ═══ PRECISION ═══ */}
       <section className="relative z-10 py-20 px-4 bg-white/[0.01]">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-[#D4AF37]/30">✦</p>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-[#A78BFA]/30">✦</p>
           <h2 className="mt-4 font-heading text-2xl text-cream/70">{t.precTitle}</h2>
           <p className="mt-6 text-[14px] leading-[1.9] text-cream/35">{t.precP}</p>
         </div>
@@ -405,9 +418,9 @@ export default function LandingPage() {
               <button
                 key={tier.t}
                 onClick={goToConsultation}
-                className="group rounded-2xl border border-white/[0.05] bg-white/[0.02] p-7 text-center transition hover:border-[#D4AF37]/20 hover:bg-white/[0.03]"
+                className="group rounded-2xl border border-white/[0.05] bg-white/[0.02] p-7 text-center transition hover:border-[#A78BFA]/20 hover:bg-white/[0.03]"
               >
-                <p className="text-3xl font-heading text-[#D4AF37]/60 group-hover:text-[#D4AF37]/80 transition">{tier.p}</p>
+                <p className="text-3xl font-heading text-[#A78BFA]/60 group-hover:text-[#A78BFA]/80 transition">{tier.p}</p>
                 <p className="mt-3 text-[13px] font-medium text-cream/70">{tier.t}</p>
                 <p className="mt-2 text-[11px] text-cream/30 leading-relaxed">{tier.d}</p>
               </button>
@@ -416,7 +429,7 @@ export default function LandingPage() {
 
           <button
             onClick={goToConsultation}
-            className="mt-8 text-[12px] text-[#D4AF37]/40 hover:text-[#D4AF37]/70 transition tracking-wider"
+            className="mt-8 text-[12px] text-[#A78BFA]/40 hover:text-[#A78BFA]/70 transition tracking-wider"
           >
             {t.consultCta} →
           </button>
@@ -426,7 +439,7 @@ export default function LandingPage() {
       {/* ═══ FINAL CTA ═══ */}
       <section className="relative z-10 py-32 px-4 text-center">
         {/* Subtle glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#D4AF37]/[0.02] blur-[80px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#A78BFA]/[0.02] blur-[80px] pointer-events-none" />
 
         <div className="relative">
           <p className="font-heading text-xl sm:text-2xl text-cream/40 italic max-w-lg mx-auto leading-relaxed">
@@ -435,7 +448,7 @@ export default function LandingPage() {
           <p className="mt-4 text-[14px] text-cream/25">{t.finalP}</p>
           <button
             onClick={goToApp}
-            className="mt-10 rounded-full bg-gradient-to-r from-[#D4AF37]/90 to-[#C49B30]/90 px-10 py-4 text-[15px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(212,175,55,0.15)] transition hover:shadow-[0_0_40px_rgba(212,175,55,0.25)]"
+            className="mt-10 rounded-full bg-gradient-to-r from-[#A78BFA]/90 to-[#8B5CF6]/90 px-10 py-4 text-[15px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
           >
             {t.finalCta}
           </button>
@@ -444,7 +457,7 @@ export default function LandingPage() {
 
       {/* ═══ FOOTER ═══ */}
       <footer className="relative z-10 border-t border-white/[0.03] py-10 text-center">
-        <p className="font-heading text-lg tracking-[0.15em] text-[#D4AF37]/20">LUMINA</p>
+        <p className="font-heading text-lg tracking-[0.15em] text-[#A78BFA]/20">LUMINA</p>
         <p className="mt-2 text-[10px] text-cream/15 tracking-wider">JPL DE421 · Equal House System</p>
       </footer>
     </div>

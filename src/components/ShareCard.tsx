@@ -39,38 +39,41 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
   const share = async () => {
     setStatus('Creating...');
     const blob = await generateImage();
-    
-    if (blob && navigator.share) {
-      const file = new File([blob], 'lumina-compatibility.png', { type: 'image/png' });
-      
-      // Just try sharing with file directly — don't pre-check canShare (buggy on iOS Safari)
-      try {
-        await navigator.share({ files: [file] });
-        setStatus('');
-        return;
-      } catch (e) {
-        if ((e as Error).name === 'AbortError') { setStatus(''); return; }
-        // File share failed — try text+url share
+    if (!blob) { setStatus('Error'); setTimeout(() => setStatus(''), 2000); return; }
+
+    const file = new File([blob], 'lumina-compatibility.png', { type: 'image/png' });
+    const shareText = `✦ ${title}\n${bullets.join(' · ')}`;
+
+    // Attempt 1: share with files + text + url (full share sheet)
+    if (navigator.share) {
+      const shareData: ShareData = {
+        files: [file],
+        title: 'Lumina',
+        text: shareText,
+        url: 'https://luminastrology.com',
+      };
+
+      // Check if this device supports file sharing
+      const canShareFiles = typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] });
+
+      if (canShareFiles) {
         try {
-          await navigator.share({
-            title: 'Lumina — Compatibility',
-            text: `✦ ${title}\n${bullets.join(' · ')}`,
-            url: 'https://luminastrology.com/synastry',
-          });
+          await navigator.share(shareData);
           setStatus('');
           return;
-        } catch (e2) {
-          if ((e2 as Error).name === 'AbortError') { setStatus(''); return; }
+        } catch (e) {
+          if ((e as Error).name === 'AbortError') { setStatus(''); return; }
         }
       }
-    } else if (navigator.share) {
-      // No image but have share API
+
+      // Attempt 2: share text + url only (still opens share sheet on iOS!)
       try {
-        await navigator.share({
-          title: 'Lumina — Compatibility',
-          text: `✦ ${title}\n${bullets.join(' · ')}`,
-          url: 'https://luminastrology.com/synastry',
-        });
+        await navigator.share({ title: 'Lumina', text: shareText, url: 'https://luminastrology.com' });
+        // Also save image so they have it in downloads
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'lumina-compatibility.png'; a.click();
+        URL.revokeObjectURL(url);
         setStatus('');
         return;
       } catch (e) {
@@ -78,13 +81,18 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
       }
     }
 
-    // Final fallback — clipboard
-    const text = `✦ ${title}\n${bullets.join('\n')}\nluminastrology.com`;
+    // Attempt 3: save image + copy text
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'lumina-compatibility.png'; a.click();
+    URL.revokeObjectURL(url);
     try {
-      await navigator.clipboard.writeText(text);
-      setStatus('Copied ✓');
-    } catch { setStatus(''); }
-    setTimeout(() => setStatus(''), 2500);
+      await navigator.clipboard.writeText(`${shareText}\nluminastrology.com`);
+      setStatus('Image saved + text copied ✓');
+    } catch {
+      setStatus('Image saved ✓');
+    }
+    setTimeout(() => setStatus(''), 3000);
   };
 
   const download = async () => {

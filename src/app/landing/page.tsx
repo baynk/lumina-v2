@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react'; // useRef for StarCanvas
 
 /* ─── Translations ────────────────────────────── */
 const T = {
@@ -243,46 +243,21 @@ export default function LandingPage() {
   const router = useRouter();
   const { language } = useLanguage();
   const t = T[language] || T.en;
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
-    let ticking = false;
-    const onScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          if (el) el.style.transform = `translateY(${window.scrollY * 0.25}px)`;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   const goToApp = () => router.push('/');
   const goToConsultation = () => router.push('/consultation');
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden" style={{ background: '#080C1F' }}>
+      {/* Full-page starfield background */}
+      <div className="fixed inset-0 z-0 opacity-25" style={{
+        backgroundImage: 'url(/images/brand/deep-space.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+      }} />
       <StarCanvas />
 
       {/* ═══ HERO ═══ */}
       <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-5 sm:px-6 text-center">
-        {/* Parallax background image */}
-        <div
-          ref={heroRef}
-          className="absolute inset-0 z-0 opacity-30 will-change-transform"
-          style={{
-            backgroundImage: 'url(/images/brand/deep-space.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        {/* Gradient overlay — extra tall to bleed into next section */}
-        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[#080C1F]/70 via-[#080C1F]/20 to-[#080C1F]" style={{ bottom: '-20vh' }} />
 
         <div className="relative z-10 max-w-2xl">
           {/* Zodiac wheel */}

@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import UserMenu from '@/components/UserMenu';
 import LanguageToggle from '@/components/LanguageToggle';
 import BottomNav from '@/components/BottomNav';
+import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 
 const dmSerif = DM_Serif_Display({
   subsets: ['latin', 'latin-ext'],
@@ -45,7 +46,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${dmSerif.variable} ${inter.variable}`}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#080C1F" />
+      </head>
       <body className="min-h-screen bg-midnight text-warmWhite font-body antialiased">
+        <ServiceWorkerRegistrar />
         <AppProviders>
           <div className="star-field" aria-hidden="true" />
           <div className="celestial-gradient" aria-hidden="true" />

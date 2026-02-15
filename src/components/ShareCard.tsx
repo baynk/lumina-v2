@@ -43,42 +43,60 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
     if (blob) {
       const file = new File([blob], 'lumina-compatibility.png', { type: 'image/png' });
       
-      // Try native share with file
+      // Check if we can share files
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+          setStatus('');
+          return;
+        }
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') { setStatus(''); return; }
+      }
+
+      // If file share not supported, save to downloads and open text share
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lumina-compatibility.png';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // Then open share sheet with text + link
       if (navigator.share) {
         try {
           await navigator.share({
-            files: [file],
+            title: 'Lumina — Compatibility',
+            text: `✦ ${title}\n${bullets.join(' · ')}`,
+            url: 'https://luminastrology.com/synastry',
           });
           setStatus('');
           return;
-        } catch (e) {
-          // User cancelled or share failed — try without files
-          if ((e as Error).name !== 'AbortError') {
-            try {
-              await navigator.share({
-                title: 'Lumina Compatibility',
-                text: `${title} — ${bullets.join(' · ')}`,
-                url: 'https://luminastrology.com',
-              });
-              setStatus('');
-              return;
-            } catch { /* fall through */ }
-          } else {
-            setStatus('');
-            return;
-          }
-        }
+        } catch { /* fall through */ }
       }
+
+      setStatus('Image saved ✓');
+      setTimeout(() => setStatus(''), 2500);
+      return;
     }
     
-    // Fallback: text share or clipboard
-    const text = `✦ ${title}\n${bullets.join('\n')}\n\nluminastrology.com`;
-    try {
-      await navigator.clipboard.writeText(text);
-      setStatus('Copied to clipboard ✓');
-    } catch {
-      setStatus('');
+    // No image — share text only
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Lumina — Compatibility',
+          text: `✦ ${title}\n${bullets.join(' · ')}`,
+          url: 'https://luminastrology.com/synastry',
+        });
+        setStatus('');
+        return;
+      } catch { /* fall through */ }
     }
+
+    // Final fallback
+    const text = `✦ ${title}\n${bullets.join('\n')}\nluminastrology.com`;
+    await navigator.clipboard.writeText(text);
+    setStatus('Copied ✓');
     setTimeout(() => setStatus(''), 2500);
   };
 

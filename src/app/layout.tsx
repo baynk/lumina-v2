@@ -8,6 +8,8 @@ import LanguageToggle from '@/components/LanguageToggle';
 import BottomNav from '@/components/BottomNav';
 import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com';
+
 const dmSerif = DM_Serif_Display({
   subsets: ['latin', 'latin-ext'],
   weight: '400',
@@ -24,12 +26,26 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Lumina — Astrology & Celestial Guidance',
   description: 'Premium astrology insights with natal chart precision and daily celestial guidance.',
+  metadataBase: new URL(siteUrl),
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/icons/icon-192x192.png',
+  },
   openGraph: {
     title: 'Lumina — Astrology & Celestial Guidance',
     description: 'Premium astrology insights with natal chart precision and daily celestial guidance.',
-    url: 'https://luminastrology.com',
+    url: siteUrl,
     siteName: 'Lumina',
     type: 'website',
+    images: [
+      {
+        url: `${siteUrl}/images/og-default.jpg`,
+        width: 1200,
+        height: 630,
+        alt: 'Lumina',
+      },
+    ],
   },
 };
 

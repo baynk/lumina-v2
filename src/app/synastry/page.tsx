@@ -538,7 +538,13 @@ export default function SynastryPage() {
       const response = await fetch('/api/synastry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ birthDataA: toBirthData(personA), birthDataB: toBirthData(personB), language }),
+        body: JSON.stringify({
+          birthDataA: toBirthData(personA),
+          birthDataB: toBirthData(personB),
+          nameA: personA.name,
+          nameB: personB.name,
+          language,
+        }),
       });
       if (!response.ok) throw new Error('failed');
       const payload = (await response.json()) as SynastryResponse;

@@ -6,6 +6,8 @@ import type { BirthData, SynastryNarrative } from '@/types';
 type RequestBody = {
   birthDataA: BirthData;
   birthDataB: BirthData;
+  nameA?: string;
+  nameB?: string;
   language: 'en' | 'ru';
 };
 
@@ -55,11 +57,14 @@ async function generateNarrative(body: RequestBody, synastryData: ReturnType<typ
     body.language === 'ru'
       ? 'IMPORTANT: Write ALL text values in Russian (Cyrillic script). Every single string value in the JSON must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid heavy jargon unless you immediately explain it.'
       : 'Write in modern premium English. Avoid jargon unless you immediately explain it.';
+  const nameA = body.nameA?.trim() || 'Person A';
+  const nameB = body.nameB?.trim() || 'Person B';
 
   const prompt = [
     'You are a relationship astrologer writing for a smart friend who is curious about astrology but not an expert.',
     'Be honest. Mention challenges, not only positives.',
     languageInstruction,
+    `Person A is named ${nameA}. Person B is named ${nameB}. Use their actual names throughout the narrative.`,
     'Use their actual placements and aspects from the provided synastry data.',
     'Return ONLY valid JSON with keys:',
     '{"overallConnection":"...","communicationStyle":"...","emotionalCompatibility":"...","attractionChemistry":"...","growthChallenges":"...","longTermPotential":"..."}',

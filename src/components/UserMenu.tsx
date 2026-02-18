@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from 'react';
 export default function UserMenu() {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,9 +20,25 @@ export default function UserMenu() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    setImageLoaded(false);
+    setImageError(false);
+  }, [session?.user?.image]);
+
+  const initials = session?.user?.name
+    ? session.user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : '?';
+
   if (status === 'loading') {
     return (
-      <div className="h-8 w-8 rounded-full bg-white/10 animate-pulse" />
+      <div className="flex h-8 w-8 items-center justify-center rounded-full border border-lumina-accent/30 bg-lumina-accent/20 text-xs font-semibold text-lumina-soft">
+        {initials}
+      </div>
     );
   }
 
@@ -39,14 +57,7 @@ export default function UserMenu() {
     );
   }
 
-  const initials = session.user?.name
-    ? session.user.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : '?';
+  const hasImage = Boolean(session.user?.image) && !imageError;
 
   return (
     <div ref={menuRef} className="relative">
@@ -54,17 +65,24 @@ export default function UserMenu() {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 transition"
       >
-        {session.user?.image ? (
-          <img
-            src={session.user.image}
-            alt=""
-            className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-white/20 object-cover"
-          />
-        ) : (
-          <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-lumina-accent/20 border border-lumina-accent/30 text-[10px] sm:text-xs font-semibold text-lumina-soft">
-            {initials}
-          </div>
-        )}
+        <div className="relative h-7 w-7 sm:h-8 sm:w-8">
+          {hasImage && (
+            <img
+              src={session.user?.image || ''}
+              alt=""
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
+              className={`h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-white/20 object-cover transition-opacity ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          )}
+          {(!hasImage || !imageLoaded) && (
+            <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-lumina-accent/30 bg-lumina-accent/20 text-[10px] sm:text-xs font-semibold text-lumina-soft">
+              {initials}
+            </div>
+          )}
+        </div>
       </button>
 
       {open && (

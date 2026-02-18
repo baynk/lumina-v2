@@ -320,48 +320,52 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ BENEFITS ═══ */}
-      {[
-        { tag: t.ben1Tag, title: t.ben1Title, p: t.ben1P },
-        { tag: t.ben2Tag, title: t.ben2Title, p: t.ben2P },
-        { tag: t.ben3Tag, title: t.ben3Title, p: t.ben3P },
-      ].map((ben, i) => (
-        <section key={i} className="relative z-10 py-20 sm:py-24 lg:py-32 xl:py-36 px-6 lg:px-12">
-          <div className="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-4xl">
-            <p className="text-[10px] lg:text-[12px] xl:text-[13px] tracking-[0.3em] uppercase text-[#A78BFA]/40 font-medium">{ben.tag}</p>
-            <h2 className="mt-3 font-heading text-2xl sm:text-3xl lg:text-5xl xl:text-6xl text-cream/90 leading-snug">
-              {ben.title}
-            </h2>
-            <p className="mt-4 lg:mt-6 text-[14px] lg:text-[18px] xl:text-[20px] leading-[1.85] text-cream/40 max-w-md lg:max-w-2xl">
-              {ben.p}
-            </p>
+      {/* ═══ BENEFITS (compact grid on desktop) ═══ */}
+      <section className="relative z-10 py-16 sm:py-20 lg:py-24 px-6 lg:px-12">
+        <div className="mx-auto max-w-5xl lg:max-w-6xl">
+          <div className="grid gap-8 sm:gap-6 lg:grid-cols-3 lg:gap-10">
+            {[
+              { tag: t.ben1Tag, title: t.ben1Title, p: t.ben1P },
+              { tag: t.ben2Tag, title: t.ben2Title, p: t.ben2P },
+              { tag: t.ben3Tag, title: t.ben3Title, p: t.ben3P },
+            ].map((ben, i) => (
+              <div key={i} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 lg:p-8">
+                <p className="text-[10px] lg:text-[11px] tracking-[0.3em] uppercase text-[#A78BFA]/40 font-medium">{ben.tag}</p>
+                <h2 className="mt-3 font-heading text-xl sm:text-2xl lg:text-2xl xl:text-3xl text-cream/90 leading-snug">
+                  {ben.title}
+                </h2>
+                <p className="mt-3 text-[13px] lg:text-[15px] xl:text-[16px] leading-[1.8] text-cream/40">
+                  {ben.p}
+                </p>
+              </div>
+            ))}
           </div>
-        </section>
-      ))}
+        </div>
+      </section>
 
       {/* ═══ DIVIDER ═══ */}
-      <div className="relative z-10 py-6">
+      <div className="relative z-10 py-4 lg:py-6">
         <CelestialDivider />
       </div>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section className="relative z-10 py-24 lg:py-36 xl:py-40 px-6 lg:px-12">
-        <div className="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-4xl text-center">
-          <h2 className="font-heading text-3xl lg:text-5xl xl:text-6xl text-cream/80">{t.howTitle}</h2>
+      <section className="relative z-10 py-16 sm:py-20 lg:py-24 px-6 lg:px-12">
+        <div className="mx-auto max-w-2xl lg:max-w-5xl text-center">
+          <h2 className="font-heading text-3xl lg:text-4xl xl:text-5xl text-cream/80">{t.howTitle}</h2>
 
-          <div className="mt-16 lg:mt-24 space-y-14 lg:space-y-16 text-left">
+          <div className="mt-12 lg:mt-16 grid gap-8 lg:grid-cols-3 lg:gap-10 text-left">
             {[
               { n: '01', title: t.step1, desc: t.step1d },
               { n: '02', title: t.step2, desc: t.step2d },
               { n: '03', title: t.step3, desc: t.step3d },
             ].map((step) => (
-              <div key={step.n} className="flex gap-6 lg:gap-10">
-                <div className="flex-shrink-0 w-12 h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-full border border-[#A78BFA]/20 flex items-center justify-center">
-                  <span className="text-[13px] lg:text-[16px] xl:text-[18px] font-heading text-[#A78BFA]/50">{step.n}</span>
+              <div key={step.n} className="flex gap-5 lg:flex-col lg:text-center lg:items-center">
+                <div className="flex-shrink-0 w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#A78BFA]/20 flex items-center justify-center">
+                  <span className="text-[13px] lg:text-[15px] font-heading text-[#A78BFA]/50">{step.n}</span>
                 </div>
                 <div>
-                  <h3 className="text-[15px] lg:text-[20px] xl:text-[22px] font-semibold text-cream/80">{step.title}</h3>
-                  <p className="mt-1.5 text-[13px] lg:text-[17px] xl:text-[18px] leading-relaxed text-cream/35">{step.desc}</p>
+                  <h3 className="text-[15px] lg:text-[18px] xl:text-[20px] font-semibold text-cream/80">{step.title}</h3>
+                  <p className="mt-1.5 text-[13px] lg:text-[15px] xl:text-[16px] leading-relaxed text-cream/35">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -369,52 +373,70 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ PRECISION ═══ */}
-      <section className="relative z-10 py-20 lg:py-32 xl:py-36 px-6 lg:px-12">
-        <div className="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-4xl text-center">
+      {/* ═══ PRECISION + CTA combined ═══ */}
+      <section className="relative z-10 py-16 sm:py-20 lg:py-24 px-6 lg:px-12">
+        <div className="mx-auto max-w-2xl lg:max-w-3xl text-center">
           <p className="text-[10px] lg:text-[12px] tracking-[0.3em] uppercase text-[#A78BFA]/30">✦</p>
-          <h2 className="mt-4 font-heading text-2xl lg:text-4xl xl:text-5xl text-cream/70">{t.precTitle}</h2>
-          <p className="mt-6 lg:mt-8 text-[14px] lg:text-[18px] xl:text-[20px] leading-[1.9] text-cream/35">{t.precP}</p>
-        </div>
-      </section>
-
-      {/* ═══ MID-PAGE CTA ═══ */}
-      <section className="relative z-10 py-20 lg:py-28 px-6 text-center">
-        <div className="mx-auto max-w-md lg:max-w-lg">
+          <h2 className="mt-4 font-heading text-2xl lg:text-3xl xl:text-4xl text-cream/70">{t.precTitle}</h2>
+          <p className="mt-5 text-[14px] lg:text-[17px] xl:text-[18px] leading-[1.9] text-cream/35">{t.precP}</p>
           <button
             onClick={goToApp}
-            className="w-full sm:w-auto rounded-full bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6] px-10 sm:px-16 lg:px-20 py-4 sm:py-5 lg:py-6 text-[15px] sm:text-[16px] lg:text-[18px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
+            className="mt-10 rounded-full bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6] px-10 sm:px-16 lg:px-18 py-4 sm:py-5 lg:py-5 text-[15px] sm:text-[16px] lg:text-[17px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
           >
             {t.heroCta}
           </button>
-          <p className="mt-3 text-[11px] lg:text-[13px] text-cream/25 tracking-wider">{t.heroSub}</p>
+          <p className="mt-3 text-[11px] lg:text-[12px] text-cream/25 tracking-wider">{t.heroSub}</p>
         </div>
       </section>
 
-      {/* ═══ PRACTITIONER (soft mention, not a hard sell) ═══ */}
-      <section className="relative z-10 py-16 lg:py-24 px-6">
-        <div className="mx-auto max-w-2xl lg:max-w-3xl xl:max-w-4xl text-center">
-          <p className="text-[13px] lg:text-[17px] xl:text-[18px] text-cream/30 leading-relaxed">{t.consultP}</p>
-          <button
-            onClick={goToConsultation}
-            className="mt-4 text-[12px] lg:text-[15px] text-[#A78BFA]/40 hover:text-[#A78BFA]/70 transition tracking-wider"
-          >
-            {t.consultCta} →
-          </button>
+      {/* ═══ PRACTITIONER PROFILE ═══ */}
+      <section className="relative z-10 py-16 sm:py-20 lg:py-24 px-6 lg:px-12">
+        <div className="mx-auto max-w-3xl lg:max-w-4xl">
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-8 lg:p-10 lg:flex lg:gap-10 lg:items-start">
+            {/* Avatar placeholder */}
+            <div className="mx-auto mb-6 lg:mb-0 lg:mx-0 flex-shrink-0 w-24 h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-[#A78BFA]/20 to-[#8B5CF6]/10 flex items-center justify-center">
+              <span className="font-heading text-3xl lg:text-4xl text-[#A78BFA]/40">IR</span>
+            </div>
+            <div className="text-center lg:text-left">
+              <p className="text-[10px] lg:text-[11px] tracking-[0.3em] uppercase text-[#A78BFA]/40 font-medium">
+                {language === 'ru' ? 'Ваш астролог' : 'Your Astrologer'}
+              </p>
+              <h3 className="mt-2 font-heading text-2xl lg:text-3xl text-cream/90">Iryna Rudas</h3>
+              <p className="mt-1 text-[12px] lg:text-[14px] text-cream/30">
+                {language === 'ru' ? 'Харьков, Украина → Милан, Италия' : 'Kharkiv, Ukraine → Milan, Italy'}
+              </p>
+              <p className="mt-4 text-[14px] lg:text-[16px] xl:text-[17px] leading-[1.85] text-cream/45">
+                {language === 'ru'
+                  ? 'Ирина помогла сотням женщин по всей Европе разобраться в себе, отношениях и карьерных перекрёстках через призму классической астрологии. Она работает приватно с предпринимательницами, креативными профессионалами и женщинами, которые хотят понять себя глубже.'
+                  : 'Iryna has guided hundreds of women across Europe through personal and professional crossroads using classical astrology and modern psychological insight. She works privately with entrepreneurs, creatives, and professionals who want to understand themselves at a deeper level.'}
+              </p>
+              <p className="mt-4 text-[13px] lg:text-[15px] italic text-cream/25">
+                {language === 'ru'
+                  ? '«Астрология — не предсказание будущего. Это язык, который помогает вам увидеть то, что вы уже чувствуете, но не можете сформулировать.»'
+                  : '"Astrology isn\'t about predicting the future. It\'s a language that helps you see what you already feel but can\'t quite articulate."'}
+              </p>
+              <button
+                onClick={goToConsultation}
+                className="mt-6 text-[13px] lg:text-[14px] text-[#A78BFA]/60 hover:text-[#A78BFA]/90 transition tracking-wider font-medium"
+              >
+                {language === 'ru' ? 'Записаться на консультацию →' : 'Book a consultation →'}
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ═══ FINAL CTA ═══ */}
-      <section className="relative z-10 py-28 lg:py-40 xl:py-48 px-6 text-center">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] lg:w-[600px] lg:h-[600px] xl:w-[800px] xl:h-[800px] rounded-full bg-[#A78BFA]/[0.02] blur-[80px] lg:blur-[120px] pointer-events-none" />
+      <section className="relative z-10 py-20 lg:py-28 px-6 text-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] lg:w-[500px] lg:h-[500px] rounded-full bg-[#A78BFA]/[0.02] blur-[80px] lg:blur-[100px] pointer-events-none" />
         <div className="relative">
-          <p className="font-heading text-xl sm:text-2xl lg:text-4xl xl:text-5xl text-cream/40 italic max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto leading-relaxed">
+          <p className="font-heading text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-cream/40 italic max-w-lg lg:max-w-2xl mx-auto leading-relaxed">
             {t.finalTitle}
           </p>
-          <p className="mt-4 lg:mt-6 text-[14px] lg:text-[18px] xl:text-[20px] text-cream/25">{t.finalP}</p>
+          <p className="mt-3 text-[14px] lg:text-[16px] xl:text-[18px] text-cream/25">{t.finalP}</p>
           <button
             onClick={goToApp}
-            className="mt-10 lg:mt-14 rounded-full bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6] px-10 sm:px-14 lg:px-16 py-4 sm:py-5 lg:py-6 text-[15px] sm:text-[16px] lg:text-[18px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
+            className="mt-8 rounded-full bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6] px-10 sm:px-14 lg:px-16 py-4 sm:py-5 text-[15px] sm:text-[16px] lg:text-[17px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
           >
             {t.finalCta}
           </button>

@@ -74,6 +74,9 @@ export function clearProfile(): void {
   try {
     localStorage.removeItem(PROFILE_KEY);
     localStorage.removeItem(OLD_BIRTH_KEY);
+    localStorage.removeItem('lumina_synastry_result');
+    localStorage.removeItem('lumina_synastry_names');
+    localStorage.removeItem('lumina_synastry_share_url');
     window.dispatchEvent(new Event('lumina-profile-changed'));
   } catch {
     // Silently fail

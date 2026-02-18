@@ -409,8 +409,8 @@ export default function LandingPage() {
               </p>
               <p className="mt-4 text-[14px] lg:text-[16px] xl:text-[17px] leading-[1.85] text-cream/45">
                 {language === 'ru'
-                  ? 'Ирина помогла сотням девушек по всему миру разобраться в себе, отношениях и важных жизненных решениях через призму классической астрологии. Она работает приватно с предпринимательницами, творческими людьми и девушками, которые хотят понять себя глубже.'
-                  : 'Iryna has guided hundreds of women around the world through relationships, self-discovery, and major life decisions using classical astrology and modern psychological insight. She works privately with entrepreneurs, creatives, and women who want to understand themselves at a deeper level.'}
+                  ? 'Ирина помогла сотням девушек по всему миру разобраться в себе, отношениях и важных жизненных решениях через призму классической астрологии. Она работает приватно с предпринимательницами, творческими людьми и всеми, кто хочет понять себя глубже.'
+                  : 'Iryna has guided hundreds of women around the world through relationships, self-discovery, and major life decisions using classical astrology and modern psychological insight. She works privately with entrepreneurs, creatives, and anyone ready to understand themselves at a deeper level.'}
               </p>
               <p className="mt-4 text-[13px] lg:text-[15px] italic text-cream/25">
                 {language === 'ru'

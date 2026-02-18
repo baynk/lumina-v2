@@ -247,9 +247,11 @@ export default function LandingPage() {
   const goToConsultation = () => router.push('/consultation');
 
   return (
-    <div className="relative overflow-hidden" style={{ background: '#080C1F' }}>
+    <div className="relative overflow-hidden -mx-[calc((100vw-100%)/2)] px-[calc((100vw-100%)/2)]" style={{ background: '#080C1F', isolation: 'isolate' }}>
+      {/* Opaque background to cover parent layout gradients */}
+      <div className="fixed inset-0 z-[-2]" style={{ background: '#080C1F' }} />
       {/* Full-page starfield background */}
-      <div className="fixed inset-0 z-0 opacity-25" style={{
+      <div className="fixed inset-0 z-[-1] opacity-25" style={{
         backgroundImage: 'url(/images/brand/deep-space.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center top',

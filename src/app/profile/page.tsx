@@ -81,7 +81,33 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function loadData() {
-      const p = loadProfile();
+      let p = loadProfile();
+
+      // If no local profile but signed in, try server
+      if (!p && session?.user) {
+        try {
+          const res = await fetch('/api/user');
+          if (res.ok) {
+            const srv = await res.json();
+            if (srv.onboarding_completed && srv.birth_date) {
+              const [y, m, d] = srv.birth_date.split('-').map(Number);
+              const [h, min] = (srv.birth_time || '12:00').split(':').map(Number);
+              p = {
+                birthData: {
+                  year: y, month: m - 1, day: d, hour: h, minute: min,
+                  latitude: srv.birth_latitude, longitude: srv.birth_longitude,
+                  timezone: srv.birth_timezone || 'UTC',
+                },
+                name: srv.name || '',
+                locationName: srv.birth_place || '',
+                savedAt: Date.now(),
+              };
+              saveProfile(p);
+            }
+          }
+        } catch { /* continue */ }
+      }
+
       if (!p) {
         setLoading(false);
         return;

@@ -149,11 +149,37 @@ export default function ChartPage() {
       } else {
         // Fall back to old format
         const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (!raw) { setNeedsProfile(true); setLoadingChart(false); return; }
-        const parsed = JSON.parse(raw) as StoredBirthPayload;
-        if (!parsed?.birthData) { setNeedsProfile(true); setLoadingChart(false); return; }
-        birthData = parsed.birthData;
-        profilePayload = parsed;
+        if (raw) {
+          const parsed = JSON.parse(raw) as StoredBirthPayload;
+          if (parsed?.birthData) {
+            birthData = parsed.birthData;
+            profilePayload = parsed;
+          }
+        }
+
+        // Fall back to server-side profile
+        if (!birthData) {
+          try {
+            const res = await fetch('/api/user');
+            if (res.ok) {
+              const srv = await res.json();
+              if (srv.onboarding_completed && srv.birth_date) {
+                const [y, m, d] = srv.birth_date.split('-').map(Number);
+                const [h, min] = (srv.birth_time || '12:00').split(':').map(Number);
+                birthData = {
+                  year: y, month: m - 1, day: d, hour: h, minute: min,
+                  latitude: srv.birth_latitude, longitude: srv.birth_longitude,
+                  timezone: srv.birth_timezone || 'UTC',
+                };
+                profilePayload = { name: srv.name || '', locationName: srv.birth_place || '', birthData };
+                // Re-save to localStorage for next time
+                saveProfile({ birthData, name: srv.name || '', locationName: srv.birth_place || '', savedAt: Date.now() });
+              }
+            }
+          } catch { /* continue */ }
+        }
+
+        if (!birthData) { setNeedsProfile(true); setLoadingChart(false); return; }
       }
 
       // ALWAYS re-derive timezone from birth coordinates — this is the single source of truth.

@@ -31,6 +31,10 @@ export interface AspectData {
   type: string;
   aspect: string;
   description: string;
+  planet1?: string;
+  planet2?: string;
+  sign1?: string;
+  sign2?: string;
 }
 
 export interface DailyCelestialData {

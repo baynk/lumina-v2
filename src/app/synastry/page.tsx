@@ -7,7 +7,7 @@ import ShareCard from '@/components/ShareCard';
 import RadarChart from '@/components/RadarChart';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile } from '@/lib/profile';
-import { translateAspectType, translatePlanet, translateSign } from '@/lib/translations';
+import { translateAspectType, translatePlanet, translateSign, translateSynastryAspectMeaning } from '@/lib/translations';
 import type { BirthData, SynastryData, SynastryNarrative } from '@/types';
 
 type LocationResult = {
@@ -780,7 +780,7 @@ export default function SynastryPage() {
                 </div>
                 <p className="text-sm leading-relaxed text-cream/80">
                   {language === 'ru'
-                    ? `${translatePlanet(aspect.planetA, language)} в ${translateSign(aspect.signA, language)} — ${translateAspectType(aspect.type, language).toLowerCase()} — ${translatePlanet(aspect.planetB, language)} в ${translateSign(aspect.signB, language)}. ${aspect.meaning}`
+                    ? `${translatePlanet(aspect.planetA, language)} в ${translateSign(aspect.signA, language)} — ${translateAspectType(aspect.type, language).toLowerCase()} — ${translatePlanet(aspect.planetB, language)} в ${translateSign(aspect.signB, language)}. ${translateSynastryAspectMeaning(aspect.type, language)}`
                     : `Your ${aspect.planetA} in ${aspect.signA} ${aspect.type.toLowerCase()}s their ${aspect.planetB} in ${aspect.signB}. ${aspect.meaning}`
                   }
                 </p>

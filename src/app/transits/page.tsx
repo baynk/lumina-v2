@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile } from '@/lib/profile';
-import { translateAspectType, translatePlanet, translateSign } from '@/lib/translations';
+import { formatAspectDescription, translateAspectType, translatePlanet, translateSign } from '@/lib/translations';
 import type { BirthData, TransitAlert, TransitReport } from '@/lib/types';
 
 const planetSymbols: Record<string, string> = {
@@ -45,6 +45,16 @@ function TransitCard({ item }: { item: TransitAlert }) {
   const transitSymbol = planetSymbols[item.transitPlanet] || '✦';
   const natalSymbol = planetSymbols[item.natalPlanet] || '✦';
   const headline = useHeadline(item, language, t.transitsHeadlineTemplate);
+  const localizedFallback = formatAspectDescription(
+    {
+      type: item.aspect,
+      planet1: item.transitPlanet,
+      sign1: item.transitSign,
+      planet2: item.natalPlanet,
+      sign2: item.natalSign,
+    },
+    language
+  );
 
   return (
     <article className={`lumina-card border-l-4 p-4 ${borderByTone(item.tone)}`}>
@@ -70,7 +80,7 @@ function TransitCard({ item }: { item: TransitAlert }) {
       {open ? (
         <div className="mt-4 space-y-2 border-t border-white/10 pt-3 text-sm leading-relaxed text-cream/90">
           <p className="text-lumina-soft">{t.transitsMeaningQuestion}</p>
-          <p>{item.aiInterpretation || item.description}</p>
+          <p>{item.aiInterpretation || localizedFallback}</p>
           <p className="text-xs text-cream/60">
             {translatePlanet(item.transitPlanet, language)} {language === 'ru' ? 'в' : 'in'} {translateSign(item.transitSign, language)}{' '}
             {translateAspectType(item.aspect, language).toLowerCase()} {language === 'ru' ? 'к вашей натальной' : 'to your natal'}{' '}

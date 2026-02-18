@@ -541,6 +541,23 @@ export const aspectTypeNames = {
   },
 } as const;
 
+const synastryAspectMeanings = {
+  en: {
+    conjunction: 'Strong pull and focus here; this area feels immediate and hard to ignore.',
+    sextile: 'Easy cooperation and support when you both make a little effort.',
+    square: 'Friction that can trigger growth if you face differences directly.',
+    trine: 'Natural flow and mutual understanding that feels emotionally smooth.',
+    opposition: 'A mirror dynamic: strong attraction plus clear polarity to balance.',
+  },
+  ru: {
+    conjunction: 'Сильное притяжение и фокус: эта тема ощущается очень ярко и её трудно игнорировать.',
+    sextile: 'Лёгкое взаимодействие и поддержка, особенно когда вы оба вкладываетесь в контакт.',
+    square: 'Напряжение, которое запускает рост, если честно проживать различия.',
+    trine: 'Естественный поток и взаимопонимание, создающие эмоциональную лёгкость.',
+    opposition: 'Зеркальная динамика: сильное притяжение и заметная полярность, которую важно балансировать.',
+  },
+} as const;
+
 // Russian genitive case forms for zodiac signs (used after "с сердцем ___" and "с лицом ___")
 export const zodiacGenitive: Record<string, string> = {
   Aries: 'Овна',
@@ -575,4 +592,40 @@ export function translateMoonPhase(phase: string, language: Language): string {
 
 export function translateAspectType(type: string, language: Language): string {
   return aspectTypeNames[language][type as keyof (typeof aspectTypeNames)['en']] ?? type;
+}
+
+type AspectDescriptionInput = {
+  type: string;
+  aspect?: string;
+  description?: string;
+  planet1?: string;
+  planet2?: string;
+  sign1?: string;
+  sign2?: string;
+};
+
+export function formatAspectDescription(
+  aspect: AspectDescriptionInput,
+  language: Language,
+  planetSignsByName?: Record<string, string>
+): string {
+  const [parsedPlanet1, , parsedPlanet2] = (aspect.aspect || '').split(' ');
+  const planet1 = aspect.planet1 ?? parsedPlanet1;
+  const planet2 = aspect.planet2 ?? parsedPlanet2;
+  const sign1 = aspect.sign1 ?? (planet1 ? planetSignsByName?.[planet1] : undefined);
+  const sign2 = aspect.sign2 ?? (planet2 ? planetSignsByName?.[planet2] : undefined);
+
+  if (!planet1 || !planet2 || !sign1 || !sign2) {
+    return aspect.description ?? '';
+  }
+
+  if (language === 'ru') {
+    return `${translatePlanet(planet1, language)} в ${translateSign(sign1, language)} образует ${translateAspectType(aspect.type, language).toLowerCase()} с ${translatePlanet(planet2, language)} в ${translateSign(sign2, language)}`;
+  }
+
+  return `${translatePlanet(planet1, language)} in ${translateSign(sign1, language)} forms a ${translateAspectType(aspect.type, language).toLowerCase()} with ${translatePlanet(planet2, language)} in ${translateSign(sign2, language)}`;
+}
+
+export function translateSynastryAspectMeaning(type: string, language: Language): string {
+  return synastryAspectMeanings[language][type as keyof (typeof synastryAspectMeanings)['en']] ?? '';
 }

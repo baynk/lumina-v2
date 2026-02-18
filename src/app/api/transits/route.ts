@@ -67,11 +67,11 @@ export async function POST(request: Request) {
       ...report,
       activeTransits: report.activeTransits.map((item) => ({
         ...item,
-        aiInterpretation: aiMap[item.id] || item.description,
+        aiInterpretation: aiMap[item.id],
       })),
       upcomingTransits: report.upcomingTransits.map((item) => ({
         ...item,
-        aiInterpretation: aiMap[item.id] || item.description,
+        aiInterpretation: aiMap[item.id],
       })),
     };
 

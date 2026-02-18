@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
+import { formatAspectDescription } from '@/lib/translations';
 import type { AspectData, BirthData, HouseInfo, PlanetInfo } from '@/types';
 
 type SolarReturnResult = {
@@ -25,6 +27,7 @@ type Props = {
 };
 
 export default function SolarReturnChart({ birthData, year }: Props) {
+  const { language } = useLanguage();
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(year ?? currentYear);
   const [city, setCity] = useState('');
@@ -72,6 +75,11 @@ export default function SolarReturnChart({ birthData, year }: Props) {
       return diff?.signChanged || diff?.houseChanged;
     });
   }, [planetDiffMap, result]);
+
+  const currentPlanetSigns = useMemo(
+    () => Object.fromEntries(result?.planets.map((planet) => [planet.planet, planet.sign]) ?? []),
+    [result]
+  );
 
   const runCalculation = async () => {
     setLoading(true);
@@ -298,7 +306,7 @@ export default function SolarReturnChart({ birthData, year }: Props) {
                 <div key={`${aspect.aspect}-${index}`} className="rounded-xl bg-white/5 p-3">
                   <p className="text-sm font-semibold text-cream">{aspect.aspect}</p>
                   <p className="mt-1 text-xs uppercase tracking-[0.12em] text-lumina-soft">{aspect.type}</p>
-                  <p className="mt-2 text-sm text-cream/90">{aspect.description}</p>
+                  <p className="mt-2 text-sm text-cream/90">{formatAspectDescription(aspect, language, currentPlanetSigns)}</p>
                 </div>
               ))}
             </div>

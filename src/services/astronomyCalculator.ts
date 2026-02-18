@@ -375,7 +375,11 @@ function calculateMajorAspects(planets: PlanetInfo[]): AspectData[] {
           aspects.push({
             type: aspect.name,
             aspect: `${planet1.planet} ${aspect.name} ${planet2.planet}`,
-            description: `${planet1.planet} in ${planet1.sign} forms a ${aspect.name} with ${planet2.planet} in ${planet2.sign}`
+            description: `${planet1.planet} in ${planet1.sign} forms a ${aspect.name} with ${planet2.planet} in ${planet2.sign}`,
+            planet1: planet1.planet,
+            planet2: planet2.planet,
+            sign1: planet1.sign,
+            sign2: planet2.sign,
           });
           break; // Only record one aspect per planet pair
         }

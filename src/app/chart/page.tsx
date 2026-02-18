@@ -7,6 +7,7 @@ import ExplainModal from '@/components/ExplainModal';
 import { useLanguage } from '@/context/LanguageContext';
 import { calculateDailyCelestialData, calculateNatalChart } from '@/lib/astronomyCalculator';
 import {
+  formatAspectDescription,
   translateAspectType,
   translateMoonPhase,
   translatePlanet,
@@ -208,6 +209,10 @@ export default function ChartPage() {
   }, [dailyData, language, natalChart, t.horoscopeFallback]);
 
   const moonSign = useMemo(() => natalChart?.planets.find((p) => p.planet === 'Moon')?.sign, [natalChart]);
+  const dailyPlanetSigns = useMemo(
+    () => Object.fromEntries(dailyData?.planets.map((planet) => [planet.planet, planet.sign]) ?? []),
+    [dailyData]
+  );
 
   const todayFormatted = useMemo(() => {
     const now = new Date();
@@ -366,7 +371,7 @@ export default function ChartPage() {
                         <AspectSvg type={aspect.type} />
                         <span>{translateAspectType(aspect.type, language)}</span>
                       </p>
-                      <p className="mt-1 text-sm text-warmWhite">{aspect.description}</p>
+                      <p className="mt-1 text-sm text-warmWhite">{formatAspectDescription(aspect, language, dailyPlanetSigns)}</p>
                     </div>
                   ))}
                 </div>

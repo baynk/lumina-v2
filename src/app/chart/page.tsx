@@ -259,7 +259,7 @@ export default function ChartPage() {
               ? 'Введите данные рождения, чтобы увидеть вашу натальную карту — полные позиции планет, дома и аспекты.'
               : 'Enter your birth details to unlock your natal chart — full planetary positions, houses, and aspects.'}
           </p>
-          <button className="lumina-button mt-6 w-full" onClick={() => router.push('/')}>
+          <button className="lumina-button mt-6 w-full" onClick={() => router.push('/?start=true')}>
             {language === 'ru' ? 'Начать' : 'Get started'}
           </button>
         </div>

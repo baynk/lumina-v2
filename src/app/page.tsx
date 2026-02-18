@@ -72,7 +72,12 @@ export default function LandingPage() {
 
   const [existingProfile, setExistingProfile] = useState<UserProfileLocal | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [showLanding, setShowLanding] = useState(true);
+  const [showLanding, setShowLanding] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !new URLSearchParams(window.location.search).get('start');
+    }
+    return true;
+  });
   const [checkingProfile, setCheckingProfile] = useState(true);
 
   const [name, setName] = useState('');

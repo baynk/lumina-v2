@@ -80,6 +80,13 @@ export default function LandingPage() {
   });
   const [checkingProfile, setCheckingProfile] = useState(true);
 
+  // Skip landing if ?start=true is in the URL (e.g. from /chart "Get started")
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('start')) {
+      setShowLanding(false);
+    }
+  }, []);
+
   const [name, setName] = useState('');
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');

@@ -1,6 +1,7 @@
 'use client';
 
 import { useSession, signIn, signOut } from 'next-auth/react';
+import { clearProfile } from '@/lib/profile';
 import { useState, useRef, useEffect } from 'react';
 
 export default function UserMenu() {
@@ -105,6 +106,7 @@ export default function UserMenu() {
           <button
             onClick={() => {
               setOpen(false);
+              clearProfile();
               signOut({ callbackUrl: '/' });
             }}
             className="w-full rounded-lg px-3 py-2 text-left text-sm text-cream/70 transition hover:bg-white/10 hover:text-warmWhite"

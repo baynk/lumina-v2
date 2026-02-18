@@ -50,23 +50,34 @@ export async function POST(request: Request) {
     const client = new GoogleGenerativeAI(apiKey);
     const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const langInstruction =
-      body.language === 'ru'
-        ? 'IMPORTANT: Write ALL text in Russian (Cyrillic script). Every string value must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid jargon unless you immediately explain it.'
-        : 'Write in elegant, warm English.';
+    const isRu = body.language === 'ru';
 
-    const prompt = [
-      'Write a 2-minute onboarding narrative called "Story of You".',
-      langInstruction,
-      'Focus on Sun-Moon-Rising synthesis in plain language, with practical reflection.',
-      'Return ONLY valid JSON: {"title":"...","paragraphs":["...","...","...","..."]}',
-      'Write 4-6 short paragraphs.',
-      `Chart context: ${JSON.stringify({
-        sun: natal.planets.find((planet) => planet.planet === 'Sun'),
-        moon: natal.planets.find((planet) => planet.planet === 'Moon'),
-        risingSign: natal.risingSign,
-      })}`,
-    ].join('\n');
+    const prompt = isRu
+      ? [
+          'Ты — астролог, пишущий на русском языке. ВСЕ текстовые значения ДОЛЖНЫ быть на русском (кириллица). НЕ используй английский язык ни в одном слове.',
+          'Напиши приветственный нарратив на 2 минуты чтения — "Твоя история".',
+          'Фокус на синтезе Солнца, Луны и Асцендента простым языком с практическими размышлениями.',
+          'Верни ТОЛЬКО валидный JSON: {"title":"строка на русском","paragraphs":["абзац на русском","абзац на русском","абзац на русском","абзац на русском"]}',
+          'Напиши 4-6 коротких абзацев. Используй "ты" (не "вы"). Тон тёплый, интимный.',
+          'НАПОМИНАНИЕ: Весь текст должен быть ТОЛЬКО на русском языке. Названия знаков зодиака тоже на русском (Козерог, Овен, Рыбы и т.д.).',
+          `Контекст карты: ${JSON.stringify({
+            sun: natal.planets.find((planet) => planet.planet === 'Sun'),
+            moon: natal.planets.find((planet) => planet.planet === 'Moon'),
+            risingSign: natal.risingSign,
+          })}`,
+        ].join('\n')
+      : [
+          'Write a 2-minute onboarding narrative called "Story of You".',
+          'Write in elegant, warm English.',
+          'Focus on Sun-Moon-Rising synthesis in plain language, with practical reflection.',
+          'Return ONLY valid JSON: {"title":"...","paragraphs":["...","...","...","..."]}',
+          'Write 4-6 short paragraphs.',
+          `Chart context: ${JSON.stringify({
+            sun: natal.planets.find((planet) => planet.planet === 'Sun'),
+            moon: natal.planets.find((planet) => planet.planet === 'Moon'),
+            risingSign: natal.risingSign,
+          })}`,
+        ].join('\n');
 
     const result = await model.generateContent(prompt);
     const text = cleanJson(result.response.text());

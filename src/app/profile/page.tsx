@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import html2canvas from 'html2canvas';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile, saveProfile, clearProfile, type UserProfileLocal, type RelationshipStatus, type Interest, type Gender } from '@/lib/profile';
@@ -56,6 +56,7 @@ export default function ProfilePage() {
   const { data: session } = useSession();
   const { language, t } = useLanguage();
 
+  const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfileLocal | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | ''>('');
@@ -75,7 +76,7 @@ export default function ProfilePage() {
     async function loadData() {
       const p = loadProfile();
       if (!p) {
-        router.replace('/chart');
+        setLoading(false);
         return;
       }
       setProfile(p);
@@ -103,6 +104,7 @@ export default function ProfilePage() {
           // Fall through with localStorage data
         }
       }
+      setLoading(false);
     }
     loadData();
   }, [router, session]);
@@ -270,10 +272,67 @@ export default function ProfilePage() {
     setTimeout(() => setShareStatus(''), 2000);
   };
 
-  if (!profile) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="mx-auto w-full max-w-md px-4 pb-28 pt-12 sm:px-6">
+        <div className="text-center">
+          <p className="font-heading text-4xl text-lumina-soft">✦</p>
+          <h1 className="mt-4 font-heading text-2xl text-cream/90">
+            {language === 'ru' ? 'Создайте свой космический профиль' : 'Create your cosmic profile'}
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-cream/50">
+            {language === 'ru'
+              ? 'Войдите, чтобы сохранить вашу карту, получать ежедневные инсайты и проверять совместимость'
+              : 'Sign in to save your chart, get daily insights, and check compatibility'}
+          </p>
+        </div>
+
+        <div className="mt-8 space-y-3">
+          {[
+            {
+              icon: '🌟',
+              en: 'Personalized natal chart with full planetary positions',
+              ru: 'Персональная натальная карта с позициями всех планет',
+            },
+            {
+              icon: '📅',
+              en: 'Daily horoscope tailored to your birth data',
+              ru: 'Ежедневный гороскоп на основе ваших данных рождения',
+            },
+            {
+              icon: '💫',
+              en: 'Compatibility analysis with anyone',
+              ru: 'Анализ совместимости с любым человеком',
+            },
+          ].map((item) => (
+            <div key={item.icon} className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+              <span className="text-lg">{item.icon}</span>
+              <p className="text-sm text-cream/70">{language === 'ru' ? item.ru : item.en}</p>
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={() => signIn('google', { callbackUrl: '/profile' })}
+          className="lumina-button mt-8 w-full"
+        >
+          {language === 'ru' ? 'Войти через Google' : 'Continue with Google'}
+        </button>
+
+        <button
+          onClick={() => router.push('/chart')}
+          className="mt-3 w-full py-2 text-center text-sm text-cream/40 transition hover:text-cream/70"
+        >
+          {language === 'ru' ? 'или сначала введите данные рождения' : 'or enter birth details first'}
+        </button>
       </div>
     );
   }

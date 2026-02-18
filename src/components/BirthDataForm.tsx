@@ -169,8 +169,8 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
-          <div className="sm:col-span-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
             <p className="lumina-label mb-2">{t.dateOfBirth}</p>
             <div className="grid grid-cols-3 gap-2">
               <select className="lumina-input" value={day} onChange={(e) => setDay(e.target.value)} required>
@@ -194,7 +194,7 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
             </div>
           </div>
 
-          <div className="sm:col-span-2">
+          <div>
             <p className="lumina-label mb-2">{t.timeOfBirth}</p>
             <div className="grid grid-cols-2 gap-2">
               <select className="lumina-input" value={hour} onChange={(e) => setHour(e.target.value)} required={timeAccuracy !== 'unknown'} disabled={timeAccuracy === 'unknown'}>

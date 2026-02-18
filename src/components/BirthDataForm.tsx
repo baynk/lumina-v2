@@ -169,7 +169,7 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <p className="lumina-label mb-2">{t.dateOfBirth}</p>
             <div className="grid grid-cols-3 gap-2">

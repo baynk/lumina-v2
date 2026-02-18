@@ -323,22 +323,49 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-3 sm:px-6">
-      <header className="animate-fadeInUp text-center">
-        <h1 className="font-heading text-6xl text-lumina-soft">Lumina</h1>
-        <p className="mt-2 text-base text-cream">{t.homeNewTagline}</p>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-cream/70">{t.homeNewParagraph}</p>
-        <button
-          type="button"
-          onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-          className="lumina-button mt-6 w-full"
-        >
-          {t.homeBeginJourney}
-        </button>
-      </header>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-3 sm:px-6">
+      {/* Desktop: split layout. Mobile: stacked */}
+      <div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 lg:min-h-[80vh]">
+        {/* Left: Hero / value prop */}
+        <header className="animate-fadeInUp text-center lg:text-left">
+          <h1 className="font-heading text-5xl sm:text-6xl lg:text-7xl text-lumina-soft">Lumina</h1>
+          <p className="mt-3 text-base lg:text-lg text-cream">{t.homeNewTagline}</p>
+          <p className="mx-auto mt-3 max-w-md text-sm lg:text-[15px] leading-relaxed text-cream/60 lg:mx-0">
+            {t.homeNewParagraph}
+          </p>
 
-      <div ref={formRef} className="mt-7">
-        <BirthDataForm onComplete={handleFormComplete} />
+          {/* Trust signals — desktop only */}
+          <div className="mt-8 hidden lg:flex items-center gap-6 text-cream/30">
+            <div>
+              <p className="text-[11px] font-heading text-[#A78BFA]/50">JPL DE421</p>
+              <p className="mt-0.5 text-[10px]">{language === 'ru' ? 'Эфемериды космических агентств' : 'Space-agency ephemeris'}</p>
+            </div>
+            <div className="w-px h-6 bg-white/10" />
+            <div>
+              <p className="text-[11px] font-heading text-[#A78BFA]/50">{language === 'ru' ? '10 планет' : '10 Planets'}</p>
+              <p className="mt-0.5 text-[10px]">{language === 'ru' ? 'Полный небесный чертёж' : 'Complete celestial blueprint'}</p>
+            </div>
+            <div className="w-px h-6 bg-white/10" />
+            <div>
+              <p className="text-[11px] font-heading text-[#A78BFA]/50">{language === 'ru' ? 'Бесплатно' : 'Free'}</p>
+              <p className="mt-0.5 text-[10px]">{language === 'ru' ? '60 секунд · Без регистрации' : '60 seconds · No signup'}</p>
+            </div>
+          </div>
+
+          {/* Mobile: CTA to scroll to form */}
+          <button
+            type="button"
+            onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="lumina-button mt-6 w-full lg:hidden"
+          >
+            {t.homeBeginJourney}
+          </button>
+        </header>
+
+        {/* Right: Form */}
+        <div ref={formRef} className="mt-7 lg:mt-0 max-w-md mx-auto lg:mx-0 lg:ml-auto">
+          <BirthDataForm onComplete={handleFormComplete} />
+        </div>
       </div>
     </div>
   );

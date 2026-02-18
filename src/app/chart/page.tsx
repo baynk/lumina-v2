@@ -107,6 +107,7 @@ export default function ChartPage() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<ChartTab>('today');
   const [isExplainOpen, setIsExplainOpen] = useState(false);
+  const [needsProfile, setNeedsProfile] = useState(false);
   const [explainState, setExplainState] = useState<ExplainState | null>(null);
   const [showShareCard, setShowShareCard] = useState(false);
 
@@ -142,9 +143,9 @@ export default function ChartPage() {
       } else {
         // Fall back to old format
         const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (!raw) { router.replace('/'); return; }
+        if (!raw) { setNeedsProfile(true); setLoadingChart(false); return; }
         const parsed = JSON.parse(raw) as StoredBirthPayload;
-        if (!parsed?.birthData) { router.replace('/'); return; }
+        if (!parsed?.birthData) { setNeedsProfile(true); setLoadingChart(false); return; }
         birthData = parsed.birthData;
         profilePayload = parsed;
       }
@@ -240,6 +241,27 @@ export default function ChartPage() {
         <div className="text-center">
           <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
           <p className="mt-3 text-cream">{t.loadingChart}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (needsProfile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-6">
+        <div className="glass-card max-w-md p-8 text-center">
+          <p className="font-heading text-3xl text-lumina-soft">✦</p>
+          <h2 className="mt-4 font-heading text-2xl text-cream/90">
+            {language === 'ru' ? 'Ваша карта ждёт' : 'Your chart awaits'}
+          </h2>
+          <p className="mt-3 text-[14px] leading-relaxed text-cream/50">
+            {language === 'ru'
+              ? 'Введите данные рождения, чтобы увидеть вашу натальную карту — полные позиции планет, дома и аспекты.'
+              : 'Enter your birth details to unlock your natal chart — full planetary positions, houses, and aspects.'}
+          </p>
+          <button className="lumina-button mt-6 w-full" onClick={() => router.push('/')}>
+            {language === 'ru' ? 'Начать' : 'Get started'}
+          </button>
         </div>
       </div>
     );

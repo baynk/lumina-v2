@@ -9,6 +9,7 @@ import { loadProfile, saveProfile, clearProfile, type UserProfileLocal } from '@
 import { ZodiacImage } from '@/components/icons/ZodiacIcons';
 import { translateMoonPhase } from '@/lib/translations';
 import type { BirthData } from '@/lib/types';
+import LandingContent from '@/components/LandingContent';
 
 type LocationResult = {
   place_id: string;
@@ -421,71 +422,13 @@ export default function LandingPage() {
     );
   }
 
-  // New visitor: show landing page
+  // New visitor: show full practitioner landing page
   if (showLanding && !existingProfile && !session?.user) {
     return (
-      <div className="mx-auto w-full max-w-3xl lg:max-w-5xl px-4 pb-28 pt-3 sm:px-6">
-        {/* Hero */}
-        <div className="animate-fadeInUp text-center py-12 sm:py-16 lg:py-20">
-          <p className="text-[11px] sm:text-[12px] tracking-[0.35em] uppercase text-[#A78BFA]/50 font-medium">
-            {language === 'ru' ? 'Астрология и небесное руководство' : 'Astrology & Celestial Guidance'}
-          </p>
-          <h1 className="mt-4 font-heading text-4xl sm:text-5xl lg:text-6xl leading-[1.08] text-cream">
-            {language === 'ru' ? 'Познай себя' : 'Know yourself'}<br />
-            <span className="bg-gradient-to-r from-[#A78BFA] via-[#C4B5FD] to-[#A78BFA] bg-clip-text text-transparent">
-              {language === 'ru' ? 'как звёзды знают тебя.' : 'like the stars know you.'}
-            </span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-lg text-[15px] lg:text-[17px] leading-[1.75] text-cream/50">
-            {language === 'ru'
-              ? 'Твоя натальная карта — снимок неба в момент твоего рождения. Lumina рассчитывает её с точностью космических миссий — и помогает понять, что это значит для твоей жизни.'
-              : 'Your natal chart is a snapshot of the exact sky the minute you were born. Lumina calculates it with the same precision used to navigate spacecraft — then helps you understand what it means for your life.'}
-          </p>
-        </div>
-
-        {/* What you get — preview cards */}
-        <div className="animate-fadeInUp grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-10" style={{ animationDelay: '0.15s' }}>
-          {[
-            { icon: '✦', en: 'Full natal chart', ru: 'Полная натальная карта', d_en: '10 planets, 12 houses, all major aspects', d_ru: '10 планет, 12 домов, все аспекты' },
-            { icon: '🌙', en: 'Moon & Rising', ru: 'Луна и Восходящий', d_en: 'Not just your Sun sign — your complete Big Three', d_ru: 'Не только знак Солнца — вся Большая Тройка' },
-            { icon: '💫', en: 'Compatibility', ru: 'Совместимость', d_en: 'See how your chart connects with anyone', d_ru: 'Узнай, как твоя карта связана с другими' },
-            { icon: '📖', en: 'Daily insights', ru: 'Ежедневные инсайты', d_en: 'Personalized to your exact chart, not generic', d_ru: 'Персонализированные по твоей карте' },
-          ].map((card) => (
-            <div key={card.en} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
-              <p className="text-xl mb-2">{card.icon}</p>
-              <p className="text-sm font-medium text-warmWhite">{language === 'ru' ? card.ru : card.en}</p>
-              <p className="mt-1 text-[11px] text-cream/35">{language === 'ru' ? card.d_ru : card.d_en}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <div className="animate-fadeInUp text-center mb-12" style={{ animationDelay: '0.3s' }}>
-          <button
-            onClick={() => setShowLanding(false)}
-            className="rounded-full bg-gradient-to-r from-[#A78BFA]/90 to-[#8B5CF6]/90 px-12 py-4 sm:py-5 text-[15px] sm:text-[16px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)] hover:from-[#A78BFA] hover:to-[#8B5CF6]"
-          >
-            {language === 'ru' ? 'Рассчитать мою карту — бесплатно' : 'Calculate my chart — free'}
-          </button>
-          <p className="mt-3 text-[11px] text-cream/25 tracking-wider">
-            {language === 'ru' ? '60 секунд · Без регистрации' : '60 seconds · No account needed'}
-          </p>
-        </div>
-
-        {/* Social proof / credibility */}
-        <div className="animate-fadeInUp grid grid-cols-3 gap-4 text-center mb-8" style={{ animationDelay: '0.4s' }}>
-          {[
-            { n: language === 'ru' ? 'JPL DE421' : 'JPL DE421', d: language === 'ru' ? 'Эфемериды космических агентств' : 'Space-agency ephemeris' },
-            { n: language === 'ru' ? '10 планет' : '10 Planets', d: language === 'ru' ? 'Полный небесный чертёж' : 'Complete celestial blueprint' },
-            { n: language === 'ru' ? 'Астролог' : 'Real Astrologer', d: language === 'ru' ? 'Не алгоритм — живой человек' : 'Not an algorithm — a real person' },
-          ].map((item) => (
-            <div key={item.n}>
-              <p className="text-[12px] font-heading text-[#A78BFA]/60">{item.n}</p>
-              <p className="mt-1 text-[10px] text-cream/25">{item.d}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <LandingContent
+        onCtaClick={() => setShowLanding(false)}
+        onConsultationClick={() => router.push('/consultation')}
+      />
     );
   }
 

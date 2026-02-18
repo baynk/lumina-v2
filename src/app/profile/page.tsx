@@ -75,7 +75,7 @@ export default function ProfilePage() {
     async function loadData() {
       const p = loadProfile();
       if (!p) {
-        router.replace('/');
+        router.replace('/chart');
         return;
       }
       setProfile(p);

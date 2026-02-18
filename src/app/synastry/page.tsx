@@ -234,6 +234,13 @@ export default function SynastryPage() {
   const { language, t } = useLanguage();
   const { data: session, status: sessionStatus } = useSession();
 
+  // Redirect home if profile is cleared (e.g. sign-out)
+  useEffect(() => {
+    const handler = () => { if (!loadProfile()) router.push('/'); };
+    window.addEventListener('lumina-profile-changed', handler);
+    return () => window.removeEventListener('lumina-profile-changed', handler);
+  }, [router]);
+
   const [personA, setPersonA] = useState<PersonFormState>(initialPerson);
   const [personB, setPersonB] = useState<PersonFormState>(initialPerson);
   const [loading, setLoading] = useState(false);

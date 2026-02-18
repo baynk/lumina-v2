@@ -227,6 +227,16 @@ export default function ChartPage() {
     return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }, [language]);
 
+  // Redirect home if profile is cleared (e.g. sign-out)
+  useEffect(() => {
+    const handler = () => {
+      const p = loadProfile();
+      if (!p) router.push('/');
+    };
+    window.addEventListener('lumina-profile-changed', handler);
+    return () => window.removeEventListener('lumina-profile-changed', handler);
+  }, [router]);
+
   const openPlanetExplanation = (planet: string, sign: string, house?: number) => {
     const safeHouse = house && Number.isFinite(house) ? house : 1;
     setExplainState({ title: translatePlanet(planet, language), planet, sign, house: safeHouse });

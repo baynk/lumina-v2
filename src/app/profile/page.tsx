@@ -56,6 +56,13 @@ export default function ProfilePage() {
   const { data: session } = useSession();
   const { language, t } = useLanguage();
 
+  // Redirect home if profile is cleared (e.g. sign-out)
+  useEffect(() => {
+    const handler = () => { if (!loadProfile()) router.push('/'); };
+    window.addEventListener('lumina-profile-changed', handler);
+    return () => window.removeEventListener('lumina-profile-changed', handler);
+  }, [router]);
+
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfileLocal | null>(null);
   const [displayName, setDisplayName] = useState('');

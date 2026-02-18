@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -10,13 +10,7 @@ import { ZodiacImage } from '@/components/icons/ZodiacIcons';
 import { translateMoonPhase } from '@/lib/translations';
 import type { BirthData } from '@/lib/types';
 import LandingContent from '@/components/LandingContent';
-
-type LocationResult = {
-  place_id: string;
-  display_name: string;
-  lat: string;
-  lon: string;
-};
+import BirthDataForm, { type BirthDataFormResult } from '@/components/BirthDataForm';
 
 const STORY_SHOWN_PREFIX = 'lumina_story_shown_';
 
@@ -58,17 +52,11 @@ function compactInsight(text: string): string {
   return sentences.slice(0, 3).join(' ');
 }
 
-const months = Array.from({ length: 12 }, (_, idx) => idx + 1);
-const days = Array.from({ length: 31 }, (_, idx) => idx + 1);
-const years = Array.from({ length: 100 }, (_, idx) => new Date().getFullYear() - idx);
-const hours = Array.from({ length: 24 }, (_, idx) => idx);
-const minutes = Array.from({ length: 60 }, (_, idx) => idx);
-
 export default function LandingPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
   const { data: session, status: authStatus } = useSession();
-  const formRef = useRef<HTMLElement | null>(null);
+  const formRef = useRef<HTMLDivElement | null>(null);
 
   const [existingProfile, setExistingProfile] = useState<UserProfileLocal | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -87,39 +75,12 @@ export default function LandingPage() {
     }
   }, []);
 
-  const [name, setName] = useState('');
-  const [day, setDay] = useState('');
-  const [month, setMonth] = useState('');
-  const [year, setYear] = useState('');
-  const [hour, setHour] = useState('');
-  const [minute, setMinute] = useState('');
-  const [timeAccuracy, setTimeAccuracy] = useState<'exact' | 'approximate' | 'unknown'>('exact');
-
-  const [locationQuery, setLocationQuery] = useState('');
-  const [locationResults, setLocationResults] = useState<LocationResult[]>([]);
-  const [searchingLocation, setSearchingLocation] = useState(false);
-  const [selectedLocationName, setSelectedLocationName] = useState('');
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-  const [timezone, setTimezone] = useState('UTC');
-  const [submitting, setSubmitting] = useState(false);
+  // Form state now lives in BirthDataForm component
 
   const [moonPhase, setMoonPhase] = useState('New Moon');
   const [moonIllumination, setMoonIllumination] = useState(0);
   const [dailyInsight, setDailyInsight] = useState('');
   const [dailyInsightLoading, setDailyInsightLoading] = useState(false);
-
-  const canSubmit = useMemo(
-    () =>
-      !!day &&
-      !!month &&
-      !!year &&
-      (timeAccuracy === 'unknown' || (!!hour && !!minute)) &&
-      selectedLocationName.length > 0 &&
-      latitude !== null &&
-      longitude !== null,
-    [day, hour, latitude, longitude, minute, month, selectedLocationName, timeAccuracy, year],
-  );
 
   useEffect(() => {
     if (authStatus === 'loading') return;
@@ -181,42 +142,6 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (detectedTimezone) {
-      setTimezone(detectedTimezone);
-    }
-  }, []);
-
-  useEffect(() => {
-    const query = locationQuery.trim();
-    if (query.length < 2) {
-      setLocationResults([]);
-      return;
-    }
-
-    const timeout = setTimeout(async () => {
-      try {
-        setSearchingLocation(true);
-        const response = await fetch(
-          `/api/geocode?q=${encodeURIComponent(query)}`,
-        );
-        if (!response.ok) {
-          setLocationResults([]);
-          return;
-        }
-        const payload = (await response.json()) as LocationResult[];
-        setLocationResults(payload);
-      } catch {
-        setLocationResults([]);
-      } finally {
-        setSearchingLocation(false);
-      }
-    }, 350);
-
-    return () => clearTimeout(timeout);
-  }, [locationQuery]);
-
-  useEffect(() => {
     if (!existingProfile || showForm) return;
 
     const run = async () => {
@@ -247,77 +172,30 @@ export default function LandingPage() {
     run();
   }, [existingProfile, language, showForm, t.horoscopeFallback]);
 
-  const handleSelectLocation = async (result: LocationResult) => {
-    setSelectedLocationName(result.display_name);
-    setLocationQuery(result.display_name);
-    const lat = Number.parseFloat(result.lat);
-    const lon = Number.parseFloat(result.lon);
-    setLatitude(lat);
-    setLongitude(lon);
-    setLocationResults([]);
-
-    try {
-      const tzResp = await fetch(`/api/timezone?lat=${lat}&lon=${lon}`);
-      const tzData = (await tzResp.json()) as { timezone?: string };
-      if (tzData.timezone) {
-        setTimezone(tzData.timezone);
-      }
-    } catch {
-      const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (detectedTimezone) setTimezone(detectedTimezone);
-    }
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!canSubmit || latitude === null || longitude === null) return;
-
-    setSubmitting(true);
-
-    let resolvedTz = timezone;
-    try {
-      const tzResp = await fetch(`/api/timezone?lat=${latitude}&lon=${longitude}`);
-      const tzData = (await tzResp.json()) as { timezone?: string };
-      if (tzData.timezone) {
-        resolvedTz = tzData.timezone;
-      }
-    } catch {
-      // continue
-    }
-
-    const birthData: BirthData = {
-      year: Number.parseInt(year, 10),
-      month: Number.parseInt(month, 10) - 1,
-      day: Number.parseInt(day, 10),
-      hour: timeAccuracy === 'unknown' ? 12 : Number.parseInt(hour, 10),
-      minute: timeAccuracy === 'unknown' ? 0 : Number.parseInt(minute, 10),
-      latitude,
-      longitude,
-      timezone: resolvedTz,
-    };
-
+  const handleFormComplete = useCallback(async (data: BirthDataFormResult) => {
     saveProfile({
-      birthData,
-      name: name.trim(),
-      locationName: selectedLocationName,
-      timeAccuracy,
+      birthData: data.birthData,
+      name: data.name,
+      locationName: data.locationName,
+      timeAccuracy: data.timeAccuracy,
       savedAt: Date.now(),
     });
 
     if (session?.user) {
       try {
         const pad = (n: number) => n.toString().padStart(2, '0');
+        const bd = data.birthData;
         await fetch('/api/user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            birth_date: `${year}-${pad(Number(month))}-${pad(Number(day))}`,
-            birth_time: timeAccuracy === 'unknown' ? '12:00' : `${pad(Number(hour))}:${pad(Number(minute))}`,
-            birth_place: selectedLocationName,
-            birth_latitude: latitude,
-            birth_longitude: longitude,
-            birth_timezone: resolvedTz,
-            name: name.trim() || undefined,
+            birth_date: `${bd.year}-${pad(bd.month + 1)}-${pad(bd.day)}`,
+            birth_time: data.timeAccuracy === 'unknown' ? '12:00' : `${pad(bd.hour)}:${pad(bd.minute)}`,
+            birth_place: data.locationName,
+            birth_latitude: bd.latitude,
+            birth_longitude: bd.longitude,
+            birth_timezone: bd.timezone,
+            name: data.name || undefined,
           }),
         });
       } catch {
@@ -325,10 +203,10 @@ export default function LandingPage() {
       }
     }
 
-    const key = `${STORY_SHOWN_PREFIX}${birthProfileKey(birthData)}`;
+    const key = `${STORY_SHOWN_PREFIX}${birthProfileKey(data.birthData)}`;
     const alreadyShown = window.localStorage.getItem(key) === '1';
     router.push(alreadyShown ? '/chart' : '/story-of-you');
-  };
+  }, [router, session]);
 
   const handleStartFresh = useCallback(() => {
     const msg = language === 'ru'
@@ -459,171 +337,9 @@ export default function LandingPage() {
         </button>
       </header>
 
-      <section ref={formRef} className="glass-card mt-7 p-5 sm:p-6">
-        <p className="lumina-section-title mb-4">{t.enterBirthDetails}</p>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="name" className="lumina-label">
-              {t.name} ({t.optional})
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="lumina-input"
-              placeholder={t.homeNamePlaceholder}
-              autoComplete="name"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
-            <div className="sm:col-span-3">
-              <p className="lumina-label mb-2">{t.dateOfBirth}</p>
-              <div className="grid grid-cols-3 gap-2">
-                <select className="lumina-input" value={day} onChange={(event) => setDay(event.target.value)} required>
-                  <option value="">{t.day}</option>
-                  {days.map((item) => (
-                    <option key={item} value={item}>
-                      {String(item).padStart(2, '0')}
-                    </option>
-                  ))}
-                </select>
-                <select className="lumina-input" value={month} onChange={(event) => setMonth(event.target.value)} required>
-                  <option value="">{t.month}</option>
-                  {months.map((item) => (
-                    <option key={item} value={item}>
-                      {String(item).padStart(2, '0')}
-                    </option>
-                  ))}
-                </select>
-                <select className="lumina-input" value={year} onChange={(event) => setYear(event.target.value)} required>
-                  <option value="">{t.year}</option>
-                  {years.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="sm:col-span-2">
-              <p className="lumina-label mb-2">{t.timeOfBirth}</p>
-              <div className="grid grid-cols-2 gap-2">
-                <select className="lumina-input" value={hour} onChange={(event) => setHour(event.target.value)} required={timeAccuracy !== 'unknown'} disabled={timeAccuracy === 'unknown'}>
-                  <option value="">{t.hour}</option>
-                  {hours.map((item) => (
-                    <option key={item} value={item}>
-                      {String(item).padStart(2, '0')}
-                    </option>
-                  ))}
-                </select>
-                <select className="lumina-input" value={minute} onChange={(event) => setMinute(event.target.value)} required={timeAccuracy !== 'unknown'} disabled={timeAccuracy === 'unknown'}>
-                  <option value="">{t.minute}</option>
-                  {minutes.map((item) => (
-                    <option key={item} value={item}>
-                      {String(item).padStart(2, '0')}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {/* Time accuracy */}
-              <div className="mt-2 flex gap-1.5">
-                {([
-                  { value: 'exact' as const, en: 'Exact', ru: 'Точное' },
-                  { value: 'approximate' as const, en: '~Approximate', ru: '~Примерное' },
-                  { value: 'unknown' as const, en: 'Unknown', ru: 'Не знаю' },
-                ] as const).map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setTimeAccuracy(opt.value)}
-                    className={`flex-1 rounded-lg py-1.5 text-[11px] transition ${
-                      timeAccuracy === opt.value
-                        ? 'bg-purple-400/20 text-purple-300 border border-purple-400/30'
-                        : 'bg-white/[0.03] text-cream/40 border border-white/[0.06] hover:text-cream/60'
-                    }`}
-                  >
-                    {language === 'ru' ? opt.ru : opt.en}
-                  </button>
-                ))}
-              </div>
-              {timeAccuracy === 'unknown' && (
-                <p className="mt-1.5 text-[10px] text-amber-300/60">
-                  {language === 'ru'
-                    ? '⚠ Без точного времени восходящий знак и дома будут неточными'
-                    : '⚠ Without exact time, Rising sign and houses will be inaccurate'}
-                </p>
-              )}
-              {timeAccuracy === 'approximate' && (
-                <p className="mt-1.5 text-[10px] text-cream/30">
-                  {language === 'ru'
-                    ? 'Укажите ближайшее время — Rising может отличаться на 1-2 знака'
-                    : 'Enter your closest estimate — Rising may be off by 1-2 signs'}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="relative">
-            <label htmlFor="birth-location" className="lumina-label">
-              {t.birthLocation}
-            </label>
-            <input
-              id="birth-location"
-              type="text"
-              value={locationQuery}
-              onChange={(event) => {
-                setLocationQuery(event.target.value);
-                setSelectedLocationName('');
-                setLatitude(null);
-                setLongitude(null);
-              }}
-              className="lumina-input"
-              placeholder={t.searchCityOrPlace}
-              autoComplete="off"
-              required
-            />
-
-            {locationResults.length > 0 ? (
-              <div className="absolute z-40 bottom-full mb-1 w-full max-h-48 overflow-y-auto rounded-xl border border-white/10 bg-[#0f1433]/95 backdrop-blur-md">
-                {locationResults.map((result) => (
-                  <button
-                    key={result.place_id}
-                    type="button"
-                    className="block min-h-11 w-full border-b border-white/5 px-3 py-3 text-left text-sm text-warmWhite transition hover:bg-white/10"
-                    onClick={() => handleSelectLocation(result)}
-                  >
-                    {result.display_name}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {searchingLocation ? <p className="mt-2 text-xs text-cream/60">...</p> : null}
-          </div>
-
-          {selectedLocationName && latitude !== null && longitude !== null ? (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-cream">
-              <p className="text-warmWhite">
-                {t.selectedLocation}: {selectedLocationName}
-              </p>
-              <p>
-                {t.latitude}: {latitude.toFixed(4)} | {t.longitude}: {longitude.toFixed(4)}
-              </p>
-              <p>
-                {t.timezone}: {timezone}
-              </p>
-            </div>
-          ) : null}
-
-          <button type="submit" disabled={!canSubmit || submitting} className="lumina-button w-full">
-            {t.homeDiscoverStars}
-          </button>
-        </form>
-      </section>
+      <div ref={formRef} className="mt-7">
+        <BirthDataForm onComplete={handleFormComplete} />
+      </div>
     </div>
   );
 }

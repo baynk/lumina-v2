@@ -2,8 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import MoonPhaseVisual from '@/components/MoonPhaseVisual';
 import ExplainModal from '@/components/ExplainModal';
+import BlurGate from '@/components/BlurGate';
+import BirthDataForm, { type BirthDataFormResult } from '@/components/BirthDataForm';
 import { useLanguage } from '@/context/LanguageContext';
 import { calculateDailyCelestialData, calculateNatalChart } from '@/lib/astronomyCalculator';
 import {
@@ -17,7 +20,7 @@ import {
 import { ZodiacImage } from '@/components/icons/ZodiacIcons';
 import { getAspectIcon, getPlanetIcon } from '@/components/icons/PlanetIcons';
 import { getHouseTheme, getPlanetWhyItMatters } from '@/lib/education';
-import { loadProfile } from '@/lib/profile';
+import { loadProfile, saveProfile } from '@/lib/profile';
 import type { BirthData, DailyCelestialData, NatalChartData } from '@/lib/types';
 
 type StoredBirthPayload = {
@@ -103,12 +106,14 @@ export default function ChartPage() {
   const [natalChart, setNatalChart] = useState<NatalChartData | null>(null);
   const [dailyData, setDailyData] = useState<DailyCelestialData | null>(null);
   const [horoscope, setHoroscope] = useState('');
+  const { data: authSession } = useSession();
   const [loadingChart, setLoadingChart] = useState(true);
   const [loadingHoroscope, setLoadingHoroscope] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<ChartTab>('today');
   const [isExplainOpen, setIsExplainOpen] = useState(false);
   const [needsProfile, setNeedsProfile] = useState(false);
+  const [teaserData, setTeaserData] = useState<{ natal: NatalChartData; daily: DailyCelestialData; name: string } | null>(null);
   const [explainState, setExplainState] = useState<ExplainState | null>(null);
   const [showShareCard, setShowShareCard] = useState(false);
 
@@ -251,22 +256,118 @@ export default function ChartPage() {
     );
   }
 
-  if (needsProfile) {
+  if (needsProfile && !teaserData) {
+    const handleTeaserSubmit = (data: BirthDataFormResult) => {
+      saveProfile({
+        birthData: data.birthData,
+        name: data.name,
+        locationName: data.locationName,
+        timeAccuracy: data.timeAccuracy,
+        savedAt: Date.now(),
+      });
+
+      // If already authenticated, skip teaser and load full chart
+      if (authSession?.user) {
+        setNeedsProfile(false);
+        setLoadingChart(true);
+        // Re-trigger the init effect by reloading
+        window.location.reload();
+        return;
+      }
+
+      const natal = calculateNatalChart(data.birthData);
+      const daily = calculateDailyCelestialData();
+      setTeaserData({ natal, daily, name: data.name });
+    };
+
     return (
-      <div className="flex min-h-screen items-center justify-center px-6">
-        <div className="glass-card max-w-md p-8 text-center">
+      <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-6 sm:px-6">
+        <header className="animate-fadeInUp text-center mb-6">
           <p className="font-heading text-3xl text-lumina-soft">✦</p>
-          <h2 className="mt-4 font-heading text-2xl text-cream/90">
+          <h2 className="mt-3 font-heading text-2xl text-cream/90">
             {language === 'ru' ? 'Ваша карта ждёт' : 'Your chart awaits'}
           </h2>
-          <p className="mt-3 text-[14px] leading-relaxed text-cream/50">
+          <p className="mt-2 text-sm text-cream/50">
             {language === 'ru'
-              ? 'Введите данные рождения, чтобы увидеть вашу натальную карту — полные позиции планет, дома и аспекты.'
-              : 'Enter your birth details to unlock your natal chart — full planetary positions, houses, and aspects.'}
+              ? 'Введите данные рождения, чтобы увидеть вашу натальную карту'
+              : 'Enter your birth details to see your natal chart'}
           </p>
-          <button className="lumina-button mt-6 w-full" onClick={() => router.push('/?start=true')}>
-            {language === 'ru' ? 'Начать' : 'Get started'}
-          </button>
+        </header>
+        <BirthDataForm
+          onComplete={handleTeaserSubmit}
+          submitLabel={language === 'ru' ? 'Показать мою карту' : 'Show my chart'}
+        />
+      </div>
+    );
+  }
+
+  if (needsProfile && teaserData) {
+    const sunPlanet = teaserData.natal.planets.find((p) => p.planet === 'Sun');
+    const moonPlanet = teaserData.natal.planets.find((p) => p.planet === 'Moon');
+    const risingSign = teaserData.natal.planets.find((p) => p.planet === 'Ascendant');
+    const nameLabel = teaserData.name || (language === 'ru' ? 'друг' : 'friend');
+
+    return (
+      <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-6 sm:px-6">
+        {/* Teaser: visible key insights */}
+        <header className="animate-fadeInUp text-center">
+          {sunPlanet && <ZodiacImage sign={sunPlanet.sign} size={80} className="mx-auto opacity-90" />}
+          <h1 className="mt-4 font-heading text-3xl text-lumina-soft">
+            {language === 'ru' ? `${nameLabel}, вы — ${translateSign(sunPlanet?.sign || 'Aries', language)}` : `${nameLabel}, you are a ${sunPlanet?.sign || 'Aries'}`}
+          </h1>
+        </header>
+
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          {moonPlanet && (
+            <div className="glass-card p-4 text-center">
+              <p className="lumina-label">{language === 'ru' ? 'Луна' : 'Moon'}</p>
+              <ZodiacImage sign={moonPlanet.sign} size={32} className="mx-auto mt-2 opacity-80" />
+              <p className="mt-2 text-sm font-medium text-cream">{translateSign(moonPlanet.sign, language)}</p>
+              <p className="mt-1 text-[11px] text-cream/50">
+                {language === 'ru' ? 'Ваши эмоции и интуиция' : 'Your emotions & intuition'}
+              </p>
+            </div>
+          )}
+          {risingSign && (
+            <div className="glass-card p-4 text-center">
+              <p className="lumina-label">{language === 'ru' ? 'Восходящий' : 'Rising'}</p>
+              <ZodiacImage sign={risingSign.sign} size={32} className="mx-auto mt-2 opacity-80" />
+              <p className="mt-2 text-sm font-medium text-cream">{translateSign(risingSign.sign, language)}</p>
+              <p className="mt-1 text-[11px] text-cream/50">
+                {language === 'ru' ? 'Как вас видят другие' : 'How others see you'}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Blurred sections — gate */}
+        <div className="mt-6">
+          <BlurGate language={language}>
+            <div className="space-y-4">
+              <div className="glass-card p-5">
+                <p className="lumina-label mb-3">{language === 'ru' ? 'Ваш ежедневный гороскоп' : 'Your daily horoscope'}</p>
+                <p className="text-sm text-cream/80">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+              </div>
+              <div className="glass-card p-5">
+                <p className="lumina-label mb-3">{language === 'ru' ? 'Позиции планет' : 'Planetary positions'}</p>
+                <div className="space-y-2">
+                  {['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'].map((p) => (
+                    <div key={p} className="flex justify-between text-sm text-cream/70">
+                      <span>{p}</span><span>Aquarius 15°42&apos;</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="glass-card p-5">
+                <p className="lumina-label mb-3">{language === 'ru' ? 'Аспекты сегодня' : 'Today&apos;s aspects'}</p>
+                <div className="space-y-2">
+                  {['Sun Conjunction Mars', 'Moon Trine Jupiter', 'Venus Square Saturn'].map((a) => (
+                    <p key={a} className="text-sm text-cream/70">{a}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </BlurGate>
         </div>
       </div>
     );

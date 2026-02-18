@@ -77,6 +77,15 @@ export function clearProfile(): void {
     localStorage.removeItem('lumina_synastry_result');
     localStorage.removeItem('lumina_synastry_names');
     localStorage.removeItem('lumina_synastry_share_url');
+    localStorage.removeItem('lumina_onboarding_story_cache');
+    localStorage.removeItem('lumina_push_prompt_dismissed');
+    // Clear all story-shown flags
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k?.startsWith('lumina_story_shown_')) keysToRemove.push(k);
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
     window.dispatchEvent(new Event('lumina-profile-changed'));
   } catch {
     // Silently fail

@@ -28,18 +28,24 @@ async function generateAiDetails(alerts: TransitAlert[], language: 'en' | 'ru'):
     date: item.date,
   }));
 
-  const languageInstruction =
-    language === 'ru'
-      ? 'IMPORTANT: Write ALL text in Russian (Cyrillic script). Every string value must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid jargon unless you immediately explain it.'
-      : 'Write in clear practical English.';
+  const isRu = language === 'ru';
+  const selectedJson = JSON.stringify(selected);
 
-  const prompt = [
-    'You are an astrologer explaining practical transit impact.',
-    languageInstruction,
-    'Explain what each transit means in daily life, what to pay attention to, and likely opportunity/challenge. Keep grounded and actionable.',
-    'Return ONLY valid JSON object where keys are transit IDs and values are 2-3 sentence practical explanations.',
-    `Transit list: ${JSON.stringify(selected)}`,
-  ].join('\n');
+  const prompt = isRu
+    ? [
+        'Ты — астролог, объясняющий практическое влияние транзитов.',
+        'ВАЖНО: Пиши ВСЁ на русском языке (кириллица). НИ ОДНОГО слова на английском. Используй "ты". Названия планет и знаков — на русском.',
+        'Объясни, что каждый транзит значит в повседневной жизни, на что обратить внимание, возможности и вызовы. Будь практичной.',
+        'Верни ТОЛЬКО валидный JSON-объект, где ключи — ID транзитов, а значения — объяснения в 2-3 предложениях.',
+        `Список транзитов: ${selectedJson}`,
+      ].join('\n')
+    : [
+        'You are an astrologer explaining practical transit impact.',
+        'Write in clear practical English.',
+        'Explain what each transit means in daily life, what to pay attention to, and likely opportunity/challenge. Keep grounded and actionable.',
+        'Return ONLY valid JSON object where keys are transit IDs and values are 2-3 sentence practical explanations.',
+        `Transit list: ${selectedJson}`,
+      ].join('\n');
 
   const result = await model.generateContent(prompt);
   const text = cleanJson(result.response.text());

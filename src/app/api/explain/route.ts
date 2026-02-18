@@ -29,19 +29,26 @@ export async function POST(request: Request) {
     const client = new GoogleGenerativeAI(apiKey);
     const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const languageInstruction =
-      body.language === 'ru'
-        ? 'IMPORTANT: Write ALL text in Russian (Cyrillic script). Every string value must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid jargon unless you immediately explain it.'
-        : 'Write in natural modern English with a premium astrology tone.';
+    const isRu = body.language === 'ru';
 
-    const prompt = [
-      'You are a warm, insightful astrologer writing for a modern audience.',
-      languageInstruction,
-      `Placement: ${body.planet} in ${body.sign}, House ${body.house}.`,
-      'Output 120-180 words in 2-3 short paragraphs.',
-      'Cover: what this placement means for personality, one strength, one growth area, and a practical tip.',
-      'Be specific, warm, and vivid. No disclaimers or hedging.',
-    ].join('\n');
+    const prompt = isRu
+      ? [
+          'Ты — тёплый, проницательный астролог, пишущий для современной аудитории.',
+          'ВАЖНО: Пиши ВСЁ на русском языке (кириллица). НИ ОДНОГО слова на английском. Используй "ты".',
+          `Расположение: ${body.planet} в ${body.sign}, Дом ${body.house}.`,
+          'Напиши 120-180 слов в 2-3 коротких абзацах.',
+          'Охвати: что значит это расположение для личности, одну сильную сторону, одну зону роста и практический совет.',
+          'Будь конкретной, тёплой и образной. Без дисклеймеров.',
+          'Названия планет и знаков — на русском (Солнце, Луна, Козерог, Овен и т.д.).',
+        ].join('\n')
+      : [
+          'You are a warm, insightful astrologer writing for a modern audience.',
+          'Write in natural modern English with a premium astrology tone.',
+          `Placement: ${body.planet} in ${body.sign}, House ${body.house}.`,
+          'Output 120-180 words in 2-3 short paragraphs.',
+          'Cover: what this placement means for personality, one strength, one growth area, and a practical tip.',
+          'Be specific, warm, and vivid. No disclaimers or hedging.',
+        ].join('\n');
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12000);

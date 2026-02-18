@@ -53,31 +53,49 @@ async function generateNarrative(body: RequestBody, synastryData: ReturnType<typ
   const client = new GoogleGenerativeAI(apiKey);
   const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-  const languageInstruction =
-    body.language === 'ru'
-      ? 'IMPORTANT: Write ALL text values in Russian (Cyrillic script). Every single string value in the JSON must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid heavy jargon unless you immediately explain it.'
-      : 'Write in modern premium English. Avoid jargon unless you immediately explain it.';
-  const nameA = body.nameA?.trim() || 'Person A';
-  const nameB = body.nameB?.trim() || 'Person B';
+  const isRu = body.language === 'ru';
+  const nameA = body.nameA?.trim() || (isRu ? 'Партнёр A' : 'Person A');
+  const nameB = body.nameB?.trim() || (isRu ? 'Партнёр B' : 'Person B');
+  const synJson = JSON.stringify(synastryData);
 
-  const prompt = [
-    'You are a relationship astrologer writing for a smart friend who is curious about astrology but not an expert.',
-    'Be honest. Mention challenges, not only positives.',
-    languageInstruction,
-    `Person A is named ${nameA}. Person B is named ${nameB}. Use their actual names throughout the narrative.`,
-    'Use their actual placements and aspects from the provided synastry data.',
-    'Return ONLY valid JSON with keys:',
-    '{"overallConnection":"...","communicationStyle":"...","emotionalCompatibility":"...","attractionChemistry":"...","growthChallenges":"...","longTermPotential":"..."}',
-    'Each section must be 3-4 sentences in plain language.',
-    'Section requirements:',
-    '1. Overall Connection: the vibe of this relationship in 2-3 opening sentences plus one grounding sentence.',
-    '2. Communication Style: how they talk, argue, and resolve conflict.',
-    '3. Emotional Compatibility: how they create emotional safety or insecurity.',
-    '4. Attraction & Chemistry: Venus/Mars dynamics and romantic pull.',
-    '5. Growth & Challenges: especially Saturn aspects, squares, oppositions.',
-    '6. Long-term Potential: composite chart strengths and practical guidance.',
-    `Synastry data: ${JSON.stringify(synastryData)}`,
-  ].join('\n');
+  const prompt = isRu
+    ? [
+        'Ты — астролог отношений, пишущий для умной подруги, которая интересуется астрологией, но не эксперт.',
+        'Будь честной. Упоминай трудности, не только позитив.',
+        'ВАЖНО: ВСЕ текстовые значения ДОЛЖНЫ быть на русском (кириллица). НИ ОДНОГО слова на английском. Используй "ты". Названия знаков и планет — на русском.',
+        `Партнёр A — ${nameA}. Партнёр B — ${nameB}. Используй их реальные имена в тексте.`,
+        'Используй реальные расположения и аспекты из предоставленных данных синастрии.',
+        'Верни ТОЛЬКО валидный JSON с ключами:',
+        '{"overallConnection":"...","communicationStyle":"...","emotionalCompatibility":"...","attractionChemistry":"...","growthChallenges":"...","longTermPotential":"..."}',
+        'Каждый раздел — 3-4 предложения простым языком.',
+        'Требования к разделам:',
+        '1. overallConnection: вайб этих отношений в 2-3 вступительных предложениях + одно заземляющее.',
+        '2. communicationStyle: как они общаются, спорят и решают конфликты.',
+        '3. emotionalCompatibility: как они создают эмоциональную безопасность или нестабильность.',
+        '4. attractionChemistry: динамика Венеры/Марса и романтическое притяжение.',
+        '5. growthChallenges: особенно аспекты Сатурна, квадраты, оппозиции.',
+        '6. longTermPotential: сильные стороны композитной карты и практические советы.',
+        'НАПОМИНАНИЕ: Весь текст — ТОЛЬКО на русском языке.',
+        `Данные синастрии: ${synJson}`,
+      ].join('\n')
+    : [
+        'You are a relationship astrologer writing for a smart friend who is curious about astrology but not an expert.',
+        'Be honest. Mention challenges, not only positives.',
+        'Write in modern premium English. Avoid jargon unless you immediately explain it.',
+        `Person A is named ${nameA}. Person B is named ${nameB}. Use their actual names throughout the narrative.`,
+        'Use their actual placements and aspects from the provided synastry data.',
+        'Return ONLY valid JSON with keys:',
+        '{"overallConnection":"...","communicationStyle":"...","emotionalCompatibility":"...","attractionChemistry":"...","growthChallenges":"...","longTermPotential":"..."}',
+        'Each section must be 3-4 sentences in plain language.',
+        'Section requirements:',
+        '1. Overall Connection: the vibe of this relationship in 2-3 opening sentences plus one grounding sentence.',
+        '2. Communication Style: how they talk, argue, and resolve conflict.',
+        '3. Emotional Compatibility: how they create emotional safety or insecurity.',
+        '4. Attraction & Chemistry: Venus/Mars dynamics and romantic pull.',
+        '5. Growth & Challenges: especially Saturn aspects, squares, oppositions.',
+        '6. Long-term Potential: composite chart strengths and practical guidance.',
+        `Synastry data: ${synJson}`,
+      ].join('\n');
 
   const result = await model.generateContent(prompt);
   const text = cleanJson(result.response.text());

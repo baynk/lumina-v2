@@ -48,18 +48,23 @@ export async function POST(request: Request) {
     const client = new GoogleGenerativeAI(apiKey);
     const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const instruction =
-      body.language === 'ru'
-        ? 'IMPORTANT: Write ALL text in Russian (Cyrillic script). Every string value must be in Russian. Do not use English at all. Use natural conversational Russian. Avoid jargon unless you immediately explain it.'
-        : 'Write in warm modern English.';
+    const isRu = body.language === 'ru';
 
-    const prompt = [
-      'Create personalized moon ritual content for an astrology app user.',
-      instruction,
-      `Moon phase: ${body.moonPhase}. User Sun sign: ${body.sunSign}.`,
-      'Return ONLY valid JSON: {"title":"...","summary":"...","prompts":["...","...","..."]}',
-      'Keep summary to 2 concise sentences and prompts practical.',
-    ].join('\n');
+    const prompt = isRu
+      ? [
+          'Создай персонализированный контент лунного ритуала для пользователя астрологического приложения.',
+          'ВАЖНО: Пиши ВСЁ на русском языке (кириллица). НИ ОДНОГО слова на английском. Используй "ты".',
+          `Фаза Луны: ${body.moonPhase}. Солнечный знак пользователя: ${body.sunSign}.`,
+          'Верни ТОЛЬКО валидный JSON: {"title":"заголовок на русском","summary":"описание на русском","prompts":["подсказка 1","подсказка 2","подсказка 3"]}',
+          'Описание — 2 лаконичных предложения, подсказки — практичные.',
+        ].join('\n')
+      : [
+          'Create personalized moon ritual content for an astrology app user.',
+          'Write in warm modern English.',
+          `Moon phase: ${body.moonPhase}. User Sun sign: ${body.sunSign}.`,
+          'Return ONLY valid JSON: {"title":"...","summary":"...","prompts":["...","...","..."]}',
+          'Keep summary to 2 concise sentences and prompts practical.',
+        ].join('\n');
 
     const result = await model.generateContent(prompt);
     const text = cleanJson(result.response.text());

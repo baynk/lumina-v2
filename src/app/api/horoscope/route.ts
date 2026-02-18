@@ -42,23 +42,35 @@ export async function POST(request: Request) {
       day: 'numeric',
     });
 
-    const languageInstruction =
-      body.language === 'ru'
-        ? 'Write in natural, conversational Russian as a native speaker. Use informal form. Use authentic Russian astrological terminology.'
-        : 'Write in warm, premium English for a modern astrology app audience.';
+    const isRu = body.language === 'ru';
+    const chartJson = JSON.stringify(body.natalChart);
+    const dailyJson = JSON.stringify(body.dailyData);
 
-    const prompt = [
-      'You are an expert astrologer writing a personalized daily horoscope.',
-      `Today is ${dateStr}. This reading is specifically for today — make it unique and specific to today's transits.`,
-      languageInstruction,
-      'Tone: insightful, elegant, emotionally intelligent, practical.',
-      'Length: 120-180 words, 2 short paragraphs maximum.',
-      'Include: emotional climate, relationship cue, and one concrete action for today.',
-      'Reference specific planetary positions and aspects from the transit data — do NOT give generic advice.',
-      `Natal chart data: ${JSON.stringify(body.natalChart)}`,
-      `Current daily transits and moon data: ${JSON.stringify(body.dailyData)}`,
-      'Avoid generic filler, avoid disclaimers, and avoid repeating the same advice every day.',
-    ].join('\n');
+    const prompt = isRu
+      ? [
+          'Ты — опытный астролог, пишущий персональный ежедневный гороскоп.',
+          `Сегодня ${dateStr}. Этот прогноз — именно на сегодня, уникальный для сегодняшних транзитов.`,
+          'ВАЖНО: Пиши ВСЁ на русском языке (кириллица). НИ ОДНОГО слова на английском. Используй "ты" (не "вы"). Названия планет и знаков — на русском.',
+          'Тон: проницательный, элегантный, эмоционально умный, практичный.',
+          'Длина: 120-180 слов, максимум 2 коротких абзаца.',
+          'Включи: эмоциональный фон дня, подсказку для отношений и одно конкретное действие на сегодня.',
+          'Ссылайся на конкретные позиции планет и аспекты из транзитных данных — НЕ давай общих советов.',
+          `Данные натальной карты: ${chartJson}`,
+          `Текущие транзиты и лунные данные: ${dailyJson}`,
+          'Избегай общих фраз, дисклеймеров и повторений.',
+        ].join('\n')
+      : [
+          'You are an expert astrologer writing a personalized daily horoscope.',
+          `Today is ${dateStr}. This reading is specifically for today — make it unique and specific to today's transits.`,
+          'Write in warm, premium English for a modern astrology app audience.',
+          'Tone: insightful, elegant, emotionally intelligent, practical.',
+          'Length: 120-180 words, 2 short paragraphs maximum.',
+          'Include: emotional climate, relationship cue, and one concrete action for today.',
+          'Reference specific planetary positions and aspects from the transit data — do NOT give generic advice.',
+          `Natal chart data: ${chartJson}`,
+          `Current daily transits and moon data: ${dailyJson}`,
+          'Avoid generic filler, avoid disclaimers, and avoid repeating the same advice every day.',
+        ].join('\n');
 
     const result = await model.generateContent(prompt);
     const text = result.response.text().trim();

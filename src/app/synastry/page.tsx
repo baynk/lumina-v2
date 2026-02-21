@@ -420,8 +420,25 @@ export default function SynastryPage() {
   };
 
   const canSubmit = useMemo(() => {
+    const isValidCalendarDate = (p: PersonFormState) => {
+      const y = Number.parseInt(p.year, 10);
+      const m = Number.parseInt(p.month, 10);
+      const d = Number.parseInt(p.day, 10);
+      if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return false;
+      const date = new Date(Date.UTC(y, m - 1, d));
+      return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+    };
+
     const valid = (p: PersonFormState) =>
-      p.day && p.month && p.year && p.hour && p.minute && p.selectedLocationName && p.latitude !== null && p.longitude !== null;
+      p.day &&
+      p.month &&
+      p.year &&
+      p.hour &&
+      p.minute &&
+      p.selectedLocationName &&
+      p.latitude !== null &&
+      p.longitude !== null &&
+      isValidCalendarDate(p);
     return valid(personA) && valid(personB);
   }, [personA, personB]);
 
@@ -538,7 +555,10 @@ export default function SynastryPage() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      setError(language === 'ru' ? 'Проверьте дату рождения для обоих людей' : 'Please check both birth dates');
+      return;
+    }
     setLoading(true);
     setError('');
     try {

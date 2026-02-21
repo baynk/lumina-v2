@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { useLanguage } from '@/context/LanguageContext';
+import { secureSignOut } from '@/lib/authClient';
 
 type Stats = {
   totalUsers: number;
@@ -85,6 +87,7 @@ const T: Record<string, Record<string, string>> = {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
   const { data: session, status: authStatus } = useSession();
   const { language } = useLanguage();
   const l = T[language] || T.en;
@@ -96,6 +99,10 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (authStatus === 'unauthenticated') {
+      router.replace('/auth/signin?callbackUrl=%2Fadmin');
+      return;
+    }
     if (authStatus === 'loading') return;
     if (!session?.user) {
       setError('Not signed in');
@@ -103,7 +110,7 @@ export default function AdminPage() {
       return;
     }
     loadData();
-  }, [authStatus, session, tab]);
+  }, [authStatus, router, session, tab]);
 
   async function loadData() {
     setLoading(true);
@@ -158,7 +165,7 @@ export default function AdminPage() {
             </button>
             {session?.user && (
               <button
-                onClick={() => signOut({ callbackUrl: '/admin' })}
+                onClick={() => secureSignOut('/auth/signin?callbackUrl=%2Fadmin')}
                 className="text-xs text-cream/40 hover:text-cream transition"
               >
                 Sign out first (switch accounts)

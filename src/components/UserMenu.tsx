@@ -1,7 +1,7 @@
 'use client';
 
-import { useSession, signIn, signOut } from 'next-auth/react';
-import { clearProfile } from '@/lib/profile';
+import { useSession, signIn } from 'next-auth/react';
+import { secureSignOut } from '@/lib/authClient';
 import { useState, useRef, useEffect } from 'react';
 
 export default function UserMenu() {
@@ -104,10 +104,9 @@ export default function UserMenu() {
             Profile
           </a>
           <button
-            onClick={() => {
+            onClick={async () => {
               setOpen(false);
-              clearProfile();
-              signOut({ callbackUrl: '/' });
+              await secureSignOut('/');
             }}
             className="w-full rounded-lg px-3 py-2 text-left text-sm text-cream/70 transition hover:bg-white/10 hover:text-warmWhite"
           >

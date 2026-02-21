@@ -50,6 +50,7 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
   const [longitude, setLongitude] = useState<number | null>(null);
   const [timezone, setTimezone] = useState('UTC');
   const [submitting, setSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState('');
 
   const canSubmit = useMemo(
     () =>
@@ -117,6 +118,26 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!canSubmit || latitude === null || longitude === null) return;
+    setValidationError('');
+
+    const parsedYear = Number.parseInt(year, 10);
+    const parsedMonth = Number.parseInt(month, 10);
+    const parsedDay = Number.parseInt(day, 10);
+    const calendarDate = new Date(Date.UTC(parsedYear, parsedMonth - 1, parsedDay));
+    const isValidDate =
+      Number.isFinite(parsedYear) &&
+      Number.isFinite(parsedMonth) &&
+      Number.isFinite(parsedDay) &&
+      calendarDate.getUTCFullYear() === parsedYear &&
+      calendarDate.getUTCMonth() === parsedMonth - 1 &&
+      calendarDate.getUTCDate() === parsedDay;
+
+    if (!isValidDate) {
+      setValidationError(
+        language === 'ru' ? 'Проверьте корректность даты рождения' : 'Please enter a valid birth date'
+      );
+      return;
+    }
 
     setSubmitting(true);
 
@@ -302,6 +323,9 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
         <button type="submit" disabled={!canSubmit || submitting} className="lumina-button w-full">
           {submitLabel || t.homeDiscoverStars}
         </button>
+        {validationError && (
+          <p className="text-xs text-red-300">{validationError}</p>
+        )}
       </form>
     </section>
   );

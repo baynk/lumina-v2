@@ -130,6 +130,23 @@ export default function LandingPage() {
     checkProfile();
   }, [session, authStatus]);
 
+  // Clear personalized state on sign-out
+  useEffect(() => {
+    const handler = () => {
+      const p = loadProfile();
+      if (!p) {
+        setExistingProfile(null);
+        setHoroscope('');
+      }
+    };
+    window.addEventListener('lumina-profile-changed', handler);
+    window.addEventListener('lumina-auth-signed-out', handler);
+    return () => {
+      window.removeEventListener('lumina-profile-changed', handler);
+      window.removeEventListener('lumina-auth-signed-out', handler);
+    };
+  }, []);
+
   useEffect(() => {
     try {
       const daily = calculateDailyCelestialData();

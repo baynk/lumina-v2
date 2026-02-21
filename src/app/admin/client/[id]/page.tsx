@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 
@@ -338,6 +338,7 @@ function NatalWheel({ chart, clientName, birthInfo }: { chart: NatalChart; clien
 }
 
 export default function AdminClientWorkspacePage() {
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const consultationId = params?.id;
 
@@ -354,6 +355,11 @@ export default function AdminClientWorkspacePage() {
   const isAdmin = isAdminEmail(session?.user?.email);
 
   useEffect(() => {
+    if (authStatus === 'unauthenticated') {
+      const callback = consultationId ? `%2Fadmin%2Fclient%2F${encodeURIComponent(consultationId)}` : '%2Fadmin';
+      router.replace(`/auth/signin?callbackUrl=${callback}`);
+      return;
+    }
     if (authStatus === 'loading') return;
 
     if (!session?.user?.email) {
@@ -404,7 +410,7 @@ export default function AdminClientWorkspacePage() {
     };
 
     loadClient();
-  }, [authStatus, consultationId, isAdmin, session?.user?.email]);
+  }, [authStatus, consultationId, isAdmin, router, session?.user?.email]);
 
   const planetOrder = useMemo(() => {
     const preferred = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'];

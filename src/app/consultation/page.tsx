@@ -15,6 +15,28 @@ const CALENDLY_LINKS = {
   'video-60': 'https://calendly.com/luminastrology/deep-dive-reading-60-min',
 };
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DATE_RE = /^(\d{2})\.(\d{2})\.(\d{4})$/;
+const TIME_RE = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+function isValidBirthDate(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  const match = DATE_RE.exec(trimmed);
+  if (!match) return false;
+  const day = Number.parseInt(match[1], 10);
+  const month = Number.parseInt(match[2], 10);
+  const year = Number.parseInt(match[3], 10);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+function isValidBirthTime(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  return TIME_RE.test(trimmed);
+}
+
 export default function ConsultationPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
@@ -33,6 +55,7 @@ export default function ConsultationPage() {
   const [unsureBirthTime, setUnsureBirthTime] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Pre-fill from profile
   useEffect(() => {
@@ -64,6 +87,20 @@ export default function ConsultationPage() {
 
   const handleSubmitWritten = async () => {
     if (!name.trim() || !question.trim() || !contactEmail.trim()) return;
+    if (!EMAIL_RE.test(contactEmail.trim())) {
+      setSubmitError(language === 'ru' ? 'Введите корректный email' : 'Please enter a valid email');
+      return;
+    }
+    if (!isValidBirthDate(birthDate)) {
+      setSubmitError(language === 'ru' ? 'Неверный формат даты рождения (ДД.ММ.ГГГГ)' : 'Invalid birth date format (DD.MM.YYYY)');
+      return;
+    }
+    if (!unsureBirthTime && !isValidBirthTime(birthTime)) {
+      setSubmitError(language === 'ru' ? 'Неверный формат времени (ЧЧ:ММ)' : 'Invalid birth time format (HH:MM)');
+      return;
+    }
+
+    setSubmitError('');
     setSubmitting(true);
     try {
       const res = await fetch('/api/consultation', {
@@ -351,6 +388,20 @@ export default function ConsultationPage() {
                 type="button"
                 onClick={async () => {
                   if (!name.trim() || !contactEmail.trim() || !question.trim()) return;
+                  if (!EMAIL_RE.test(contactEmail.trim())) {
+                    setSubmitError(language === 'ru' ? 'Введите корректный email' : 'Please enter a valid email');
+                    return;
+                  }
+                  if (!isValidBirthDate(birthDate)) {
+                    setSubmitError(language === 'ru' ? 'Неверный формат даты рождения (ДД.ММ.ГГГГ)' : 'Invalid birth date format (DD.MM.YYYY)');
+                    return;
+                  }
+                  if (!unsureBirthTime && !isValidBirthTime(birthTime)) {
+                    setSubmitError(language === 'ru' ? 'Неверный формат времени (ЧЧ:ММ)' : 'Invalid birth time format (HH:MM)');
+                    return;
+                  }
+
+                  setSubmitError('');
                   setSubmitting(true);
                   try {
                     await fetch('/api/consultation', {
@@ -386,6 +437,7 @@ export default function ConsultationPage() {
                   ? '...'
                   : (language === 'ru' ? 'Отправить и выбрать время →' : 'Submit & Choose a Time →')}
               </button>
+              {submitError && <p className="text-center text-xs text-red-300">{submitError}</p>}
               <p className="text-center text-[10px] text-cream/30">
                 {language === 'ru'
                   ? 'После отправки откроется календарь для выбора времени сессии'
@@ -504,6 +556,7 @@ export default function ConsultationPage() {
               ? '...'
               : (language === 'ru' ? 'Отправить запрос · €25' : 'Submit Request · €25')}
           </button>
+          {submitError && <p className="text-center text-xs text-red-300">{submitError}</p>}
           <p className="text-center text-[10px] text-cream/30">
             {language === 'ru' ? 'Оплата после подтверждения запроса' : 'Payment link will be sent after request confirmation'}
           </p>

@@ -124,7 +124,7 @@ export default function AstroMapGL({ data, activePlanets, activeAngles }: AstroM
       <Map
         mapLib={maplibregl}
         initialViewState={{ latitude: 20, longitude: 0, zoom: 1.5 }}
-        mapStyle="https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json"
+        mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
         style={{ width: '100%', height: '100%' }}
         interactiveLayerIds={['astro-lines-solid', 'astro-lines-dashed']}
         onMouseMove={(event) => {

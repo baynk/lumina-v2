@@ -77,6 +77,10 @@ export default function PlanetFilter({
         })}
       </div>
 
+      {activePlanets.length === 0 && (
+        <p className="mb-3 -mt-1 text-[11px] text-lumina-accent/60 italic">↑ Tap a planet to draw its lines on the map</p>
+      )}
+
       <p className="mb-3 text-xs uppercase tracking-wide text-slate-400">Angles</p>
       <div className="flex flex-wrap gap-2">
         {ANGLES.map((angle) => {

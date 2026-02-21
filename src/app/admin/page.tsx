@@ -211,6 +211,16 @@ export default function AdminPage() {
         ))}
       </div>
 
+      <div className="mb-6">
+        <Link
+          href="/admin/astrocartography"
+          className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-200 transition hover:border-cyan-300/50 hover:bg-cyan-500/20"
+        >
+          <span aria-hidden>🗺️</span>
+          Astrocartography Map
+        </Link>
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-lumina-accent border-t-transparent" />

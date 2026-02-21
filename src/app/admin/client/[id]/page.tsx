@@ -718,6 +718,7 @@ export default function AdminClientWorkspacePage() {
           userData={data.birthDataUsed}
           clientName={data.consultation.name}
           clientEmail={data.consultation.contact_email || data.user?.email}
+          natalPlanets={data.natalChart?.planets || null}
         />
       </div>
 

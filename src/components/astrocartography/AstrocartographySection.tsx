@@ -22,10 +22,18 @@ type BirthData = {
   birth_timezone: string | null;
 };
 
+type NatalPlanet = {
+  planet: string;
+  sign: string;
+  degrees: string;
+  house?: number;
+};
+
 type Props = {
   userData: BirthData | null;
   clientName: string;
   clientEmail?: string | null;
+  natalPlanets?: NatalPlanet[] | null;
 };
 
 function hasSufficientBirthData(d: BirthData | null): boolean {
@@ -96,7 +104,7 @@ function transformToGeoJSON(planets: AstrocartographyPlanetLines[]): AstroFeatur
   return { type: 'FeatureCollection', features };
 }
 
-export default function AstrocartographySection({ userData, clientName, clientEmail }: Props) {
+export default function AstrocartographySection({ userData, clientName, clientEmail, natalPlanets }: Props) {
   const [activePlanets, setActivePlanets] = useState<string[]>([]);
   const [activeAngles, setActiveAngles] = useState<AngleType[]>(ALL_ANGLES);
   const [geoJSON, setGeoJSON] = useState<AstroFeatureCollection | null>(null);
@@ -226,6 +234,7 @@ export default function AstrocartographySection({ userData, clientName, clientEm
             onToggleAngle={toggleAngle}
             onSelectAllPlanets={selectAllPlanets}
             onClearAllPlanets={clearAllPlanets}
+            natalPlanets={natalPlanets}
           />
           <div className="mt-3">
             <AstroMapGL data={geoJSON} activePlanets={activePlanets} activeAngles={activeAngles} />

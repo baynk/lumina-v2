@@ -1,5 +1,7 @@
 'use client';
 
+import { getPersonalizedInterpretation, type NatalPlanet } from './interpretations';
+
 type AngleType = 'mc' | 'ic' | 'asc' | 'desc';
 
 type PlanetMeta = {
@@ -21,7 +23,8 @@ const PLANETS: PlanetMeta[] = [
   { planet: 'Pluto', symbol: '♇', color: '#7f1d1d' },
 ];
 
-const ANGLES: Array<{ value: AngleType; label: string }> = [
+const ANGLE_LABELS: Record<string, string> = { mc: 'Midheaven', ic: 'Imum Coeli', asc: 'Ascendant', desc: 'Descendant' };
+const ANGLE_ABBR: Array<{ value: AngleType; label: string }> = [
   { value: 'mc', label: 'MC' },
   { value: 'ic', label: 'IC' },
   { value: 'asc', label: 'ASC' },
@@ -35,6 +38,7 @@ type PlanetFilterProps = {
   onToggleAngle: (angleType: AngleType) => void;
   onSelectAllPlanets: () => void;
   onClearAllPlanets: () => void;
+  natalPlanets?: NatalPlanet[] | null;
 };
 
 export default function PlanetFilter({
@@ -44,7 +48,10 @@ export default function PlanetFilter({
   onToggleAngle,
   onSelectAllPlanets,
   onClearAllPlanets,
+  natalPlanets,
 }: PlanetFilterProps) {
+  const activeMeta = PLANETS.filter((p) => activePlanets.includes(p.planet));
+
   return (
     <div className="rounded-2xl border border-slate-700 bg-slate-950/80 p-4">
       <div className="mb-3 flex items-center justify-between">
@@ -81,9 +88,49 @@ export default function PlanetFilter({
         <p className="mb-3 -mt-1 text-[11px] text-lumina-accent/60 italic">↑ Tap a planet to draw its lines on the map</p>
       )}
 
+      {/* Interpretation cards for active planets */}
+      {activeMeta.length > 0 && (
+        <div className="mb-4 space-y-3">
+          {activeMeta.map((pm) => {
+            const interp = getPersonalizedInterpretation(pm.planet, natalPlanets || null);
+            if (!interp) return null;
+            return (
+              <div
+                key={pm.planet}
+                className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3"
+                style={{ borderLeftWidth: 3, borderLeftColor: pm.color }}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span style={{ color: pm.color }} className="text-base">{pm.symbol}</span>
+                  <span className="text-sm font-medium text-warmWhite">{pm.planet}</span>
+                  {interp.sign && (
+                    <span className="text-[10px] text-cream/40 ml-1">in {interp.sign}</span>
+                  )}
+                </div>
+                <p className="text-[11px] text-cream/50 italic mb-2">{interp.theme}</p>
+                <div className="space-y-1.5">
+                  {activeAngles.map((angle) => {
+                    const desc = interp.lines[angle];
+                    if (!desc) return null;
+                    return (
+                      <div key={angle} className="flex gap-2">
+                        <span className="text-[10px] font-mono text-cyan-300/70 w-8 shrink-0 pt-0.5">
+                          {angle.toUpperCase()}
+                        </span>
+                        <p className="text-[11px] text-cream/60 leading-relaxed">{desc}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <p className="mb-3 text-xs uppercase tracking-wide text-slate-400">Angles</p>
       <div className="flex flex-wrap gap-2">
-        {ANGLES.map((angle) => {
+        {ANGLE_ABBR.map((angle) => {
           const active = activeAngles.includes(angle.value);
           return (
             <button

@@ -109,7 +109,14 @@ export default function AstrocartographySection({ userData, clientName, clientEm
   useEffect(() => {
     if (!hasBirthData || !userData) return;
 
-    const [y, m, d] = (userData!.birth_date!).split('-').map(Number);
+    const dateStr = userData!.birth_date!.trim();
+    let y: number, m: number, d: number;
+    const dotMatch = dateStr.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (dotMatch) {
+      d = Number(dotMatch[1]); m = Number(dotMatch[2]); y = Number(dotMatch[3]);
+    } else {
+      [y, m, d] = dateStr.split('-').map(Number);
+    }
     const [h, min] = (userData!.birth_time!).split(':').map(Number);
 
     const params = new URLSearchParams({
@@ -120,7 +127,7 @@ export default function AstrocartographySection({ userData, clientName, clientEm
       minute: String(min),
       lat: String(Number(userData!.birth_latitude)),
       lon: String(Number(userData!.birth_longitude)),
-      timezone: String(userData!.birth_timezone),
+      tz: String(userData!.birth_timezone),
     });
 
     setLoading(true);
@@ -131,8 +138,9 @@ export default function AstrocartographySection({ userData, clientName, clientEm
         if (!r.ok) throw new Error(`API error ${r.status}`);
         return r.json();
       })
-      .then((data) => {
-        const geo = transformToGeoJSON(data.planets || []);
+      .then((resp) => {
+        const acgData = resp.data || resp;
+        const geo = transformToGeoJSON(acgData.planets || []);
         setGeoJSON(geo);
       })
       .catch((err) => setError(err.message || 'Failed to calculate astrocartography'))

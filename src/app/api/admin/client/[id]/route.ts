@@ -258,6 +258,16 @@ export async function GET(
       chartError: natalChart
         ? null
         : 'Natal chart could not be calculated. Missing or invalid birth date/coordinates/timezone.',
+      birthDataUsed: parsedDate && hasCoordinates
+        ? {
+            birth_date: birthDateRaw,
+            birth_time: birthTimeRaw,
+            birth_place: row.birth_place || row.linked_user_birth_place,
+            birth_latitude: latitude,
+            birth_longitude: longitude,
+            birth_timezone: timezone,
+          }
+        : null,
     });
   } catch (error) {
     console.error('Admin client detail API error:', error);

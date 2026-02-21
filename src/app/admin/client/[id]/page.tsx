@@ -68,11 +68,21 @@ type NatalChart = {
   aspects: Aspect[];
 };
 
+type BirthDataUsed = {
+  birth_date: string | null;
+  birth_time: string | null;
+  birth_place: string | null;
+  birth_latitude: number | null;
+  birth_longitude: number | null;
+  birth_timezone: string | null;
+};
+
 type ApiPayload = {
   consultation: ConsultationDetail;
   user: LinkedUser | null;
   natalChart: NatalChart | null;
   chartError: string | null;
+  birthDataUsed: BirthDataUsed | null;
   error?: string;
 };
 
@@ -705,14 +715,7 @@ export default function AdminClientWorkspacePage() {
       {/* Astrocartography Map */}
       <div className="mb-5 print:hidden">
         <AstrocartographySection
-          userData={{
-            birth_date: data.user?.birth_date || data.consultation.birth_date,
-            birth_time: data.user?.birth_time || data.consultation.birth_time,
-            birth_place: data.user?.birth_place || data.consultation.birth_place,
-            birth_latitude: data.user?.birth_latitude ?? null,
-            birth_longitude: data.user?.birth_longitude ?? null,
-            birth_timezone: data.user?.birth_timezone ?? null,
-          }}
+          userData={data.birthDataUsed}
           clientName={data.consultation.name}
           clientEmail={data.consultation.contact_email || data.user?.email}
         />

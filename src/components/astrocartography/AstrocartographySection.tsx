@@ -28,9 +28,14 @@ type Props = {
   clientEmail?: string | null;
 };
 
-function hasSufficientBirthData(d: BirthData | null): d is BirthData & { birth_date: string; birth_time: string; birth_latitude: number; birth_longitude: number; birth_timezone: string } {
+function hasSufficientBirthData(d: BirthData | null): boolean {
   if (!d) return false;
-  return !!(d.birth_date && d.birth_time && d.birth_latitude != null && d.birth_longitude != null && d.birth_timezone);
+  if (!d.birth_date || !d.birth_time) return false;
+  const lat = Number(d.birth_latitude);
+  const lon = Number(d.birth_longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return false;
+  if (!d.birth_timezone) return false;
+  return true;
 }
 
 function transformToGeoJSON(planets: AstrocartographyPlanetLines[]): AstroFeatureCollection {
@@ -104,9 +109,8 @@ export default function AstrocartographySection({ userData, clientName, clientEm
   useEffect(() => {
     if (!hasBirthData || !userData) return;
 
-    const bd = userData as BirthData & { birth_date: string; birth_time: string; birth_latitude: number; birth_longitude: number; birth_timezone: string };
-    const [y, m, d] = bd.birth_date.split('-').map(Number);
-    const [h, min] = bd.birth_time.split(':').map(Number);
+    const [y, m, d] = (userData!.birth_date!).split('-').map(Number);
+    const [h, min] = (userData!.birth_time!).split(':').map(Number);
 
     const params = new URLSearchParams({
       year: String(y),
@@ -114,9 +118,9 @@ export default function AstrocartographySection({ userData, clientName, clientEm
       day: String(d),
       hour: String(h),
       minute: String(min),
-      lat: String(bd.birth_latitude),
-      lon: String(bd.birth_longitude),
-      timezone: bd.birth_timezone,
+      lat: String(Number(userData!.birth_latitude)),
+      lon: String(Number(userData!.birth_longitude)),
+      timezone: String(userData!.birth_timezone),
     });
 
     setLoading(true);

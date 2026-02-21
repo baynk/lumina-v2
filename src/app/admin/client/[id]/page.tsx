@@ -705,14 +705,14 @@ export default function AdminClientWorkspacePage() {
       {/* Astrocartography Map */}
       <div className="mb-5 print:hidden">
         <AstrocartographySection
-          userData={data.user ? {
-            birth_date: data.user.birth_date,
-            birth_time: data.user.birth_time,
-            birth_place: data.user.birth_place,
-            birth_latitude: data.user.birth_latitude,
-            birth_longitude: data.user.birth_longitude,
-            birth_timezone: data.user.birth_timezone,
-          } : null}
+          userData={{
+            birth_date: data.user?.birth_date || data.consultation.birth_date,
+            birth_time: data.user?.birth_time || data.consultation.birth_time,
+            birth_place: data.user?.birth_place || data.consultation.birth_place,
+            birth_latitude: data.user?.birth_latitude ?? null,
+            birth_longitude: data.user?.birth_longitude ?? null,
+            birth_timezone: data.user?.birth_timezone ?? null,
+          }}
           clientName={data.consultation.name}
           clientEmail={data.consultation.contact_email || data.user?.email}
         />

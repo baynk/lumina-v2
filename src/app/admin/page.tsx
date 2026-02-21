@@ -239,31 +239,33 @@ export default function AdminPage() {
                       <th className="pb-2 pr-4">{l.user}</th>
                       <th className="pb-2 pr-4">{l.email}</th>
                       <th className="pb-2 pr-4">{l.birth}</th>
-                      <th className="pb-2 pr-4">{l.gender}</th>
-                      <th className="pb-2 pr-4">{l.status}</th>
-                      <th className="pb-2 pr-4">{l.joined}</th>
-                      <th className="pb-2">{l.lastActive}</th>
+                      <th className="pb-2 pr-4 hidden sm:table-cell">{l.gender}</th>
+                      <th className="pb-2 pr-4 hidden sm:table-cell">{l.status}</th>
+                      <th className="pb-2 pr-4 hidden sm:table-cell">{l.joined}</th>
+                      <th className="pb-2 hidden sm:table-cell">{l.lastActive}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((u) => (
-                      <tr key={u.id} className="border-b border-white/5 text-cream/80">
+                      <tr key={u.id} className="border-b border-white/5 text-cream/80 hover:bg-white/[0.03] transition cursor-pointer">
                         <td className="py-2.5 pr-4">
-                          <div className="flex items-center gap-2">
-                            {u.image ? (
-                              <img src={u.image} alt="" className="h-6 w-6 rounded-full" />
-                            ) : (
-                              <div className="h-6 w-6 rounded-full bg-lumina-accent/20 flex items-center justify-center text-[10px] text-lumina-soft">
-                                {(u.name || u.email)?.[0]?.toUpperCase()}
-                              </div>
-                            )}
-                            <span>{u.name || '—'}</span>
-                          </div>
+                          <Link href={`/admin/user/${u.id}`} className="block">
+                            <div className="flex items-center gap-2">
+                              {u.image ? (
+                                <img src={u.image} alt="" className="h-6 w-6 rounded-full" />
+                              ) : (
+                                <div className="h-6 w-6 rounded-full bg-lumina-accent/20 flex items-center justify-center text-[10px] text-lumina-soft">
+                                  {(u.name || u.email)?.[0]?.toUpperCase()}
+                                </div>
+                              )}
+                              <span>{u.name || '—'}</span>
+                            </div>
+                          </Link>
                         </td>
                         <td className="py-2.5 pr-4 text-cream/60">{u.email}</td>
                         <td className="py-2.5 pr-4">{u.birth_date || '—'}</td>
-                        <td className="py-2.5 pr-4 capitalize">{u.gender || '—'}</td>
-                        <td className="py-2.5 pr-4">
+                        <td className="py-2.5 pr-4 capitalize hidden sm:table-cell">{u.gender || '—'}</td>
+                        <td className="py-2.5 pr-4 hidden sm:table-cell">
                           <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] border ${
                             u.onboarding_completed
                               ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
@@ -272,8 +274,8 @@ export default function AdminPage() {
                             {u.onboarding_completed ? l.active : l.pending}
                           </span>
                         </td>
-                        <td className="py-2.5 pr-4 text-cream/50 text-xs">{formatDate(u.created_at)}</td>
-                        <td className="py-2.5 text-cream/50 text-xs">{u.last_active_at ? formatDate(u.last_active_at) : '—'}</td>
+                        <td className="py-2.5 pr-4 text-cream/50 text-xs hidden sm:table-cell">{formatDate(u.created_at)}</td>
+                        <td className="py-2.5 text-cream/50 text-xs hidden sm:table-cell">{u.last_active_at ? formatDate(u.last_active_at) : '—'}</td>
                       </tr>
                     ))}
                   </tbody>

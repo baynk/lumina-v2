@@ -33,6 +33,8 @@ type PlanetFilterProps = {
   activeAngles: AngleType[];
   onTogglePlanet: (planet: string) => void;
   onToggleAngle: (angleType: AngleType) => void;
+  onSelectAllPlanets: () => void;
+  onClearAllPlanets: () => void;
 };
 
 export default function PlanetFilter({
@@ -40,10 +42,18 @@ export default function PlanetFilter({
   activeAngles,
   onTogglePlanet,
   onToggleAngle,
+  onSelectAllPlanets,
+  onClearAllPlanets,
 }: PlanetFilterProps) {
   return (
     <div className="rounded-2xl border border-slate-700 bg-slate-950/80 p-4">
-      <p className="mb-3 text-xs uppercase tracking-wide text-slate-400">Planets</p>
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-xs uppercase tracking-wide text-slate-400">Planets</p>
+        <div className="flex gap-3">
+          <button type="button" onClick={onSelectAllPlanets} className="text-[10px] text-cream/40 hover:text-cream/70 transition">Select all</button>
+          <button type="button" onClick={onClearAllPlanets} className="text-[10px] text-cream/40 hover:text-cream/70 transition">Clear all</button>
+        </div>
+      </div>
       <div className="mb-4 flex flex-wrap gap-2">
         {PLANETS.map((item) => {
           const active = activePlanets.includes(item.planet);

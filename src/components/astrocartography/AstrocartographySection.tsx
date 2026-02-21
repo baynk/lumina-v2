@@ -97,7 +97,7 @@ function transformToGeoJSON(planets: AstrocartographyPlanetLines[]): AstroFeatur
 }
 
 export default function AstrocartographySection({ userData, clientName, clientEmail }: Props) {
-  const [activePlanets, setActivePlanets] = useState<string[]>(ALL_PLANETS);
+  const [activePlanets, setActivePlanets] = useState<string[]>([]);
   const [activeAngles, setActiveAngles] = useState<AngleType[]>(ALL_ANGLES);
   const [geoJSON, setGeoJSON] = useState<AstroFeatureCollection | null>(null);
   const [loading, setLoading] = useState(false);
@@ -154,6 +154,9 @@ export default function AstrocartographySection({ userData, clientName, clientEm
   const toggleAngle = useCallback((angle: AngleType) => {
     setActiveAngles((prev) => prev.includes(angle) ? prev.filter((a) => a !== angle) : [...prev, angle]);
   }, []);
+
+  const selectAllPlanets = useCallback(() => setActivePlanets(ALL_PLANETS), []);
+  const clearAllPlanets = useCallback(() => setActivePlanets([]), []);
 
   const missingFields = useMemo(() => {
     if (!userData) return ['birth date', 'birth time', 'birth location'];
@@ -221,6 +224,8 @@ export default function AstrocartographySection({ userData, clientName, clientEm
             activeAngles={activeAngles}
             onTogglePlanet={togglePlanet}
             onToggleAngle={toggleAngle}
+            onSelectAllPlanets={selectAllPlanets}
+            onClearAllPlanets={clearAllPlanets}
           />
           <div className="mt-3">
             <AstroMapGL data={geoJSON} activePlanets={activePlanets} activeAngles={activeAngles} />

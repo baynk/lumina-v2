@@ -87,7 +87,7 @@ type ApiPayload = {
   error?: string;
 };
 
-const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com'];
+const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com', 'rudasirina773@gmail.com'];
 const ADMIN_DOMAINS = ['ryanwright.io'];
 
 const PLANET_SYMBOLS: Record<string, string> = {

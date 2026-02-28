@@ -4,7 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getAllUsers, getAllConsultations, updateConsultationStatus, getStats, initDB } from '@/lib/db';
 
 // Admin emails that can access the admin panel
-const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com'];
+const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com', 'rudasirina773@gmail.com'];
 const ADMIN_DOMAINS = ['ryanwright.io'];
 
 let dbInitialized = false;

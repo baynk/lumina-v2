@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-const ADMIN_EMAILS = new Set(['ryan@ryanwright.io', 'luminastrology@gmail.com']);
+const ADMIN_EMAILS = new Set(['ryan@ryanwright.io', 'luminastrology@gmail.com', 'rudasirina773@gmail.com']);
 const ADMIN_DOMAINS = new Set(['ryanwright.io']);
 
 function isAdminEmail(email: string | null | undefined) {

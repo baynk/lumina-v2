@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { setWebhook } from '@/lib/telegram';
 
-const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com'];
+const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com', 'rudasirina773@gmail.com'];
 const ADMIN_DOMAINS = ['ryanwright.io'];
 
 async function isAuthorized(request: Request) {

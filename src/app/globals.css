@@ -339,3 +339,15 @@ select option {
   tbody tr { border-bottom: 1px solid #eee !important; }
   @page { margin: 1.5cm 2cm; size: A4; }
 }
+
+/* Astrocartography map popup */
+.astro-popup .mapboxgl-popup-content {
+  background: rgba(8, 12, 31, 0.92) !important;
+  border: 1px solid rgba(167, 139, 250, 0.3) !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+.astro-popup .mapboxgl-popup-tip {
+  border-bottom-color: rgba(8, 12, 31, 0.92) !important;
+}

@@ -17,7 +17,7 @@ type TelegramDailyUser = {
   birth_timezone: string | null;
 };
 
-const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com'];
+const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com', 'rudasirina773@gmail.com'];
 const ADMIN_DOMAINS = ['ryanwright.io'];
 
 const fallbackText = {

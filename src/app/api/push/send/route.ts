@@ -17,7 +17,7 @@ type PushSubscriptionRow = {
   keys_auth: string;
 };
 
-const ADMIN_EMAILS = new Set(['ryan@ryanwright.io', 'luminastrology@gmail.com']);
+const ADMIN_EMAILS = new Set(['ryan@ryanwright.io', 'luminastrology@gmail.com', 'rudasirina773@gmail.com']);
 const ADMIN_DOMAIN = 'ryanwright.io';
 
 function isAdminEmail(email: string) {

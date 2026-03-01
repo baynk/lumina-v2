@@ -405,6 +405,7 @@ export default function LandingPage() {
     const featureCards = [
       { href: '/chart', icon: '✦', title: t.homeFeatureChartTitle, description: t.homeFeatureChartDesc },
       { href: '/synastry', icon: '💫', title: t.homeFeatureCompatibilityTitle, description: t.homeFeatureCompatibilityDesc },
+      { href: '/calendar', icon: '🗓️', title: t.homeFeatureCalendarTitle, description: t.homeFeatureCalendarDesc },
       { href: '/transits', icon: '🔮', title: t.homeFeatureTransitsTitle, description: t.homeFeatureTransitsDesc },
       { href: '/consultation', icon: '🌙', title: t.homeFeatureConsultationTitle, description: t.homeFeatureConsultationDesc },
     ];

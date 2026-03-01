@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import RadarChart from '@/components/RadarChart';
+import { useLanguage } from '@/context/LanguageContext';
 
 // Types (same as synastry page)
 type SynastryNarrative = {
@@ -72,6 +73,7 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
 }
 
 export default function PublicCompatibilityPage() {
+  const { language } = useLanguage();
   const params = useParams();
   const id = params.id as string;
   const [data, setData] = useState<StoredResult | null>(null);
@@ -253,13 +255,21 @@ export default function PublicCompatibilityPage() {
           </section>
         )}
 
-        {/* CTA */}
+        {/* Recipient CTA */}
         <div className="text-center">
           <div className="glass-card p-8 text-center">
-            <p className="text-lg font-heading text-warmWhite mb-2">Discover your own compatibility</p>
-            <p className="text-sm text-cream/50 mb-5">Real astronomical data. Real insights. Not generic horoscopes.</p>
-            <Link href="/synastry" className="lumina-button inline-block">
-              Start Your Reading ✦
+            <p className="text-xl font-heading text-warmWhite mb-2">
+              {language === 'ru'
+                ? 'Хотите узнать СВОЙ космический чертёж?'
+                : 'Want to discover YOUR cosmic blueprint?'}
+            </p>
+            <p className="text-sm text-cream/60 mb-6">
+              {language === 'ru'
+                ? 'Получите натальную карту бесплатно за 60 секунд'
+                : 'Get your free natal chart in 60 seconds'}
+            </p>
+            <Link href="/" className="lumina-button inline-block px-6 py-3">
+              {language === 'ru' ? 'Получить мою карту бесплатно ✦' : 'Get My Free Natal Chart ✦'}
             </Link>
           </div>
           <p className="mt-6 text-xs text-cream/20">

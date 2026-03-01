@@ -80,6 +80,8 @@ const initialPerson = (): PersonFormState => ({
   searching: false,
 });
 
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com').replace(/\/+$/, '');
+
 /* ─── Radar Chart ─── */
 // RadarChart extracted to @/components/RadarChart
 
@@ -294,7 +296,13 @@ export default function SynastryPage() {
 
     // Try localStorage first
     const profile = loadProfile();
-    if (profile?.birthData?.latitude) {
+    if (
+      profile?.birthData &&
+      profile.birthData.latitude !== null &&
+      profile.birthData.latitude !== undefined &&
+      profile.birthData.longitude !== null &&
+      profile.birthData.longitude !== undefined
+    ) {
       applyProfile(profile.name, profile.birthData, profile.locationName);
       return;
     }
@@ -303,7 +311,13 @@ export default function SynastryPage() {
     fetch('/api/user')
       .then((res) => res.ok ? res.json() : null)
       .then((data) => {
-        if (data?.birth_latitude && data?.birth_date) {
+        if (
+          data?.birth_date &&
+          data.birth_latitude !== null &&
+          data.birth_latitude !== undefined &&
+          data.birth_longitude !== null &&
+          data.birth_longitude !== undefined
+        ) {
           const [y, m, d] = (data.birth_date as string).split('-').map(Number);
           const [hr, min] = (data.birth_time || '12:00').split(':').map(Number);
           applyProfile(data.name || '', {
@@ -598,7 +612,7 @@ export default function SynastryPage() {
         });
         if (saveRes.ok) {
           const { id: resultId } = await saveRes.json();
-          const url = `https://luminastrology.com/compatibility/${resultId}`;
+          const url = `${siteUrl}/compatibility/${resultId}`;
           localStorage.setItem('lumina_synastry_share_url', url);
           setShareUrl(url);
         }
@@ -632,7 +646,7 @@ export default function SynastryPage() {
       });
       if (res.ok) {
         const { id } = await res.json();
-        const url = `https://luminastrology.com/compatibility/${id}`;
+        const url = `${siteUrl}/compatibility/${id}`;
         localStorage.setItem('lumina_synastry_share_url', url);
         setShareUrl(url);
         return url;
@@ -642,6 +656,15 @@ export default function SynastryPage() {
   };
 
   const [shareLinkStatus, setShareLinkStatus] = useState('');
+  const getShareNames = () => {
+    let cachedNames = { a: '', b: '' };
+    try { cachedNames = JSON.parse(localStorage.getItem('lumina_synastry_names') || '{}'); } catch {}
+    return {
+      nameA: personA.name || cachedNames.a || (language === 'ru' ? 'Партнёр A' : 'Person A'),
+      nameB: personB.name || cachedNames.b || (language === 'ru' ? 'Партнёр B' : 'Person B'),
+    };
+  };
+
   const handleShareLink = async () => {
     const url = shareUrl || await generateShareUrl();
     if (!url) return;
@@ -667,6 +690,30 @@ export default function SynastryPage() {
     }
     setShareLinkStatus(language === 'ru' ? '✓ Ссылка скопирована' : '✓ Link copied');
     setTimeout(() => setShareLinkStatus(''), 3000);
+  };
+
+  const handleShareWhatsApp = async () => {
+    const url = shareUrl || await generateShareUrl();
+    if (!url) return;
+    const { nameA, nameB } = getShareNames();
+    const text = language === 'ru'
+      ? `✨ Наша совместимость в Lumina: ${nameA} & ${nameB}\n${url}`
+      : `✨ Our Lumina compatibility reading: ${nameA} & ${nameB}\n${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleShareTelegram = async () => {
+    const url = shareUrl || await generateShareUrl();
+    if (!url) return;
+    const { nameA, nameB } = getShareNames();
+    const text = language === 'ru'
+      ? `✨ Наша совместимость в Lumina: ${nameA} & ${nameB}`
+      : `✨ Our Lumina compatibility reading: ${nameA} & ${nameB}`;
+    window.open(
+      `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   const sections: { key: keyof SynastryNarrative; title: string; icon: string; text: string }[] = result
@@ -845,6 +892,24 @@ export default function SynastryPage() {
         {shareUrl && (
           <p className="mb-4 -mt-2 text-center text-[11px] text-cream/30 break-all">{shareUrl}</p>
         )}
+        <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={handleShareWhatsApp}
+            disabled={shareLinkLoading}
+            className="w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm text-cream/85 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {language === 'ru' ? '💬 Отправить в WhatsApp' : '💬 Share on WhatsApp'}
+          </button>
+          <button
+            type="button"
+            onClick={handleShareTelegram}
+            disabled={shareLinkLoading}
+            className="w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm text-cream/85 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {language === 'ru' ? '✈️ Отправить в Telegram' : '✈️ Share on Telegram'}
+          </button>
+        </div>
 
         {/* Share Card (image) */}
         <ShareCard

@@ -364,3 +364,9 @@ select option {
 .maplibregl-popup-tip {
   border-bottom-color: rgba(8, 12, 31, 0.95) !important;
 }
+
+/* Cyrillic heading fallback — Playfair Display for Russian text */
+:lang(ru) .font-heading,
+[data-lang="ru"] .font-heading {
+  font-family: var(--font-heading-cyr), var(--font-heading), serif;
+}

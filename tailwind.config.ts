@@ -24,7 +24,7 @@ const config: Config = {
         cream: '#c8bfb6',
       },
       fontFamily: {
-        heading: ['var(--font-heading)', 'var(--font-heading-cyr)', 'serif'],
+        heading: ['var(--font-heading)', 'serif'],
         body: ['var(--font-inter)', 'sans-serif'],
       },
       boxShadow: {

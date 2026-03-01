@@ -113,6 +113,30 @@ export async function initDB() {
       created_at TIMESTAMPTZ DEFAULT now()
     )
   `;
+
+  await ensureReferralSchema();
+}
+
+export async function ensureReferralSchema() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS referrals (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      referrer_id TEXT REFERENCES users(id),
+      referred_email TEXT,
+      referred_id TEXT REFERENCES users(id),
+      status TEXT DEFAULT 'pending',
+      reward_claimed BOOLEAN DEFAULT false,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_referrals_referred_id ON referrals(referred_id)`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_referrals_referred_unique ON referrals(referred_id) WHERE referred_id IS NOT NULL`;
+
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code TEXT UNIQUE`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_count INTEGER DEFAULT 0`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS synastry_unlocked BOOLEAN DEFAULT true`;
 }
 
 // Get or create user profile from NextAuth session

@@ -11,8 +11,11 @@ import { formatAspectDescription, translateAspectType, translateMoonPhase, trans
 import type { BirthData, DailyCelestialData, TransitAlert, TransitReport } from '@/lib/types';
 import LandingContent from '@/components/LandingContent';
 import BirthDataForm, { type BirthDataFormResult } from '@/components/BirthDataForm';
+import ReferralBanner from '@/components/ReferralBanner';
 
 const STORY_SHOWN_PREFIX = 'lumina_story_shown_';
+const REFERRAL_CODE_STORAGE_KEY = 'lumina_referral_code';
+const REFERRAL_CLAIMED_PREFIX = 'lumina_referral_claimed_';
 const planetSymbols: Record<string, string> = {
   Sun: '☉',
   Moon: '☽',
@@ -103,6 +106,7 @@ export default function LandingPage() {
   const { language, t } = useLanguage();
   const { data: session, status: authStatus } = useSession();
   const formRef = useRef<HTMLDivElement | null>(null);
+  const referralAcceptInFlight = useRef(false);
 
   const [existingProfile, setExistingProfile] = useState<UserProfileLocal | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -119,6 +123,13 @@ export default function LandingPage() {
     if (new URLSearchParams(window.location.search).get('start')) {
       setShowLanding(false);
     }
+  }, []);
+
+  // Save referral codes from landing links for post-auth acceptance.
+  useEffect(() => {
+    const refCode = new URLSearchParams(window.location.search).get('ref');
+    if (!refCode) return;
+    window.localStorage.setItem(REFERRAL_CODE_STORAGE_KEY, refCode.trim().toUpperCase());
   }, []);
 
   // Form state now lives in BirthDataForm component
@@ -178,6 +189,50 @@ export default function LandingPage() {
 
     checkProfile();
   }, [session, authStatus]);
+
+  const attemptReferralAccept = useCallback(async () => {
+    if (!session?.user || referralAcceptInFlight.current) return;
+
+    const storedCode = window.localStorage.getItem(REFERRAL_CODE_STORAGE_KEY)?.trim().toUpperCase();
+    if (!storedCode) return;
+
+    const userId = (session.user as Record<string, unknown>).id as string | undefined;
+    if (userId && window.localStorage.getItem(`${REFERRAL_CLAIMED_PREFIX}${userId}`) === '1') {
+      return;
+    }
+
+    referralAcceptInFlight.current = true;
+    try {
+      const response = await fetch('/api/referral/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: storedCode }),
+      });
+
+      if (response.ok) {
+        window.localStorage.removeItem(REFERRAL_CODE_STORAGE_KEY);
+        if (userId) {
+          window.localStorage.setItem(`${REFERRAL_CLAIMED_PREFIX}${userId}`, '1');
+        }
+        return;
+      }
+
+      if ([400, 404, 409].includes(response.status)) {
+        window.localStorage.removeItem(REFERRAL_CODE_STORAGE_KEY);
+      }
+    } catch {
+      // Keep the code for later retries on transient failures.
+    } finally {
+      referralAcceptInFlight.current = false;
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (authStatus !== 'authenticated') return;
+    if (!existingProfile) return;
+
+    attemptReferralAccept();
+  }, [attemptReferralAccept, authStatus, existingProfile]);
 
   // Clear personalized state on sign-out
   useEffect(() => {
@@ -305,6 +360,8 @@ export default function LandingPage() {
             name: data.name || undefined,
           }),
         });
+
+        await attemptReferralAccept();
       } catch {
         // non blocking
       }
@@ -313,7 +370,7 @@ export default function LandingPage() {
     const key = `${STORY_SHOWN_PREFIX}${birthProfileKey(data.birthData)}`;
     const alreadyShown = window.localStorage.getItem(key) === '1';
     router.push(alreadyShown ? '/chart' : '/story-of-you');
-  }, [router, session]);
+  }, [attemptReferralAccept, router, session]);
 
   const handleStartFresh = useCallback(() => {
     const msg = language === 'ru'
@@ -470,6 +527,8 @@ export default function LandingPage() {
             </button>
           ))}
         </section>
+
+        {session?.user ? <ReferralBanner /> : null}
 
         <div className="mt-6 flex items-center justify-between">
           <button type="button" onClick={() => router.push('/chart')} className="text-sm text-lumina-soft transition hover:text-warmWhite">

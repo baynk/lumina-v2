@@ -8,6 +8,7 @@ const publicRoutes = [
   '/landing',
   '/chart',
   '/synastry',
+  '/calendar',
   '/transits',
   '/consultation',
   '/journal',

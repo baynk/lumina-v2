@@ -37,6 +37,16 @@ function HeartIcon({ active }: { active: boolean }) {
   );
 }
 
+function CalendarIcon({ active }: { active: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className={`h-5 w-5 ${active ? 'text-lumina-accent' : 'text-cream/70'}`} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <rect x="4" y="5.5" width="16" height="14" rx="2.2" />
+      <path d="M4 9.5h16" />
+      <path d="M8 3.8v3.4M16 3.8v3.4" />
+    </svg>
+  );
+}
+
 function PersonIcon({ active }: { active: boolean }) {
   return (
     <svg viewBox="0 0 24 24" className={`h-5 w-5 ${active ? 'text-lumina-accent' : 'text-cream/70'}`} fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -70,6 +80,7 @@ export default function BottomNav() {
     { href: '/', label: t.bottomNavHome, icon: (active) => <HomeIcon active={active} /> },
     { href: '/chart', label: t.bottomNavChart, icon: (active) => <ChartIcon active={active} /> },
     { href: '/synastry', label: t.bottomNavCompatibility, icon: (active) => <HeartIcon active={active} /> },
+    { href: '/calendar', label: t.bottomNavCalendar, icon: (active) => <CalendarIcon active={active} /> },
     { href: '/profile', label: t.bottomNavProfile, icon: (active) => <PersonIcon active={active} /> },
   ];
 
@@ -77,7 +88,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-3 left-1/2 z-40 w-[calc(100%-1rem)] -translate-x-1/2 rounded-2xl border border-white/[0.08] bg-[#0f1433]/70 px-3 py-2 backdrop-blur-xl md:hidden">
-      <ul className="grid grid-cols-4 gap-1">
+      <ul className="grid grid-cols-5 gap-1">
         {items.map((item) => {
           const active = isActive(item.href);
           return (

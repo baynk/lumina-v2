@@ -277,8 +277,7 @@ export function calculateNatalChart(birthData: BirthData): NatalChartData {
 /**
  * Calculate current transits and daily celestial data
  */
-export function calculateDailyCelestialData(): DailyCelestialData {
-  const now = new Date();
+export function calculateDailyCelestialData(now: Date = new Date()): DailyCelestialData {
   const time = Astronomy.MakeTime(now);
 
   // Calculate current planetary positions (transits)

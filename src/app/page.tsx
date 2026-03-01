@@ -7,12 +7,26 @@ import { useLanguage } from '@/context/LanguageContext';
 import { calculateDailyCelestialData, calculateNatalChart } from '@/lib/astronomyCalculator';
 import { loadProfile, saveProfile, clearProfile, type UserProfileLocal } from '@/lib/profile';
 import { ZodiacImage } from '@/components/icons/ZodiacIcons';
-import { translateMoonPhase } from '@/lib/translations';
-import type { BirthData } from '@/lib/types';
+import { formatAspectDescription, translateAspectType, translateMoonPhase, translatePlanet } from '@/lib/translations';
+import type { BirthData, DailyCelestialData, TransitAlert, TransitReport } from '@/lib/types';
 import LandingContent from '@/components/LandingContent';
 import BirthDataForm, { type BirthDataFormResult } from '@/components/BirthDataForm';
 
 const STORY_SHOWN_PREFIX = 'lumina_story_shown_';
+const planetSymbols: Record<string, string> = {
+  Sun: '☉',
+  Moon: '☽',
+  Mercury: '☿',
+  Venus: '♀',
+  Mars: '♂',
+  Jupiter: '♃',
+  Saturn: '♄',
+  Uranus: '♅',
+  Neptune: '♆',
+  Pluto: '♇',
+};
+
+const signOrder = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
 
 function getZodiacSign(month: number, day: number): string {
   const signs = [
@@ -44,12 +58,44 @@ function birthProfileKey(birthData: BirthData): string {
   return `${birthData.year}-${birthData.month}-${birthData.day}-${birthData.hour}-${birthData.minute}-${birthData.latitude}-${birthData.longitude}`;
 }
 
-function compactInsight(text: string): string {
+function borderByTone(tone: TransitAlert['tone']): string {
+  if (tone === 'opportunity') return 'border-l-emerald-300';
+  if (tone === 'challenge') return 'border-l-rose-300';
+  return 'border-l-amber-300';
+}
+
+function badgeByTone(tone: TransitAlert['tone']): string {
+  if (tone === 'opportunity') return 'bg-emerald-300/15 text-emerald-200';
+  if (tone === 'challenge') return 'bg-rose-300/15 text-rose-200';
+  return 'bg-amber-300/15 text-amber-100';
+}
+
+function firstSentence(text: string): string {
   const cleaned = text.replace(/\s+/g, ' ').trim();
   if (!cleaned) return '';
-  const sentences = cleaned.split(/(?<=[.!?])\s+/).filter(Boolean);
-  if (sentences.length <= 3) return cleaned;
-  return sentences.slice(0, 3).join(' ');
+  const [sentence] = cleaned.split(/(?<=[.!?])\s+/);
+  return sentence || cleaned;
+}
+
+function zodiacDegrees(planet: DailyCelestialData['planets'][number] | undefined): number | null {
+  if (!planet) return null;
+  const signIndex = signOrder.indexOf(planet.sign);
+  if (signIndex < 0) return null;
+  const degrees = Number.parseFloat(planet.degrees);
+  if (Number.isNaN(degrees)) return null;
+  return signIndex * 30 + degrees;
+}
+
+function isMercuryRetrograde(today: DailyCelestialData, tomorrow: DailyCelestialData): boolean {
+  const todayMercury = today.planets.find((item) => item.planet === 'Mercury');
+  const tomorrowMercury = tomorrow.planets.find((item) => item.planet === 'Mercury');
+
+  const todayDegrees = zodiacDegrees(todayMercury);
+  const tomorrowDegrees = zodiacDegrees(tomorrowMercury);
+  if (todayDegrees === null || tomorrowDegrees === null) return false;
+
+  const delta = ((tomorrowDegrees - todayDegrees + 540) % 360) - 180;
+  return delta < 0;
 }
 
 export default function LandingPage() {
@@ -79,8 +125,11 @@ export default function LandingPage() {
 
   const [moonPhase, setMoonPhase] = useState('New Moon');
   const [moonIllumination, setMoonIllumination] = useState(0);
+  const [isMercuryRx, setIsMercuryRx] = useState(false);
   const [dailyInsight, setDailyInsight] = useState('');
   const [dailyInsightLoading, setDailyInsightLoading] = useState(false);
+  const [activeTransits, setActiveTransits] = useState<TransitAlert[]>([]);
+  const [activeTransitsLoading, setActiveTransitsLoading] = useState(false);
 
   useEffect(() => {
     if (authStatus === 'loading') return;
@@ -136,7 +185,8 @@ export default function LandingPage() {
       const p = loadProfile();
       if (!p) {
         setExistingProfile(null);
-        setHoroscope('');
+        setDailyInsight('');
+        setActiveTransits([]);
       }
     };
     window.addEventListener('lumina-profile-changed', handler);
@@ -149,12 +199,18 @@ export default function LandingPage() {
 
   useEffect(() => {
     try {
-      const daily = calculateDailyCelestialData();
-      setMoonPhase(daily.moon.phase);
-      setMoonIllumination(daily.moon.illumination);
+      const dailyToday = calculateDailyCelestialData();
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dailyTomorrow = calculateDailyCelestialData(tomorrow);
+
+      setMoonPhase(dailyToday.moon.phase);
+      setMoonIllumination(dailyToday.moon.illumination);
+      setIsMercuryRx(isMercuryRetrograde(dailyToday, dailyTomorrow));
     } catch {
       setMoonPhase('New Moon');
       setMoonIllumination(0);
+      setIsMercuryRx(false);
     }
   }, []);
 
@@ -173,14 +229,14 @@ export default function LandingPage() {
         });
 
         if (!response.ok) {
-          setDailyInsight(compactInsight(t.horoscopeFallback));
+          setDailyInsight(t.horoscopeFallback);
           return;
         }
 
         const payload = (await response.json()) as { horoscope?: string };
-        setDailyInsight(compactInsight(payload.horoscope || t.horoscopeFallback));
+        setDailyInsight((payload.horoscope || t.horoscopeFallback).trim());
       } catch {
-        setDailyInsight(compactInsight(t.horoscopeFallback));
+        setDailyInsight(t.horoscopeFallback);
       } finally {
         setDailyInsightLoading(false);
       }
@@ -188,6 +244,40 @@ export default function LandingPage() {
 
     run();
   }, [existingProfile, language, showForm, t.horoscopeFallback]);
+
+  useEffect(() => {
+    if (!existingProfile || showForm) {
+      setActiveTransits([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const run = async () => {
+      setActiveTransitsLoading(true);
+      try {
+        const response = await fetch('/api/transits', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ birthData: existingProfile.birthData, language }),
+        });
+
+        if (!response.ok) throw new Error('Failed');
+        const payload = (await response.json()) as TransitReport;
+        if (!cancelled) setActiveTransits(payload.activeTransits.slice(0, 3));
+      } catch {
+        if (!cancelled) setActiveTransits([]);
+      } finally {
+        if (!cancelled) setActiveTransitsLoading(false);
+      }
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [existingProfile, language, showForm]);
 
   const handleFormComplete = useCallback(async (data: BirthDataFormResult) => {
     saveProfile({
@@ -270,6 +360,11 @@ export default function LandingPage() {
             <div>
               <h1 className="font-heading text-4xl text-lumina-soft">{t.homeGreeting.replace('{name}', nameLabel)}</h1>
               <p className="mt-1 text-sm text-cream/60">{todayFormatted}</p>
+              {isMercuryRx ? (
+                <p className="mt-2 inline-flex rounded-full border border-amber-300/35 bg-amber-300/10 px-2.5 py-1 text-xs text-amber-100">
+                  {t.homeMercuryRetrogradeBadge}
+                </p>
+              ) : null}
             </div>
             <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3">
               <ZodiacImage sign={sunSign} size={64} className="opacity-90" />
@@ -286,20 +381,79 @@ export default function LandingPage() {
               <div className="skeleton h-4 w-10/12" />
             </div>
           ) : (
-            <p className="mt-3 text-base leading-relaxed text-warmWhite">{dailyInsight || t.homeDailyFallback}</p>
+            <p className="mt-3 whitespace-pre-line text-base leading-relaxed text-warmWhite">{dailyInsight || t.homeDailyFallback}</p>
+          )}
+        </section>
+
+        <section className="glass-card mt-4 p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-3">
+            <p className="lumina-section-title">{t.homeActiveTransitsTitle}</p>
+            <button type="button" onClick={() => router.push('/transits')} className="text-xs text-cream/70 transition hover:text-cream">
+              {t.homeViewAllTransits}
+            </button>
+          </div>
+
+          {activeTransitsLoading ? (
+            <div className="mt-3 space-y-2">
+              <div className="skeleton h-4 w-full" />
+              <div className="skeleton h-4 w-11/12" />
+              <div className="skeleton h-4 w-10/12" />
+            </div>
+          ) : activeTransits.length ? (
+            <div className="mt-3 space-y-2">
+              {activeTransits.map((item) => {
+                const fallback = formatAspectDescription(
+                  {
+                    type: item.aspect,
+                    planet1: item.transitPlanet,
+                    sign1: item.transitSign,
+                    planet2: item.natalPlanet,
+                    sign2: item.natalSign,
+                  },
+                  language
+                );
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => router.push('/transits')}
+                    className={`lumina-card w-full border-l-4 p-3 text-left transition hover:border-lumina-accent/35 ${borderByTone(item.tone)}`}
+                  >
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-lumina-soft">
+                      <span>{planetSymbols[item.transitPlanet] || '✦'}</span>
+                      <span>{translatePlanet(item.transitPlanet, language)}</span>
+                      <span className="text-cream/50">{translateAspectType(item.aspect, language).toLowerCase()}</span>
+                      <span>{planetSymbols[item.natalPlanet] || '✦'}</span>
+                      <span>{translatePlanet(item.natalPlanet, language)}</span>
+                      <span className={`ml-auto rounded-full px-2 py-0.5 text-[10px] ${badgeByTone(item.tone)}`}>{item.priority}</span>
+                    </div>
+                    <p className="mt-2 text-sm leading-relaxed text-warmWhite">{firstSentence(item.aiInterpretation || fallback || item.description)}</p>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm text-cream/70">{t.homeNoActiveTransits}</p>
           )}
         </section>
 
         <section className="lumina-card mt-4 p-4">
           <div className="flex items-center justify-between">
             <p className="text-sm text-lumina-soft">🌙 {translateMoonPhase(moonPhase, language)}</p>
-            <a href="/journal" className="text-xs text-cream/65 transition hover:text-cream">
-              {t.homeOpenJournal}
-            </a>
+            <p className="text-xs text-cream/60">{moonIllumination}%</p>
           </div>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/[0.08]">
             <div className="h-full rounded-full bg-gradient-to-r from-lumina-accent-muted to-lumina-accent" style={{ width: `${Math.max(5, moonIllumination)}%` }} />
           </div>
+          <button
+            type="button"
+            onClick={() => router.push('/journal')}
+            className="mt-3 flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-lumina-soft transition hover:border-lumina-accent/35 hover:text-warmWhite"
+          >
+            <span>{t.homeMoonJournalCta}</span>
+            <span aria-hidden>→</span>
+          </button>
         </section>
 
         <section className="mt-5 grid grid-cols-2 gap-3">

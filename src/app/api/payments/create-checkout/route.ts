@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { sql } from '@vercel/postgres';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getOrCreateUser, initDB } from '@/lib/db';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 
 type CheckoutType = 'subscription' | 'consultation_written' | 'consultation_video' | 'consultation_deep';
 
@@ -55,7 +55,7 @@ async function getOrCreateStripeCustomer(userId: string, email: string) {
   const existingCustomerId = existing.rows[0]?.stripe_customer_id;
   if (existingCustomerId) return existingCustomerId;
 
-  const customer = await stripe.customers.create({
+  const customer = await getStripe().customers.create({
     email,
     metadata: { userId },
   });
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Subscription price is not configured' }, { status: 500 });
       }
 
-      checkoutSession = await stripe.checkout.sessions.create({
+      checkoutSession = await getStripe().checkout.sessions.create({
         mode: 'subscription',
         customer: customerId,
         line_items: [{ price: subscriptionPriceId, quantity: 1 }],
@@ -111,7 +111,7 @@ export async function POST(request: Request) {
         },
       });
     } else {
-      checkoutSession = await stripe.checkout.sessions.create({
+      checkoutSession = await getStripe().checkout.sessions.create({
         mode: 'payment',
         customer: customerId,
         line_items: [

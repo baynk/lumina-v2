@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import Stripe from 'stripe';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 
 export const runtime = 'nodejs';
 
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
   try {
     const payload = await request.text();
-    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    event = getStripe().webhooks.constructEvent(payload, signature, webhookSecret);
   } catch (error) {
     console.error('Stripe webhook signature verification failed:', error);
     return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 });

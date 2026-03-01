@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Serif_Display, Inter } from 'next/font/google';
+import { Cormorant_Garamond, Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
@@ -12,9 +12,9 @@ import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com';
 
-const dmSerif = DM_Serif_Display({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext', 'cyrillic'],
-  weight: '400',
+  weight: ['400', '600', '700'],
   variable: '--font-heading',
   display: 'swap',
 });
@@ -107,7 +107,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${dmSerif.variable} ${inter.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#080C1F" />

@@ -2,60 +2,237 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import MoonPhaseVisual from '@/components/MoonPhaseVisual';
 import { calculateDailyCelestialData } from '@/lib/astronomyCalculator';
 import { useLanguage } from '@/context/LanguageContext';
+import { loadProfile } from '@/lib/profile';
 import { translateMoonPhase } from '@/lib/translations';
+import type { MoonRitualResponse } from '@/types';
 
-type JournalEntry = {
+type JournalSections = {
+  intention: string;
+  reflection: string;
+  gratitude: string;
+  release?: string;
+};
+
+type LocalOrDbEntry = {
   date: string;
-  text: string;
+  moonPhase: string;
+  entries: JournalSections;
 };
 
 const JOURNAL_PREFIX = 'lumina_moon_journal_';
 
-function phasePrompt(phase: string, language: 'en' | 'ru'): string {
-  const normalized = phase.toLowerCase();
+const EMPTY_SECTIONS: JournalSections = {
+  intention: '',
+  reflection: '',
+  gratitude: '',
+  release: '',
+};
 
-  if (language === 'ru') {
-    if (normalized.includes('new')) return 'Что ты хочешь начать с чистого листа в этом цикле?';
-    if (normalized.includes('full')) return 'Что сейчас достигло пика и что пора отпустить?';
-    if (normalized.includes('waxing') || normalized.includes('first')) return 'Какой один шаг сегодня укрепит твое намерение?';
-    return 'Что готово завершиться, чтобы освободить место новому?';
+function normalizeSections(value: unknown): JournalSections {
+  if (!value || typeof value !== 'object') {
+    return { ...EMPTY_SECTIONS };
   }
 
-  if (normalized.includes('new')) return 'What intention do you want to plant in this cycle?';
-  if (normalized.includes('full')) return 'What is peaking now, and what are you ready to release?';
-  if (normalized.includes('waxing') || normalized.includes('first')) return 'What one action today strengthens your intention?';
-  return 'What is ready to close so something new can begin?';
+  const source = value as Record<string, unknown>;
+  const intention = typeof source.intention === 'string' ? source.intention : '';
+  const reflection = typeof source.reflection === 'string' ? source.reflection : '';
+  const gratitude = typeof source.gratitude === 'string' ? source.gratitude : '';
+  const release = typeof source.release === 'string' ? source.release : '';
+  return { intention, reflection, gratitude, release };
+}
+
+function parseLocalPayload(raw: string): JournalSections {
+  try {
+    return normalizeSections(JSON.parse(raw));
+  } catch {
+    return {
+      intention: '',
+      reflection: raw,
+      gratitude: '',
+      release: '',
+    };
+  }
 }
 
 function firstLine(text: string): string {
   return text.split('\n').map((line) => line.trim()).find((line) => line.length > 0) || text.trim();
 }
 
+function phaseEmoji(phase: string): string {
+  const normalized = phase.toLowerCase();
+  if (normalized.includes('new')) return '🌑';
+  if (normalized.includes('waxing crescent')) return '🌒';
+  if (normalized.includes('first quarter')) return '🌓';
+  if (normalized.includes('waxing gibbous')) return '🌔';
+  if (normalized.includes('full')) return '🌕';
+  if (normalized.includes('waning gibbous')) return '🌖';
+  if (normalized.includes('last quarter') || normalized.includes('third quarter')) return '🌗';
+  return '🌘';
+}
+
+function isReleaseMoon(phase: string): boolean {
+  const normalized = phase.toLowerCase();
+  return normalized.includes('full') || normalized.includes('waning') || normalized.includes('last quarter') || normalized.includes('third quarter');
+}
+
+function getSunSign(month: number, day: number): string {
+  const signs = [
+    { sign: 'Capricorn', start: [1, 1], end: [1, 19] },
+    { sign: 'Aquarius', start: [1, 20], end: [2, 18] },
+    { sign: 'Pisces', start: [2, 19], end: [3, 20] },
+    { sign: 'Aries', start: [3, 21], end: [4, 19] },
+    { sign: 'Taurus', start: [4, 20], end: [5, 20] },
+    { sign: 'Gemini', start: [5, 21], end: [6, 20] },
+    { sign: 'Cancer', start: [6, 21], end: [7, 22] },
+    { sign: 'Leo', start: [7, 23], end: [8, 22] },
+    { sign: 'Virgo', start: [8, 23], end: [9, 22] },
+    { sign: 'Libra', start: [9, 23], end: [10, 22] },
+    { sign: 'Scorpio', start: [10, 23], end: [11, 21] },
+    { sign: 'Sagittarius', start: [11, 22], end: [12, 21] },
+    { sign: 'Capricorn', start: [12, 22], end: [12, 31] },
+  ];
+
+  for (const item of signs) {
+    if ((month === item.start[0] && day >= item.start[1]) || (month === item.end[0] && day <= item.end[1])) {
+      return item.sign;
+    }
+  }
+
+  return 'Aries';
+}
+
+function getSunSignForRitual(): string {
+  const profile = loadProfile();
+  if (profile?.birthData) {
+    return getSunSign(profile.birthData.month + 1, profile.birthData.day);
+  }
+
+  const now = new Date();
+  return getSunSign(now.getMonth() + 1, now.getDate());
+}
+
+function sectionPrompt(section: keyof JournalSections, phase: string, language: 'en' | 'ru'): string {
+  const normalized = phase.toLowerCase();
+  const isNew = normalized.includes('new');
+  const isFull = normalized.includes('full');
+  const isWaxing = normalized.includes('waxing') || normalized.includes('first quarter');
+
+  if (language === 'ru') {
+    if (section === 'intention') {
+      if (isNew) return 'Какое семя намерения ты хочешь посадить в этом лунном цикле?';
+      if (isWaxing) return 'На чем ты хочешь укрепить фокус, пока энергия растет?';
+      if (isFull) return 'Какое намерение сейчас вышло на пик?';
+      return 'Что для тебя сейчас по-настоящему важно завершить осознанно?';
+    }
+    if (section === 'reflection') {
+      if (isNew) return 'Какие мысли или ощущения были самыми заметными сегодня?';
+      if (isWaxing) return 'Что сегодня поддержало твой рост, а что отвлекало?';
+      if (isFull) return 'Что стало для тебя яснее и заметнее сегодня?';
+      return 'Что сегодня попросило замедлиться и пересмотреть свои шаги?';
+    }
+    if (section === 'gratitude') {
+      return 'За что ты благодарна сегодня, даже если это что-то маленькое?';
+    }
+    return 'Что ты готова отпустить с любовью, чтобы освободить место новому?';
+  }
+
+  if (section === 'intention') {
+    if (isNew) return 'What intention are you planting for this lunar cycle?';
+    if (isWaxing) return 'What focus are you strengthening as energy grows?';
+    if (isFull) return 'Which intention has reached its peak right now?';
+    return 'What matters most for you to complete with care now?';
+  }
+  if (section === 'reflection') {
+    if (isNew) return 'What thoughts or emotions stood out most today?';
+    if (isWaxing) return 'What supported your growth today, and what distracted you?';
+    if (isFull) return 'What became clearer for you today?';
+    return 'What asked you to slow down and recalibrate today?';
+  }
+  if (section === 'gratitude') {
+    return 'What are you grateful for today, even if it feels small?';
+  }
+  return 'What are you ready to release with love?';
+}
+
+function localEntryMoonPhase(date: string): string {
+  try {
+    return calculateDailyCelestialData(new Date(`${date}T12:00:00`)).moon.phase;
+  } catch {
+    return 'New Moon';
+  }
+}
+
 export default function JournalPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
+  const { status: sessionStatus } = useSession();
+
   const [moonPhase, setMoonPhase] = useState('New Moon');
   const [moonIllumination, setMoonIllumination] = useState(0);
-  const [journalText, setJournalText] = useState('');
+  const [entry, setEntry] = useState<JournalSections>({ ...EMPTY_SECTIONS });
   const [saved, setSaved] = useState(false);
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [entries, setEntries] = useState<LocalOrDbEntry[]>([]);
+  const [expandedDate, setExpandedDate] = useState<string | null>(null);
+  const [ritual, setRitual] = useState<MoonRitualResponse | null>(null);
+  const [loadingRitual, setLoadingRitual] = useState(false);
 
-  const todayKey = useMemo(() => `${JOURNAL_PREFIX}${new Date().toISOString().slice(0, 10)}`, []);
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const todayKey = useMemo(() => `${JOURNAL_PREFIX}${today}`, [today]);
 
-  const loadEntries = () => {
-    const items: JournalEntry[] = [];
+  const showRelease = isReleaseMoon(moonPhase);
+  const trimmedEntry = {
+    intention: entry.intention.trim(),
+    reflection: entry.reflection.trim(),
+    gratitude: entry.gratitude.trim(),
+    release: (entry.release || '').trim(),
+  };
+  const hasContent = Boolean(
+    trimmedEntry.intention || trimmedEntry.reflection || trimmedEntry.gratitude || (showRelease && trimmedEntry.release)
+  );
+
+  const loadLocalEntries = () => {
+    const localItems: LocalOrDbEntry[] = [];
+
     for (let i = 0; i < window.localStorage.length; i += 1) {
       const key = window.localStorage.key(i);
       if (!key || !key.startsWith(JOURNAL_PREFIX)) continue;
       const raw = window.localStorage.getItem(key);
       if (!raw || !raw.trim()) continue;
-      items.push({ date: key.slice(JOURNAL_PREFIX.length), text: raw });
+      const date = key.slice(JOURNAL_PREFIX.length);
+      localItems.push({
+        date,
+        moonPhase: localEntryMoonPhase(date),
+        entries: parseLocalPayload(raw),
+      });
     }
 
-    items.sort((a, b) => (a.date < b.date ? 1 : -1));
+    localItems.sort((a, b) => (a.date < b.date ? 1 : -1));
+    return localItems;
+  };
+
+  const applyEntriesWithToday = (items: LocalOrDbEntry[]) => {
     setEntries(items);
+    const todayEntry = items.find((item) => item.date === today);
+    if (todayEntry) {
+      setEntry(normalizeSections(todayEntry.entries));
+    }
+  };
+
+  const loadDbEntries = async () => {
+    const response = await fetch('/api/journal', { cache: 'no-store' });
+    if (!response.ok) return null;
+    const payload = (await response.json()) as { entries?: Array<{ date: string; moon_phase: string; entries: JournalSections }> };
+    const dbEntries = (payload.entries || []).map((item) => ({
+      date: item.date,
+      moonPhase: item.moon_phase || 'New Moon',
+      entries: normalizeSections(item.entries),
+    }));
+    return dbEntries;
   };
 
   useEffect(() => {
@@ -67,20 +244,95 @@ export default function JournalPage() {
       setMoonPhase('New Moon');
       setMoonIllumination(0);
     }
+  }, []);
 
-    const existing = window.localStorage.getItem(todayKey);
-    if (existing) setJournalText(existing);
-    loadEntries();
-  }, [todayKey]);
+  useEffect(() => {
+    const localItems = loadLocalEntries();
+    applyEntriesWithToday(localItems);
 
-  const saveEntry = () => {
-    window.localStorage.setItem(todayKey, journalText.trim());
+    if (sessionStatus !== 'authenticated') return;
+
+    (async () => {
+      const dbItems = await loadDbEntries();
+      if (!dbItems) return;
+
+      const merged = new Map<string, LocalOrDbEntry>();
+      localItems.forEach((item) => merged.set(item.date, item));
+      dbItems.forEach((item) => merged.set(item.date, item));
+      const combined = Array.from(merged.values()).sort((a, b) => (a.date < b.date ? 1 : -1));
+      applyEntriesWithToday(combined);
+    })();
+  }, [sessionStatus, todayKey]);
+
+  const saveEntry = async () => {
+    setSaving(true);
+    const localPayload: JournalSections = {
+      intention: trimmedEntry.intention,
+      reflection: trimmedEntry.reflection,
+      gratitude: trimmedEntry.gratitude,
+      release: showRelease ? trimmedEntry.release : '',
+    };
+
+    window.localStorage.setItem(todayKey, JSON.stringify(localPayload));
+
+    if (sessionStatus === 'authenticated') {
+      await fetch('/api/journal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: today,
+          entries: localPayload,
+          moon_phase: moonPhase,
+        }),
+      });
+    }
+
+    const localItems = loadLocalEntries();
+
+    if (sessionStatus === 'authenticated') {
+      const dbItems = await loadDbEntries();
+      if (dbItems) {
+        const merged = new Map<string, LocalOrDbEntry>();
+        localItems.forEach((item) => merged.set(item.date, item));
+        dbItems.forEach((item) => merged.set(item.date, item));
+        const combined = Array.from(merged.values()).sort((a, b) => (a.date < b.date ? 1 : -1));
+        applyEntriesWithToday(combined);
+      } else {
+        applyEntriesWithToday(localItems);
+      }
+    } else {
+      applyEntriesWithToday(localItems);
+    }
+
     setSaved(true);
-    loadEntries();
     window.setTimeout(() => setSaved(false), 1500);
+    setSaving(false);
+
+    setLoadingRitual(true);
+    try {
+      const ritualRes = await fetch('/api/moon-ritual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          moonPhase,
+          sunSign: getSunSignForRitual(),
+          language,
+        }),
+      });
+      const ritualPayload = (await ritualRes.json()) as MoonRitualResponse;
+      if (ritualPayload?.title && ritualPayload?.summary) {
+        setRitual(ritualPayload);
+      } else {
+        setRitual(null);
+      }
+    } catch {
+      setRitual(null);
+    } finally {
+      setLoadingRitual(false);
+    }
   };
 
-  const prompt = phasePrompt(moonPhase, language);
+  const pastEntries = entries.filter((item) => item.date !== today);
 
   return (
     <div className="mx-auto max-w-3xl px-4 pb-28 pt-2 sm:px-6">
@@ -92,35 +344,136 @@ export default function JournalPage() {
         <div className="w-14" />
       </header>
 
-      <section className="glass-card p-5 sm:p-6">
+      <section className="glass-card mb-6 p-5 sm:p-6 animate-stagger-1">
         <p className="lumina-section-title">{t.moonPhase}</p>
-        <div className="mt-3 flex items-center justify-between">
-          <p className="text-lg text-lumina-soft">🌙 {translateMoonPhase(moonPhase, language)}</p>
-          <p className="text-xs text-cream/60">{moonIllumination}%</p>
+        <div className="mt-3 flex flex-col items-center justify-center text-center">
+          <div className="animate-float">
+            <MoonPhaseVisual illumination={moonIllumination} phase={moonPhase} />
+          </div>
+          <p className="mt-2 text-xl text-lumina-soft">{phaseEmoji(moonPhase)} {translateMoonPhase(moonPhase, language)}</p>
+          <p className="mt-1 text-xs text-cream/70">{t.illumination}: {moonIllumination}%</p>
+          <div className="mt-3 h-2 w-full max-w-xs overflow-hidden rounded-full bg-white/10">
+            <div className="h-full rounded-full bg-lumina-accent transition-all duration-700" style={{ width: `${moonIllumination}%` }} aria-hidden="true" />
+          </div>
         </div>
-        <p className="mt-3 text-sm text-cream/85">{prompt}</p>
+      </section>
 
-        <textarea
-          value={journalText}
-          onChange={(event) => setJournalText(event.target.value)}
-          placeholder={t.moonJournalPlaceholder}
-          className="lumina-input mt-4 min-h-[220px]"
-        />
+      <section className="glass-card p-5 sm:p-6 animate-stagger-2">
+        <div className="space-y-4">
+          <div className="transition-all duration-500">
+            <p className="text-sm font-semibold text-lumina-soft">Intention / Намерение</p>
+            <p className="mt-1 text-xs text-cream/70">{sectionPrompt('intention', moonPhase, language)}</p>
+            <textarea
+              value={entry.intention}
+              onChange={(event) => setEntry((prev) => ({ ...prev, intention: event.target.value }))}
+              className="lumina-input mt-2 min-h-[120px] transition-all duration-300"
+            />
+          </div>
 
-        <button type="button" onClick={saveEntry} className="lumina-button mt-4 w-full" disabled={!journalText.trim()}>
-          {saved ? t.moonJournalSaved : t.moonJournalSave}
+          <div className="transition-all duration-500">
+            <p className="text-sm font-semibold text-lumina-soft">Reflection / Размышление</p>
+            <p className="mt-1 text-xs text-cream/70">{sectionPrompt('reflection', moonPhase, language)}</p>
+            <textarea
+              value={entry.reflection}
+              onChange={(event) => setEntry((prev) => ({ ...prev, reflection: event.target.value }))}
+              className="lumina-input mt-2 min-h-[140px] transition-all duration-300"
+            />
+          </div>
+
+          <div className="transition-all duration-500">
+            <p className="text-sm font-semibold text-lumina-soft">Gratitude / Благодарность</p>
+            <p className="mt-1 text-xs text-cream/70">{sectionPrompt('gratitude', moonPhase, language)}</p>
+            <textarea
+              value={entry.gratitude}
+              onChange={(event) => setEntry((prev) => ({ ...prev, gratitude: event.target.value }))}
+              className="lumina-input mt-2 min-h-[110px] transition-all duration-300"
+            />
+          </div>
+
+          {showRelease ? (
+            <div className="transition-all duration-500">
+              <p className="text-sm font-semibold text-lumina-soft">Release / Отпускание</p>
+              <p className="mt-1 text-xs text-cream/70">{sectionPrompt('release', moonPhase, language)}</p>
+              <textarea
+                value={entry.release}
+                onChange={(event) => setEntry((prev) => ({ ...prev, release: event.target.value }))}
+                className="lumina-input mt-2 min-h-[110px] transition-all duration-300"
+              />
+            </div>
+          ) : null}
+        </div>
+
+        <button type="button" onClick={saveEntry} className="lumina-button mt-5 w-full" disabled={!hasContent || saving}>
+          {saving ? (language === 'ru' ? 'Сохранение...' : 'Saving...') : saved ? t.moonJournalSaved : t.moonJournalSave}
         </button>
       </section>
 
-      <section className="mt-6 space-y-3">
+      {loadingRitual || ritual ? (
+        <section className="glass-card mt-6 overflow-hidden border-lumina-accent/30 bg-gradient-to-br from-[#181336]/70 via-[#111633]/65 to-[#1b1540]/70 p-6 animate-stagger-3">
+          <p className="font-heading text-2xl text-lumina-soft">{language === 'ru' ? '✦ Лунный ритуал' : '✦ Moon Ritual'}</p>
+          {loadingRitual ? (
+            <div className="mt-4 space-y-2">
+              <div className="skeleton h-4 w-full" />
+              <div className="skeleton h-4 w-5/6" />
+              <div className="skeleton h-4 w-4/6" />
+            </div>
+          ) : ritual ? (
+            <div className="mt-4 space-y-3">
+              <p className="text-xs uppercase tracking-[0.18em] text-cream/55">{ritual.title}</p>
+              <p className="text-base text-cream/95">{ritual.summary}</p>
+              {ritual.prompts?.length ? (
+                <ul className="space-y-2">
+                  {ritual.prompts.map((item, index) => (
+                    <li key={`${item}-${index}`} className="lumina-card px-4 py-3 text-sm text-cream/90">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
+      <section className="mt-6 space-y-3 animate-stagger-4">
         <p className="lumina-section-title">{t.journalPreviousEntries}</p>
-        {entries.length ? (
-          entries.map((entry) => (
-            <article key={entry.date} className="lumina-card p-4">
-              <p className="text-xs text-cream/50">{new Date(entry.date).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}</p>
-              <p className="mt-2 text-sm text-cream/90">{firstLine(entry.text).slice(0, 140)}</p>
-            </article>
-          ))
+        {pastEntries.length ? (
+          pastEntries.map((item) => {
+            const expanded = expandedDate === item.date;
+            return (
+              <article key={item.date} className="lumina-card overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setExpandedDate((prev) => (prev === item.date ? null : item.date))}
+                  className="w-full p-4 text-left transition-colors hover:bg-white/[0.02]"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-xs text-cream/55">
+                      {new Date(`${item.date}T12:00:00`).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
+                    </p>
+                    <p className="text-sm text-cream/90">{phaseEmoji(item.moonPhase)} {translateMoonPhase(item.moonPhase, language)}</p>
+                  </div>
+                  <p className="mt-2 text-sm text-cream/90">{firstLine(item.entries.reflection || item.entries.intention || '').slice(0, 160)}</p>
+                </button>
+                {expanded ? (
+                  <div className="border-t border-white/10 px-4 py-4 text-sm text-cream/90 animate-fadeInUp">
+                    <p className="text-xs uppercase tracking-[0.18em] text-cream/55">Intention / Намерение</p>
+                    <p className="mt-1 whitespace-pre-wrap">{item.entries.intention || '—'}</p>
+                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-cream/55">Reflection / Размышление</p>
+                    <p className="mt-1 whitespace-pre-wrap">{item.entries.reflection || '—'}</p>
+                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-cream/55">Gratitude / Благодарность</p>
+                    <p className="mt-1 whitespace-pre-wrap">{item.entries.gratitude || '—'}</p>
+                    {item.entries.release ? (
+                      <>
+                        <p className="mt-4 text-xs uppercase tracking-[0.18em] text-cream/55">Release / Отпускание</p>
+                        <p className="mt-1 whitespace-pre-wrap">{item.entries.release}</p>
+                      </>
+                    ) : null}
+                  </div>
+                ) : null}
+              </article>
+            );
+          })
         ) : (
           <p className="text-sm text-cream/70">{t.journalNoEntries}</p>
         )}

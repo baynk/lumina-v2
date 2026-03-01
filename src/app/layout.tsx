@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { DM_Serif_Display, Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import AppProviders from '@/components/providers/AppProviders';
 import Footer from '@/components/Footer';
@@ -11,7 +13,7 @@ import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com';
 
 const dmSerif = DM_Serif_Display({
-  subsets: ['latin', 'latin-ext'],
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
   weight: '400',
   variable: '--font-heading',
   display: 'swap',
@@ -120,6 +122,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-midnight text-warmWhite font-body antialiased">
         <ServiceWorkerRegistrar />
+        <Analytics />
+        <SpeedInsights />
         <AppProviders>
           <div className="star-field" aria-hidden="true" />
           <div className="celestial-gradient" aria-hidden="true" />

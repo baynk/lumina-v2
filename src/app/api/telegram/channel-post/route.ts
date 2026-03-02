@@ -84,7 +84,9 @@ async function generateGuidance(dailyData: ReturnType<typeof calculateDailyCeles
 
   try {
     const client = new GoogleGenerativeAI(apiKey);
-    const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    // Primary: Gemini 3.1 Pro, fallback: Gemini 3 Pro
+    const primaryModel = client.getGenerativeModel({ model: 'gemini-3.1-pro-preview' });
+    const fallbackModel = client.getGenerativeModel({ model: 'gemini-3-pro-preview' });
 
     const now = new Date();
     const moscowDate = new Intl.DateTimeFormat('ru-RU', {
@@ -128,8 +130,14 @@ async function generateGuidance(dailyData: ReturnType<typeof calculateDailyCeles
 
 Начни сразу с текста. В конце поставь ✦ и всё.`;
 
-    const result = await model.generateContent(prompt);
-    let text = result.response.text().trim();
+    let text = '';
+    try {
+      const result = await primaryModel.generateContent(prompt);
+      text = result.response.text().trim();
+    } catch {
+      const result = await fallbackModel.generateContent(prompt);
+      text = result.response.text().trim();
+    }
 
     // Programmatic cleanup: remove AI patterns the model keeps sneaking in
     const aiPatterns: [RegExp, string][] = [

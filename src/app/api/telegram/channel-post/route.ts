@@ -124,10 +124,34 @@ async function generateGuidance(dailyData: ReturnType<typeof calculateDailyCeles
 - Аспекты: ${aspectsList || 'спокойный день'}
 - Планеты: ${JSON.stringify(dailyData.planets?.slice(0, 5))}
 
+ПЕРЕД ОТПРАВКОЙ: Перечитай свой текст. Если найдёшь хоть одно слово из списка ЗАПРЕЩЕНО, перепиши это предложение. Это не шутка.
+
 Начни сразу с текста. В конце поставь ✦ и всё.`;
 
     const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    let text = result.response.text().trim();
+
+    // Programmatic cleanup: remove AI patterns the model keeps sneaking in
+    const aiPatterns: [RegExp, string][] = [
+      [/При этом /gi, ''],
+      [/Однако /gi, ''],
+      [/Кстати,? /gi, ''],
+      [/Кроме того,? /gi, ''],
+      [/Более того,? /gi, ''],
+      [/Стоит отметить,? /gi, ''],
+      [/В общем,? /gi, ''],
+      [/—/g, ','],
+      [/–/g, ','],
+      [/\s{2,}/g, ' '],
+    ];
+    for (const [pattern, replacement] of aiPatterns) {
+      text = text.replace(pattern, replacement);
+    }
+    // Clean up any sentences that now start with lowercase after removal
+    text = text.replace(/\.\s+([а-яё])/g, (_, c) => `. ${c.toUpperCase()}`);
+    // Remove double spaces and trim
+    text = text.replace(/\s{2,}/g, ' ').trim();
+
     return text || null;
   } catch {
     return null;

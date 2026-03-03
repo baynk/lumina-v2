@@ -84,10 +84,10 @@ async function generateGuidance(dailyData: ReturnType<typeof calculateDailyCeles
 
   try {
     const client = new GoogleGenerativeAI(apiKey);
-    // Primary: Gemini 2.5 Pro (Iryna-approved), fallbacks: 3.1 Pro, 3 Pro
-    const primaryModel = client.getGenerativeModel({ model: 'gemini-2.5-pro' });
-    const fallback1 = client.getGenerativeModel({ model: 'gemini-3.1-pro-preview' });
-    const fallback2 = client.getGenerativeModel({ model: 'gemini-3-pro-preview' });
+    // Primary: Gemini 3.1 Pro, fallback: Gemini 3 Pro
+    const primaryModel = client.getGenerativeModel({ model: 'gemini-3.1-pro-preview' });
+    const fallback1 = client.getGenerativeModel({ model: 'gemini-3-pro-preview' });
+    const fallback2 = client.getGenerativeModel({ model: 'gemini-2.5-pro' });
 
     const now = new Date();
     const moscowDate = new Intl.DateTimeFormat('ru-RU', {

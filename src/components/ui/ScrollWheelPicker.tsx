@@ -65,7 +65,7 @@ export default function ScrollWheelPicker({
     });
 
     if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(settleToNearest, 120);
+    timeoutRef.current = window.setTimeout(settleToNearest, 250);
   };
 
   return (
@@ -85,7 +85,9 @@ export default function ScrollWheelPicker({
           height: ITEM_HEIGHT * VISIBLE_ITEMS,
           paddingTop: SIDE_PADDING,
           paddingBottom: SIDE_PADDING,
+          scrollBehavior: 'smooth',
           scrollSnapType: 'y mandatory',
+          touchAction: 'pan-y',
           WebkitOverflowScrolling: 'touch',
         }}
         onScroll={handleScroll}
@@ -104,6 +106,7 @@ export default function ScrollWheelPicker({
               style={{
                 height: ITEM_HEIGHT,
                 scrollSnapAlign: 'center',
+                scrollSnapStop: 'always',
                 color,
                 opacity,
                 transform: `scale(${scale})`,

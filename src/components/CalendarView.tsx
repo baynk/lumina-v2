@@ -66,23 +66,23 @@ export default function CalendarView({
         <button
           type="button"
           onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-cream transition hover:border-lumina-accent/40 hover:text-lumina-soft"
+          className="profile-btn"
           aria-label={language === 'ru' ? 'Предыдущий месяц' : 'Previous month'}
         >
           ←
         </button>
-        <h2 className="font-heading text-2xl capitalize text-lumina-soft">{monthLabel(currentMonth, language)}</h2>
+        <h2 className="font-heading text-2xl capitalize text-[#FDFBF7]">{monthLabel(currentMonth, language)}</h2>
         <button
           type="button"
           onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-cream transition hover:border-lumina-accent/40 hover:text-lumina-soft"
+          className="profile-btn"
           aria-label={language === 'ru' ? 'Следующий месяц' : 'Next month'}
         >
           →
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] text-cream/65">
+      <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] text-[#8D8B9F]">
         {weekdayLabels.map((label) => (
           <div key={label} className="py-1 uppercase tracking-[0.12em]">
             {label}
@@ -108,13 +108,13 @@ export default function CalendarView({
               onClick={() => onSelectDate(date)}
               className={`relative h-14 rounded-xl border p-1.5 text-left transition ${
                 selected
-                  ? 'border-lumina-accent/60 bg-lumina-accent/15 shadow-[0_0_0_1px_rgba(196,181,253,0.25)]'
-                  : 'border-white/10 bg-white/[0.03] hover:border-lumina-accent/35'
+                  ? 'border-white/[0.16] bg-white/[0.08] shadow-[0_0_0_1px_rgba(253,251,247,0.08)]'
+                  : 'border-white/10 bg-white/[0.03] hover:border-white/[0.16]'
               }`}
             >
               <span
                 className={`text-sm ${
-                  isToday ? 'font-semibold text-lumina-accent' : selected ? 'text-warmWhite' : 'text-cream/85'
+                  isToday ? 'font-semibold text-[#C8A4A4]' : selected ? 'text-[#FDFBF7]' : 'text-[#C0BDD6]'
                 }`}
               >
                 {date.getDate()}

@@ -98,7 +98,11 @@ export default function StoryOfYouPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-3xl items-center px-4 pb-12 pt-6 sm:px-6">
+    <div className="lumina-screen flex min-h-screen items-center">
+      <div className="aura left-[-24%] top-[10%] h-[280px] w-[280px] bg-[#5A438A]/34" />
+      <div className="aura right-[-20%] top-[30%] h-[260px] w-[260px] bg-[#18244D]/32" />
+      <div className="aura bottom-[-12%] left-[20%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="mx-auto flex min-h-screen max-w-3xl items-center px-4 pb-12 pt-6 sm:px-6">
       <section className="glass-card w-full p-6 sm:p-8">
         {loading ? (
           <div className="space-y-3">
@@ -109,13 +113,14 @@ export default function StoryOfYouPage() {
           </div>
         ) : (
           <>
-            <h1 className="font-heading text-4xl text-lumina-soft">{story?.title || t.storyTitle}</h1>
-            <p className="mt-2 text-sm text-cream/70">{t.storySubtitle}</p>
+            <p className="lumina-label">{language === 'ru' ? 'История о вас' : 'Story of you'}</p>
+            <h1 className="mt-3 font-heading text-4xl text-[#FDFBF7]">{story?.title || t.storyTitle}</h1>
+            <p className="mt-2 text-sm text-[#8D8B9F]">{t.storySubtitle}</p>
             <div className="mt-6 space-y-4">
               {story?.paragraphs.map((paragraph, index) => (
                 <p
                   key={`${paragraph}-${index}`}
-                  className={`leading-relaxed text-warmWhite transition duration-700 ${index < visibleCount ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
+                  className={`leading-relaxed text-[#C0BDD6] transition duration-700 ${index < visibleCount ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
                 >
                   {paragraph}
                 </p>
@@ -127,6 +132,7 @@ export default function StoryOfYouPage() {
           </>
         )}
       </section>
+      </div>
     </div>
   );
 }

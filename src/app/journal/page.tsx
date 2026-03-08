@@ -335,12 +335,16 @@ export default function JournalPage() {
   const pastEntries = entries.filter((item) => item.date !== today);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-28 pt-2 sm:px-6">
+    <div className="lumina-screen">
+      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
+      <div className="aura right-[-20%] top-[24%] h-[280px] w-[280px] bg-[#18244D]/32" />
+      <div className="aura bottom-[-12%] left-[16%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="mx-auto max-w-3xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
-        <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-cream hover:text-warmWhite">
+        <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
           ← {t.back}
         </button>
-        <h1 className="font-heading text-3xl text-lumina-soft">{t.journalTitle}</h1>
+        <h1 className="font-heading text-3xl text-[#FDFBF7]">{t.journalTitle}</h1>
         <div className="w-14" />
       </header>
 
@@ -350,8 +354,8 @@ export default function JournalPage() {
           <div className="animate-float">
             <MoonPhaseVisual illumination={moonIllumination} phase={moonPhase} />
           </div>
-          <p className="mt-2 text-xl text-lumina-soft">{phaseEmoji(moonPhase)} {translateMoonPhase(moonPhase, language)}</p>
-          <p className="mt-1 text-xs text-cream/70">{t.illumination}: {moonIllumination}%</p>
+          <p className="mt-2 font-heading text-2xl text-[#FDFBF7]">{phaseEmoji(moonPhase)} {translateMoonPhase(moonPhase, language)}</p>
+          <p className="mt-1 text-xs text-[#8D8B9F]">{t.illumination}: {moonIllumination}%</p>
           <div className="mt-3 h-2 w-full max-w-xs overflow-hidden rounded-full bg-white/10">
             <div className="h-full rounded-full bg-lumina-accent transition-all duration-700" style={{ width: `${moonIllumination}%` }} aria-hidden="true" />
           </div>
@@ -361,8 +365,8 @@ export default function JournalPage() {
       <section className="glass-card p-5 sm:p-6 animate-stagger-2">
         <div className="space-y-4">
           <div className="transition-all duration-500">
-            <p className="text-sm font-semibold text-lumina-soft">Intention / Намерение</p>
-            <p className="mt-1 text-xs text-cream/70">{sectionPrompt('intention', moonPhase, language)}</p>
+            <p className="font-heading text-xl text-[#FDFBF7]">Intention / Намерение</p>
+            <p className="mt-1 text-xs text-[#8D8B9F]">{sectionPrompt('intention', moonPhase, language)}</p>
             <textarea
               value={entry.intention}
               onChange={(event) => setEntry((prev) => ({ ...prev, intention: event.target.value }))}
@@ -371,8 +375,8 @@ export default function JournalPage() {
           </div>
 
           <div className="transition-all duration-500">
-            <p className="text-sm font-semibold text-lumina-soft">Reflection / Размышление</p>
-            <p className="mt-1 text-xs text-cream/70">{sectionPrompt('reflection', moonPhase, language)}</p>
+            <p className="font-heading text-xl text-[#FDFBF7]">Reflection / Размышление</p>
+            <p className="mt-1 text-xs text-[#8D8B9F]">{sectionPrompt('reflection', moonPhase, language)}</p>
             <textarea
               value={entry.reflection}
               onChange={(event) => setEntry((prev) => ({ ...prev, reflection: event.target.value }))}
@@ -381,8 +385,8 @@ export default function JournalPage() {
           </div>
 
           <div className="transition-all duration-500">
-            <p className="text-sm font-semibold text-lumina-soft">Gratitude / Благодарность</p>
-            <p className="mt-1 text-xs text-cream/70">{sectionPrompt('gratitude', moonPhase, language)}</p>
+            <p className="font-heading text-xl text-[#FDFBF7]">Gratitude / Благодарность</p>
+            <p className="mt-1 text-xs text-[#8D8B9F]">{sectionPrompt('gratitude', moonPhase, language)}</p>
             <textarea
               value={entry.gratitude}
               onChange={(event) => setEntry((prev) => ({ ...prev, gratitude: event.target.value }))}
@@ -392,8 +396,8 @@ export default function JournalPage() {
 
           {showRelease ? (
             <div className="transition-all duration-500">
-              <p className="text-sm font-semibold text-lumina-soft">Release / Отпускание</p>
-              <p className="mt-1 text-xs text-cream/70">{sectionPrompt('release', moonPhase, language)}</p>
+              <p className="font-heading text-xl text-[#FDFBF7]">Release / Отпускание</p>
+              <p className="mt-1 text-xs text-[#8D8B9F]">{sectionPrompt('release', moonPhase, language)}</p>
               <textarea
                 value={entry.release}
                 onChange={(event) => setEntry((prev) => ({ ...prev, release: event.target.value }))}
@@ -419,12 +423,12 @@ export default function JournalPage() {
             </div>
           ) : ritual ? (
             <div className="mt-4 space-y-3">
-              <p className="text-xs uppercase tracking-[0.18em] text-cream/55">{ritual.title}</p>
-              <p className="text-base text-cream/95">{ritual.summary}</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#C0BDD6]">{ritual.title}</p>
+              <p className="text-base text-[#FDFBF7]">{ritual.summary}</p>
               {ritual.prompts?.length ? (
                 <ul className="space-y-2">
                   {ritual.prompts.map((item, index) => (
-                    <li key={`${item}-${index}`} className="lumina-card px-4 py-3 text-sm text-cream/90">
+                    <li key={`${item}-${index}`} className="lumina-card px-4 py-3 text-sm text-[#FDFBF7]">
                       {item}
                     </li>
                   ))}
@@ -448,24 +452,24 @@ export default function JournalPage() {
                   className="w-full p-4 text-left transition-colors hover:bg-white/[0.02]"
                 >
                   <div className="flex items-center justify-between gap-4">
-                    <p className="text-xs text-cream/55">
+                    <p className="text-xs text-[#8D8B9F]">
                       {new Date(`${item.date}T12:00:00`).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
                     </p>
-                    <p className="text-sm text-cream/90">{phaseEmoji(item.moonPhase)} {translateMoonPhase(item.moonPhase, language)}</p>
+                    <p className="text-sm text-[#FDFBF7]">{phaseEmoji(item.moonPhase)} {translateMoonPhase(item.moonPhase, language)}</p>
                   </div>
-                  <p className="mt-2 text-sm text-cream/90">{firstLine(item.entries.reflection || item.entries.intention || '').slice(0, 160)}</p>
+                  <p className="mt-2 text-sm text-[#C0BDD6]">{firstLine(item.entries.reflection || item.entries.intention || '').slice(0, 160)}</p>
                 </button>
                 {expanded ? (
-                  <div className="border-t border-white/10 px-4 py-4 text-sm text-cream/90 animate-fadeInUp">
-                    <p className="text-xs uppercase tracking-[0.18em] text-cream/55">Intention / Намерение</p>
+                  <div className="animate-fadeInUp border-t border-white/10 px-4 py-4 text-sm text-[#C0BDD6]">
+                    <p className="text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">Intention / Намерение</p>
                     <p className="mt-1 whitespace-pre-wrap">{item.entries.intention || '—'}</p>
-                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-cream/55">Reflection / Размышление</p>
+                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">Reflection / Размышление</p>
                     <p className="mt-1 whitespace-pre-wrap">{item.entries.reflection || '—'}</p>
-                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-cream/55">Gratitude / Благодарность</p>
+                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">Gratitude / Благодарность</p>
                     <p className="mt-1 whitespace-pre-wrap">{item.entries.gratitude || '—'}</p>
                     {item.entries.release ? (
                       <>
-                        <p className="mt-4 text-xs uppercase tracking-[0.18em] text-cream/55">Release / Отпускание</p>
+                        <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">Release / Отпускание</p>
                         <p className="mt-1 whitespace-pre-wrap">{item.entries.release}</p>
                       </>
                     ) : null}
@@ -475,9 +479,10 @@ export default function JournalPage() {
             );
           })
         ) : (
-          <p className="text-sm text-cream/70">{t.journalNoEntries}</p>
+          <p className="text-sm text-[#8D8B9F]">{t.journalNoEntries}</p>
         )}
       </section>
+    </div>
     </div>
   );
 }

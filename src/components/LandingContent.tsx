@@ -250,9 +250,9 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
   const goToConsultation = onConsultationClick || (() => {});
 
   return (
-    <div className="relative overflow-hidden -mx-[calc((100vw-100%)/2)] px-[calc((100vw-100%)/2)]" style={{ background: '#080C1F', isolation: 'isolate' }}>
+    <div className="relative overflow-hidden -mx-[calc((100vw-100%)/2)] px-[calc((100vw-100%)/2)]" style={{ background: '#0B0814', isolation: 'isolate' }}>
       {/* Opaque background to cover parent layout gradients */}
-      <div className="fixed inset-0 z-[-2]" style={{ background: '#080C1F' }} />
+      <div className="fixed inset-0 z-[-2]" style={{ background: '#0B0814' }} />
       {/* Full-page starfield background */}
       <div className="fixed inset-0 z-[-1] opacity-25" style={{
         backgroundImage: 'url(/images/brand/deep-space.jpg)',
@@ -269,31 +269,31 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
           <ZodiacWheel />
 
           {/* Eyebrow */}
-          <p className="mt-6 text-[11px] sm:text-[12px] lg:text-[13px] xl:text-[14px] tracking-[0.35em] uppercase text-[#A78BFA]/50 font-medium">
+          <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.35em] text-[#C8A4A4] sm:text-[12px] lg:text-[13px] xl:text-[14px]">
             {t.heroEyebrow}
           </p>
 
           {/* Title */}
-          <h1 className="mt-4 font-heading text-4xl sm:text-5xl lg:text-7xl xl:text-8xl leading-[1.08] text-cream">
+          <h1 className="mt-4 font-heading text-4xl leading-[1.08] text-[#FDFBF7] sm:text-5xl lg:text-7xl xl:text-8xl">
             {t.heroTitle1}<br />
-            <span className="bg-gradient-to-r from-[#A78BFA] via-[#C4B5FD] to-[#A78BFA] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#C8A4A4] via-[#C0BDD6] to-[#C8A4A4] bg-clip-text text-transparent">
               {t.heroTitle2}
             </span>
           </h1>
 
           {/* Paragraph */}
-          <p className="mx-auto mt-6 lg:mt-8 max-w-md lg:max-w-xl xl:max-w-2xl text-[15px] lg:text-[18px] xl:text-[20px] leading-[1.75] text-cream/50">
+          <p className="mx-auto mt-6 max-w-md text-[15px] leading-[1.75] text-[#8D8B9F] lg:mt-8 lg:max-w-xl lg:text-[18px] xl:max-w-2xl xl:text-[20px]">
             {t.heroParagraph}
           </p>
 
           {/* CTA */}
           <button
             onClick={goToApp}
-            className="mt-10 lg:mt-12 rounded-full bg-gradient-to-r from-[#A78BFA]/90 to-[#8B5CF6]/90 px-10 sm:px-14 lg:px-16 py-4 sm:py-5 lg:py-6 text-[15px] sm:text-[16px] lg:text-[18px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)] hover:from-[#A78BFA] hover:to-[#8B5CF6]"
+            className="lumina-button mt-10 px-10 py-4 text-[15px] sm:px-14 sm:py-5 sm:text-[16px] lg:mt-12 lg:px-16 lg:py-6 lg:text-[18px]"
           >
             {t.heroCta}
           </button>
-          <p className="mt-3 text-[11px] lg:text-[13px] text-cream/25 tracking-wider">{t.heroSub}</p>
+          <p className="mt-3 text-[11px] tracking-wider text-[#8D8B9F] lg:text-[13px]">{t.heroSub}</p>
         </div>
 
         {/* Scroll indicator */}

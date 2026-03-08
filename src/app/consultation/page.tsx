@@ -133,18 +133,18 @@ export default function ConsultationPage() {
   // Confirmation screen (written)
   if (submitted) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="lumina-screen flex min-h-screen items-center justify-center px-4">
         <div className="max-w-md text-center animate-fadeInUp">
           <div className="mb-6 text-6xl animate-float">✨</div>
-          <h1 className="font-heading text-3xl text-lumina-soft mb-4">
+          <h1 className="mb-4 font-heading text-3xl text-[#FDFBF7]">
             {language === 'ru' ? 'Спасибо!' : 'Thank you!'}
           </h1>
-          <p className="text-cream leading-relaxed mb-4">
+          <p className="mb-4 leading-relaxed text-[#C0BDD6]">
             {language === 'ru'
               ? 'Ваш запрос получен. Мы подготовим персональный разбор и отправим его на вашу почту в течение 48 часов.'
               : 'Your request has been received. We\'ll prepare your personalized reading and deliver it to your email within 48 hours.'}
           </p>
-          <p className="text-sm text-cream/50 mb-8">
+          <p className="mb-8 text-sm text-[#8D8B9F]">
             {language === 'ru' ? 'Проверьте папку "Спам", если не получите ответ.' : 'Check your spam folder if you don\'t hear from us.'}
           </p>
           <button type="button" onClick={() => router.push('/')} className="lumina-button px-8">
@@ -156,22 +156,26 @@ export default function ConsultationPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-10 pt-0 sm:px-6">
+    <div className="lumina-screen">
+      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
+      <div className="aura right-[-20%] top-[24%] h-[280px] w-[280px] bg-[#18244D]/32" />
+      <div className="aura bottom-[-12%] left-[16%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="mx-auto max-w-2xl px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
-        <button onClick={() => selectedType ? setSelectedType(null) : router.back()} className="min-h-11 rounded-full px-4 text-sm text-cream hover:text-warmWhite">
+        <button onClick={() => selectedType ? setSelectedType(null) : router.back()} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
           ← {language === 'ru' ? 'Назад' : 'Back'}
         </button>
-        <p className="font-heading text-xl text-lumina-soft">Lumina</p>
+        <p className="font-heading text-xl text-[#FDFBF7]">Lumina</p>
         <div className="w-20" />
       </header>
 
       {/* Title */}
       <section className="mb-8 text-center animate-fadeInUp">
-        <h1 className="font-heading text-2xl sm:text-3xl text-lumina-soft mb-2">
+        <h1 className="mb-2 font-heading text-2xl text-[#FDFBF7] sm:text-3xl">
           {language === 'ru' ? 'Персональная консультация' : 'Personal Consultation'}
         </h1>
-        <p className="text-sm text-cream/60 leading-relaxed max-w-md mx-auto">
+        <p className="mx-auto max-w-md text-sm leading-relaxed text-[#8D8B9F]">
           {language === 'ru'
             ? 'Выберите формат консультации, который подходит именно вам'
             : 'Choose the consultation format that\'s right for you'}
@@ -184,29 +188,29 @@ export default function ConsultationPage() {
           {/* Written Reading */}
           <button
             onClick={() => setSelectedType('written')}
-            className="glass-card p-6 text-left hover:border-lumina-accent/40 transition group"
+            className="glass-card group p-6 text-left transition hover:border-white/[0.16]"
           >
             <div className="text-3xl mb-3">💬</div>
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Письменный разбор' : 'Written Reading'}
             </h3>
-            <p className="text-xs text-cream/50 mb-4 leading-relaxed">
+            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F]">
               {language === 'ru'
                 ? 'Детальная интерпретация натальной карты, доставка на email в течение 48 часов'
                 : 'Detailed natal chart interpretation, delivered to your email within 48 hours'}
             </p>
             <div className="flex items-baseline gap-1">
-              <span className="font-heading text-2xl text-warmWhite">€25</span>
+              <span className="font-heading text-2xl text-[#FDFBF7]">€25</span>
             </div>
           </button>
 
           {/* Video 40 min */}
           <button
             onClick={() => setSelectedType('video-40')}
-            className="glass-card p-6 text-left hover:border-lumina-accent/40 transition group relative overflow-hidden"
+            className="glass-card group relative overflow-hidden p-6 text-left transition hover:border-white/[0.16]"
           >
             <div className="absolute top-3 right-3">
-              <span className="rounded-full bg-lumina-accent/20 border border-lumina-accent/30 px-2.5 py-0.5 text-[10px] font-medium text-lumina-soft">
+              <span className="badge px-2.5 py-0.5 text-[10px]">
                 {language === 'ru' ? 'Популярный' : 'Popular'}
               </span>
             </div>
@@ -214,34 +218,34 @@ export default function ConsultationPage() {
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Личная сессия' : 'Personal Session'}
             </h3>
-            <p className="text-xs text-cream/50 mb-4 leading-relaxed">
+            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F]">
               {language === 'ru'
                 ? '40 минут видео-консультации — ответы на ваши главные вопросы'
                 : '40 min video call — focused answers to your key questions'}
             </p>
             <div className="flex items-baseline gap-1">
-              <span className="font-heading text-2xl text-warmWhite">€35</span>
-              <span className="text-xs text-cream/40">/ 40 min</span>
+              <span className="font-heading text-2xl text-[#FDFBF7]">€35</span>
+              <span className="text-xs text-[#8D8B9F]">/ 40 min</span>
             </div>
           </button>
 
           {/* Video 60 min */}
           <button
             onClick={() => setSelectedType('video-60')}
-            className="glass-card p-6 text-left hover:border-lumina-accent/40 transition group"
+            className="glass-card group p-6 text-left transition hover:border-white/[0.16]"
           >
             <div className="text-3xl mb-3">✦</div>
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Глубокий разбор' : 'Deep Dive'}
             </h3>
-            <p className="text-xs text-cream/50 mb-4 leading-relaxed">
+            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F]">
               {language === 'ru'
                 ? '60 минут видео — полный разбор карты, транзиты, прогноз'
                 : '60 min video — full chart analysis, transits, and forecast'}
             </p>
             <div className="flex items-baseline gap-1">
-              <span className="font-heading text-2xl text-warmWhite">€55</span>
-              <span className="text-xs text-cream/40">/ 60 min</span>
+              <span className="font-heading text-2xl text-[#FDFBF7]">€55</span>
+              <span className="text-xs text-[#8D8B9F]">/ 60 min</span>
             </div>
           </button>
         </div>
@@ -536,10 +540,10 @@ export default function ConsultationPage() {
               </div>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={unsureBirthTime} onChange={(e) => setUnsureBirthTime(e.target.checked)} className="h-4 w-4 rounded border-white/20 bg-white/5 accent-lumina-accent" />
-                <span className="text-sm text-cream/70">{language === 'ru' ? 'Не знаю точное время' : 'I\'m not sure of the exact time'}</span>
+                <span className="text-sm text-[#8D8B9F]">{language === 'ru' ? 'Не знаю точное время' : 'I\'m not sure of the exact time'}</span>
               </label>
               <div>
-                <label className="mb-1 block text-xs text-cream/50">{language === 'ru' ? 'Место рождения' : 'Place of birth'}</label>
+                <label className="mb-1 block text-xs text-[#8D8B9F]">{language === 'ru' ? 'Место рождения' : 'Place of birth'}</label>
                 <input type="text" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} className="lumina-input" placeholder={language === 'ru' ? 'Город, страна' : 'City, country'} />
               </div>
             </div>
@@ -556,12 +560,13 @@ export default function ConsultationPage() {
               ? '...'
               : (language === 'ru' ? 'Отправить запрос · €25' : 'Submit Request · €25')}
           </button>
-          {submitError && <p className="text-center text-xs text-red-300">{submitError}</p>}
-          <p className="text-center text-[10px] text-cream/30">
+          {submitError && <p className="text-center text-xs text-[#C8A4A4]">{submitError}</p>}
+          <p className="text-center text-[10px] text-[#8D8B9F]">
             {language === 'ru' ? 'Оплата после подтверждения запроса' : 'Payment link will be sent after request confirmation'}
           </p>
         </div>
       )}
+    </div>
     </div>
   );
 }

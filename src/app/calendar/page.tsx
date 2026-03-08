@@ -74,17 +74,21 @@ export default function CalendarPage() {
   const listLabel = dayEvents.length ? copy.selectedDay : copy.upcoming;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 pb-28 pt-2 sm:px-6">
+    <div className="lumina-screen">
+      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
+      <div className="aura right-[-20%] top-[24%] h-[280px] w-[280px] bg-[#18244D]/32" />
+      <div className="aura bottom-[-12%] left-[16%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="mx-auto max-w-4xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
-        <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-cream hover:text-warmWhite">
+        <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
           ← {t.back}
         </button>
-        <h1 className="font-heading text-3xl text-lumina-soft">{copy.title}</h1>
+        <h1 className="font-heading text-3xl text-[#FDFBF7]">{copy.title}</h1>
         <div className="w-14" />
       </header>
 
       <section className="glass-card mb-4 p-4 sm:p-5">
-        <p className="text-sm text-cream/80">{copy.subtitle}</p>
+        <p className="text-sm text-[#8D8B9F]">{copy.subtitle}</p>
       </section>
 
       <CalendarView
@@ -97,7 +101,7 @@ export default function CalendarPage() {
       />
 
       {!yearEvents.length ? (
-        <p className="mt-4 text-sm text-amber-200/90">{copy.unsupportedYear}</p>
+        <p className="mt-4 text-sm text-[#C8A4A4]">{copy.unsupportedYear}</p>
       ) : null}
 
       <section className="mt-6 space-y-3">
@@ -114,7 +118,7 @@ export default function CalendarPage() {
               <article key={`${event.type}-${event.date.toISOString()}-${event.title.en}`} className="glass-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs text-cream/60">
+                    <p className="text-xs text-[#8D8B9F]">
                       {event.date.toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US', {
                         weekday: 'short',
                         month: 'short',
@@ -122,13 +126,13 @@ export default function CalendarPage() {
                         year: 'numeric',
                       })}
                     </p>
-                    <h3 className="mt-1 text-base text-lumina-soft">
+                    <h3 className="mt-1 font-heading text-xl text-[#FDFBF7]">
                       <span className="mr-2" aria-hidden="true">
                         {eventIcon(event)}
                       </span>
                       {event.title[language]}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-cream/85">{event.description[language]}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[#8D8B9F]">{event.description[language]}</p>
                   </div>
                   {showMoon ? (
                     <div className="hidden scale-50 sm:block">
@@ -139,12 +143,12 @@ export default function CalendarPage() {
 
                 {showRetrograde && event.retrogradePeriod ? (
                   <div className="mt-3">
-                    <div className="mb-1 flex items-center justify-between text-xs text-cream/70">
+                    <div className="mb-1 flex items-center justify-between text-xs text-[#8D8B9F]">
                       <span>{copy.retrogradeProgress}</span>
                       <span>{progress}%</span>
                     </div>
                     <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full rounded-full bg-gradient-to-r from-rose-400 to-red-300" style={{ width: `${progress}%` }} />
+                      <div className="h-full rounded-full bg-[linear-gradient(90deg,#C8A4A4,#C0BDD6)]" style={{ width: `${progress}%` }} />
                     </div>
                   </div>
                 ) : null}
@@ -152,9 +156,10 @@ export default function CalendarPage() {
             );
           })
         ) : (
-          <p className="text-sm text-cream/70">{copy.empty}</p>
+          <p className="text-sm text-[#8D8B9F]">{copy.empty}</p>
         )}
       </section>
+    </div>
     </div>
   );
 }

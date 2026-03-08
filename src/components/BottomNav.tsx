@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Calendar, CircleDot, Heart, Home, User } from 'lucide-react';
+import { CalendarDays, CircleDot, HeartHandshake, Home } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { hasProfile } from '@/lib/profile';
 
@@ -15,7 +15,7 @@ type NavItem = {
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -38,19 +38,19 @@ export default function BottomNav() {
   const items: NavItem[] = [
     { href: '/', label: t.bottomNavToday, icon: Home },
     { href: '/chart', label: t.bottomNavChart, icon: CircleDot },
-    { href: '/synastry', label: t.bottomNavCompatibility, icon: Heart },
-    { href: '/calendar', label: t.bottomNavCalendar, icon: Calendar },
-    { href: '/profile', label: t.bottomNavProfile, icon: User },
+    { href: '/synastry', label: language === 'ru' ? 'Синастрия' : 'Synastry', icon: HeartHandshake },
+    { href: '/calendar', label: t.bottomNavCalendar, icon: CalendarDays },
   ];
 
   const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(`${href}/`));
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t bg-[#1A1822] pb-safe"
-      style={{ borderTopColor: 'rgba(240,235,227,0.05)' }}
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40"
+      aria-label={language === 'ru' ? 'Нижняя навигация' : 'Bottom navigation'}
     >
-      <ul className="grid grid-cols-5">
+      <div className="bottom-nav-fade pointer-events-none absolute inset-x-0 bottom-0 h-[90px]" aria-hidden="true" />
+      <ul className="pointer-events-auto mx-auto grid h-[90px] w-full max-w-md grid-cols-4 px-6 pb-5 pt-5">
         {items.map((item) => {
           const active = isActive(item.href);
           const Icon = item.icon;
@@ -59,17 +59,11 @@ export default function BottomNav() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="flex min-h-[64px] flex-col items-center justify-center gap-1 px-2 pt-2 text-center font-sans"
-                style={{ color: active ? '#C8A96E' : '#9A9298' }}
+                className="flex min-h-[64px] flex-col items-center justify-center gap-2 text-center font-body transition-colors duration-300"
+                style={{ color: active ? '#FDFBF7' : '#5C5970' }}
               >
-                <div className="flex flex-col items-center">
-                  <Icon size={20} strokeWidth={1.9} />
-                  <span
-                    className={`mt-1 h-1.5 w-1.5 rounded-full transition-opacity ${active ? 'opacity-100' : 'opacity-0'}`}
-                    style={{ backgroundColor: '#C8A96E' }}
-                  />
-                </div>
-                <span className="text-[10px] leading-none">{item.label}</span>
+                <Icon size={20} strokeWidth={1.5} absoluteStrokeWidth />
+                <span className="text-[11px] leading-none">{item.label}</span>
               </Link>
             </li>
           );

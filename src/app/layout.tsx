@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Playfair_Display, Inter } from 'next/font/google';
+import { Outfit, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
@@ -9,23 +9,18 @@ import AppShell from '@/components/AppShell';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com';
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin', 'latin-ext', 'cyrillic'],
-  weight: ['400', '500', '600'],
-  variable: '--font-heading',
-  display: 'swap',
-});
-
 const playfair = Playfair_Display({
   subsets: ['latin', 'cyrillic'],
-  weight: ['400', '600', '700'],
-  variable: '--font-heading-cyr',
+  style: ['normal', 'italic'],
+  weight: ['400', '500', '600'],
+  variable: '--font-display',
   display: 'swap',
 });
 
-const inter = Inter({
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-inter',
+const outfit = Outfit({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-body',
   display: 'swap',
 });
 
@@ -76,7 +71,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#0E0D14',
+  themeColor: '#0B0814',
 };
 
 export default function RootLayout({
@@ -111,10 +106,10 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${cormorant.variable} ${playfair.variable} ${inter.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${outfit.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#0E0D14" />
+        <meta name="theme-color" content="#0B0814" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
@@ -124,7 +119,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationSchema) }}
         />
       </head>
-      <body className="min-h-screen bg-bg-primary text-text-primary font-body antialiased">
+      <body className="min-h-screen bg-bg-base text-text-primary font-body antialiased">
         <ServiceWorkerRegistrar />
         <Analytics />
         <SpeedInsights />

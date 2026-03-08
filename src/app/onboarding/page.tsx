@@ -92,8 +92,14 @@ function isValidBirthDate(year: number, monthIndex: number, day: number) {
 }
 
 function ctaClasses(disabled = false) {
-  return `inline-flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-semibold transition ${
+  return `lumina-button inline-flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-medium transition ${
     disabled ? 'opacity-40' : 'opacity-100'
+  }`;
+}
+
+function cardClasses(active = false) {
+  return `glass-card w-full text-left transition-all duration-300 ${
+    active ? 'border-white/[0.12] bg-white/[0.03]' : ''
   }`;
 }
 
@@ -385,11 +391,6 @@ export default function OnboardingPage() {
     }
   };
 
-  const sharedButtonStyle = {
-    backgroundImage: 'linear-gradient(135deg, #C8A96E, #E8D5B5)',
-    color: '#0E0D14',
-  } as const;
-
   const featureCards = [
     { icon: '🌙', label: t.onboardingFeatureCardForecast },
     { icon: '⊙', label: t.onboardingFeatureCardChart },
@@ -414,14 +415,14 @@ export default function OnboardingPage() {
       subtitle: t.onboardingFeatureForecastSubtitle,
       cta: t.onboardingFeatureForecastCta,
       preview: (
-        <div className="w-full max-w-[190px] rounded-[28px] bg-[#14111B] p-5 text-left text-[#F0EBE3] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+        <div className="glass-card w-full max-w-[200px] p-5 text-left text-[#FDFBF7] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
           <div className="text-3xl">🌙</div>
           <p className="mt-4 font-heading text-[28px] leading-none">Луна в Рыбах</p>
-          <p className="mt-4 text-xs leading-5 text-[#B7AEB4]">
-            День для мягких решений и честных ощущений.
+          <p className="mt-4 text-xs leading-5 text-[#8D8B9F]">
+            Вечер зовет выбирать мягко и слышать то, что шепчет сердце.
           </p>
-          <p className="mt-2 text-xs leading-5 text-[#B7AEB4]">
-            Доверяй интуиции, но не спеши обещать лишнее.
+          <p className="mt-2 text-xs leading-5 text-[#8D8B9F]">
+            Интуиция ясна, когда ты не торопишься назвать ее вслух.
           </p>
         </div>
       ),
@@ -433,12 +434,12 @@ export default function OnboardingPage() {
       preview: (
         <div className="relative flex h-[190px] w-[190px] items-center justify-center">
           <svg viewBox="0 0 190 190" className="h-full w-full">
-            <circle cx="95" cy="95" r="78" stroke="#3B3447" strokeWidth="2" fill="none" />
-            <circle cx="95" cy="95" r="52" stroke="#2A2433" strokeWidth="2" fill="none" />
-            <line x1="95" y1="17" x2="95" y2="173" stroke="#2A2433" strokeWidth="1.5" />
-            <line x1="17" y1="95" x2="173" y2="95" stroke="#2A2433" strokeWidth="1.5" />
-            <line x1="40" y1="40" x2="150" y2="150" stroke="#2A2433" strokeWidth="1.5" />
-            <line x1="150" y1="40" x2="40" y2="150" stroke="#2A2433" strokeWidth="1.5" />
+            <circle cx="95" cy="95" r="78" stroke="rgba(192,189,214,0.2)" strokeWidth="2" fill="none" />
+            <circle cx="95" cy="95" r="52" stroke="rgba(192,189,214,0.14)" strokeWidth="2" fill="none" />
+            <line x1="95" y1="17" x2="95" y2="173" stroke="rgba(192,189,214,0.14)" strokeWidth="1.5" />
+            <line x1="17" y1="95" x2="173" y2="95" stroke="rgba(192,189,214,0.14)" strokeWidth="1.5" />
+            <line x1="40" y1="40" x2="150" y2="150" stroke="rgba(192,189,214,0.14)" strokeWidth="1.5" />
+            <line x1="150" y1="40" x2="40" y2="150" stroke="rgba(192,189,214,0.14)" strokeWidth="1.5" />
             {[
               [95, 28],
               [137, 52],
@@ -447,7 +448,7 @@ export default function OnboardingPage() {
               [65, 150],
               [36, 88],
             ].map(([cx, cy], index) => (
-              <circle key={`${cx}-${cy}-${index}`} cx={cx} cy={cy} r="5" fill="#C8A96E" />
+              <circle key={`${cx}-${cy}-${index}`} cx={cx} cy={cy} r="5" fill="#C8A4A4" />
             ))}
           </svg>
         </div>
@@ -458,12 +459,12 @@ export default function OnboardingPage() {
       subtitle: t.onboardingFeatureCompatSubtitle,
       cta: t.onboardingFeatureCompatCta,
       preview: (
-        <div className="flex items-center justify-center gap-5 text-[#F0EBE3]">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#3B3447] bg-[#14111B] text-4xl">
+        <div className="flex items-center justify-center gap-5 text-[#FDFBF7]">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
             ♌
           </div>
-          <span className="text-3xl text-[#C8A96E]">♡</span>
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#3B3447] bg-[#14111B] text-4xl">
+          <span className="text-3xl text-[#C8A4A4]">♡</span>
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
             ♒
           </div>
         </div>
@@ -491,7 +492,11 @@ export default function OnboardingPage() {
     : [];
 
   return (
-    <div className="lumina-orb-shell min-h-screen bg-[#0E0D14]" data-lang={language}>
+    <div className="lumina-screen lumina-orb-shell" data-lang={language}>
+      <div className="aura left-[-26%] top-[8%] h-[260px] w-[260px] bg-[#5A438A]/40" />
+      <div className="aura right-[-28%] top-[34%] h-[280px] w-[280px] bg-[#18244D]/35" />
+      <div className="aura bottom-[-12%] left-[14%] h-[250px] w-[250px] bg-[#2E1B54]/35" />
+
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-0">
         <OnboardingHeader
           currentStep={step}
@@ -500,19 +505,21 @@ export default function OnboardingPage() {
           showLanguageToggle={step === 1}
         />
 
-        <div className="flex flex-1 flex-col px-5 pb-8 sm:px-8">
+        <div className="flex flex-1 flex-col px-6 pb-8">
           {step === 1 ? (
-            <section className="flex flex-1 flex-col items-center justify-center text-center">
-              <span className="font-heading text-xl text-[#C8A96E]">✦</span>
-              <h1 className="mt-5 font-heading text-[48px] leading-[0.95] text-[#F0EBE3]">
+            <section className="animate-fadeInUp flex flex-1 flex-col items-center justify-center text-center">
+              <p className="font-body text-[11px] font-medium uppercase tracking-[2px] text-[#C8A4A4]">
+                {language === 'ru' ? 'Ваш путь начинается' : 'Your path begins'}
+              </p>
+              <h1 className="mt-5 font-heading text-[48px] leading-[0.95] text-[#FDFBF7]">
                 {t.onboardingWelcomeTitle}
               </h1>
-              <p className="mt-4 text-sm text-[#9A9298]">{t.onboardingWelcomeSubtitle}</p>
+              <p className="mt-4 max-w-[300px] text-sm leading-6 text-[#8D8B9F]">{t.onboardingWelcomeSubtitle}</p>
               <div className="mt-8 grid w-full grid-cols-2 gap-3">
                 {featureCards.map((card) => (
-                  <div key={card.label} className="rounded-2xl bg-[#1A1822] p-4 text-left">
+                  <div key={card.label} className="glass-card rounded-[24px] p-4 text-left">
                     <div className="text-xl">{card.icon}</div>
-                    <p className="mt-4 text-sm text-[#F0EBE3]">{card.label}</p>
+                    <p className="mt-4 text-sm leading-5 text-[#FDFBF7]">{card.label}</p>
                   </div>
                 ))}
               </div>
@@ -520,7 +527,6 @@ export default function OnboardingPage() {
                 type="button"
                 onClick={nextStep}
                 className={`${ctaClasses()} mt-10`}
-                style={sharedButtonStyle}
               >
                 {t.onboardingBeginJourney}
               </button>
@@ -528,8 +534,9 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 2 ? (
-            <section className="flex flex-1 flex-col pt-4">
-              <h2 className="font-heading text-[38px] leading-none text-[#F0EBE3]">
+            <section className="animate-fadeInUp flex flex-1 flex-col pt-4">
+              <p className="lumina-label">{language === 'ru' ? 'Тон вашего пространства' : 'Tone of your space'}</p>
+              <h2 className="mt-3 font-heading text-[38px] leading-none text-[#FDFBF7]">
                 {t.onboardingGenderTitle}
               </h2>
               <div className="mt-10 flex flex-col gap-3">
@@ -545,7 +552,7 @@ export default function OnboardingPage() {
                       setGender(option.value);
                       startTransition(() => setStep(3));
                     }}
-                    className="min-h-14 rounded-full border border-white/[0.06] bg-[#1A1822] px-5 text-left text-base text-[#9A9298] transition hover:text-[#F0EBE3]"
+                    className={`${cardClasses()} min-h-14 rounded-full px-5 py-4 text-base text-[#8D8B9F] hover:text-[#FDFBF7]`}
                   >
                     {option.label}
                   </button>
@@ -555,8 +562,9 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 3 ? (
-            <section className="flex flex-1 flex-col pt-4">
-              <h2 className="max-w-[280px] font-heading text-[38px] leading-none text-[#F0EBE3]">
+            <section className="animate-fadeInUp flex flex-1 flex-col pt-4">
+              <p className="lumina-label">{language === 'ru' ? 'Настрой намерение' : 'Set the intention'}</p>
+              <h2 className="mt-3 max-w-[280px] font-heading text-[38px] leading-none text-[#FDFBF7]">
                 {t.onboardingGoalsTitle}
               </h2>
               <div className="mt-8 space-y-3">
@@ -577,23 +585,23 @@ export default function OnboardingPage() {
                           return next;
                         })
                       }
-                      className="flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition"
+                      className={`${cardClasses(active)} flex items-start gap-4 rounded-[24px] p-4`}
                       style={{
-                        borderColor: active ? 'rgba(200,169,110,0.35)' : 'rgba(240,235,227,0.06)',
-                        backgroundColor: active ? 'rgba(200,169,110,0.08)' : '#1A1822',
+                        borderColor: active ? 'rgba(200,164,164,0.32)' : 'rgba(253,251,247,0.04)',
+                        backgroundColor: active ? 'rgba(200,164,164,0.08)' : undefined,
                       }}
                     >
                       <span className="pt-1 text-xl">{goal.icon}</span>
                       <span className="block">
-                        <span className="block text-sm text-[#F0EBE3]">{goal.title}</span>
-                        <span className="mt-1 block text-sm leading-5 text-[#9A9298]">{goal.description}</span>
+                        <span className="block text-sm text-[#FDFBF7]">{goal.title}</span>
+                        <span className="mt-1 block text-sm leading-5 text-[#8D8B9F]">{goal.description}</span>
                       </span>
                     </button>
                   );
                 })}
               </div>
               <div className="mt-auto pt-8">
-                <button type="button" onClick={nextStep} className={ctaClasses()} style={sharedButtonStyle}>
+                <button type="button" onClick={nextStep} className={ctaClasses()}>
                   {t.onboardingContinue}
                 </button>
               </div>
@@ -601,8 +609,9 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 4 ? (
-            <section className="flex flex-1 flex-col pt-4">
-              <h2 className="max-w-[280px] font-heading text-[38px] leading-none text-[#F0EBE3]">
+            <section className="animate-fadeInUp flex flex-1 flex-col pt-4">
+              <p className="lumina-label">{language === 'ru' ? 'Прислушайтесь к себе' : 'Listen inward'}</p>
+              <h2 className="mt-3 max-w-[280px] font-heading text-[38px] leading-none text-[#FDFBF7]">
                 {t.onboardingEnergyTitle}
               </h2>
               <div className="mt-10 flex flex-col gap-3">
@@ -616,11 +625,11 @@ export default function OnboardingPage() {
                         setSelectedEnergy(option.key);
                         startTransition(() => setStep(5));
                       }}
-                      className="flex min-h-14 w-full items-center gap-3 rounded-full border px-5 text-left text-base transition"
+                      className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 text-left text-base`}
                       style={{
-                        borderColor: active ? 'rgba(200,169,110,0.35)' : 'rgba(240,235,227,0.06)',
-                        backgroundColor: '#1A1822',
-                        color: active ? '#F0EBE3' : '#9A9298',
+                        borderColor: active ? 'rgba(200,164,164,0.32)' : 'rgba(253,251,247,0.04)',
+                        backgroundColor: active ? 'rgba(200,164,164,0.08)' : undefined,
+                        color: active ? '#FDFBF7' : '#8D8B9F',
                       }}
                     >
                       <span className="text-xl">{option.icon}</span>
@@ -633,35 +642,37 @@ export default function OnboardingPage() {
           ) : null}
 
           {[5, 6, 7].includes(step) ? (
-            <section className="flex flex-1 flex-col items-center justify-center text-center">
-              <h2 className="font-heading text-[36px] leading-none text-[#F0EBE3]">
+            <section className="animate-fadeInUp flex flex-1 flex-col items-center justify-center text-center">
+              <p className="lumina-label">{language === 'ru' ? 'Что раскрывается дальше' : 'What unfolds next'}</p>
+              <h2 className="mt-3 font-heading text-[36px] leading-none text-[#FDFBF7]">
                 {featureScreens[step - 5]?.title}
               </h2>
-              <p className="mt-3 text-sm text-[#9A9298]">{featureScreens[step - 5]?.subtitle}</p>
-              <div className="mx-auto mb-8 mt-8 flex h-[340px] w-[240px] items-center justify-center rounded-3xl bg-[#1A1822]">
+              <p className="mt-3 max-w-[300px] text-sm leading-6 text-[#8D8B9F]">{featureScreens[step - 5]?.subtitle}</p>
+              <div className="glass-card mx-auto mb-8 mt-8 flex h-[340px] w-[240px] items-center justify-center rounded-[32px]">
                 {featureScreens[step - 5]?.preview}
               </div>
-              <button type="button" onClick={nextStep} className={ctaClasses()} style={sharedButtonStyle}>
+              <button type="button" onClick={nextStep} className={ctaClasses()}>
                 {featureScreens[step - 5]?.cta}
               </button>
             </section>
           ) : null}
 
           {step === 8 ? (
-            <section className="flex flex-1 flex-col">
+            <section className="animate-fadeInUp flex flex-1 flex-col">
               <div className="pt-4">
-                <h2 className="font-heading text-[38px] leading-none text-[#F0EBE3]">{birthDateTitle}</h2>
+                <p className="lumina-label">{language === 'ru' ? 'Шаг 8 · Дата рождения' : 'Step 8 · Birth date'}</p>
+                <h2 className="mt-3 font-heading text-[38px] leading-none text-[#FDFBF7]">{birthDateTitle}</h2>
               </div>
               <div className="mt-10 grid grid-cols-3 gap-3">
                 <ScrollWheelPicker items={monthNames} selectedIndex={monthIndex} onChange={setMonthIndex} ariaLabel={t.month} />
                 <ScrollWheelPicker items={DAYS} selectedIndex={dayIndex} onChange={setDayIndex} ariaLabel={t.day} />
                 <ScrollWheelPicker items={YEARS.map(String)} selectedIndex={yearIndex} onChange={setYearIndex} ariaLabel={t.year} />
               </div>
-              <div className="mt-8 rounded-2xl bg-[#1A1822] p-4">
-                <p className="text-sm font-semibold text-[#F0EBE3]">{t.onboardingWhy}</p>
-                <p className="mt-2 text-sm leading-6 text-[#9A9298]">{t.onboardingBirthDateWhyAnswer}</p>
+              <div className="glass-card mt-8 rounded-[24px] p-4">
+                <p className="lumina-label">{t.onboardingWhy}</p>
+                <p className="mt-3 text-sm leading-6 text-[#8D8B9F]">{t.onboardingBirthDateWhyAnswer}</p>
               </div>
-              {errorMessage ? <p className="mt-4 text-sm text-[#C87B8A]">{errorMessage}</p> : null}
+              {errorMessage ? <p className="mt-4 text-sm text-[#C8A4A4]">{errorMessage}</p> : null}
               <div className="mt-auto pt-8">
                 <button
                   type="button"
@@ -675,7 +686,6 @@ export default function OnboardingPage() {
                     nextStep();
                   }}
                   className={ctaClasses()}
-                  style={sharedButtonStyle}
                 >
                   {t.onboardingContinue}
                 </button>
@@ -684,9 +694,10 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 9 ? (
-            <section className="flex flex-1 flex-col">
+            <section className="animate-fadeInUp flex flex-1 flex-col">
               <div className="pt-4">
-                <h2 className="font-heading text-[38px] leading-none text-[#F0EBE3]">
+                <p className="lumina-label">{language === 'ru' ? 'Шаг 9 · Время рождения' : 'Step 9 · Birth time'}</p>
+                <h2 className="mt-3 font-heading text-[38px] leading-none text-[#FDFBF7]">
                   {t.onboardingBirthTimeTitleShort}
                 </h2>
               </div>
@@ -710,11 +721,11 @@ export default function OnboardingPage() {
                       key={option.value}
                       type="button"
                       onClick={() => setTimeAccuracy(option.value)}
-                      className="min-h-11 rounded-full border px-3 text-xs transition"
+                      className="glass-card min-h-11 rounded-full px-3 text-xs transition"
                       style={{
-                        borderColor: active ? 'rgba(200,169,110,0.35)' : 'rgba(240,235,227,0.06)',
-                        backgroundColor: active ? 'rgba(200,169,110,0.12)' : '#1A1822',
-                        color: active ? '#F0EBE3' : '#9A9298',
+                        borderColor: active ? 'rgba(200,164,164,0.32)' : 'rgba(253,251,247,0.04)',
+                        backgroundColor: active ? 'rgba(200,164,164,0.1)' : undefined,
+                        color: active ? '#FDFBF7' : '#8D8B9F',
                       }}
                     >
                       {option.label}
@@ -722,9 +733,9 @@ export default function OnboardingPage() {
                   );
                 })}
               </div>
-              <p className="mt-4 text-sm text-[#9A9298]">{t.onboardingBirthTimeReassurance}</p>
+              <p className="mt-4 text-sm leading-6 text-[#8D8B9F]">{t.onboardingBirthTimeReassurance}</p>
               <div className="mt-auto pt-8">
-                <button type="button" onClick={nextStep} className={ctaClasses()} style={sharedButtonStyle}>
+                <button type="button" onClick={nextStep} className={ctaClasses()}>
                   {t.onboardingContinue}
                 </button>
               </div>
@@ -732,12 +743,13 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 10 ? (
-            <section className="flex flex-1 flex-col">
+            <section className="animate-fadeInUp flex flex-1 flex-col">
               <div className="pt-4">
-                <h2 className="font-heading text-[38px] leading-none text-[#F0EBE3]">{birthPlaceTitle}</h2>
+                <p className="lumina-label">{language === 'ru' ? 'Шаг 10 · Место рождения' : 'Step 10 · Birth place'}</p>
+                <h2 className="mt-3 font-heading text-[38px] leading-none text-[#FDFBF7]">{birthPlaceTitle}</h2>
               </div>
               <div className="relative mt-10">
-                <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#756D73]" size={18} />
+                <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8D8B9F]" size={18} />
                 <input
                   value={placeQuery}
                   onChange={(event) => {
@@ -745,20 +757,20 @@ export default function OnboardingPage() {
                     setSelectedPlace(null);
                   }}
                   placeholder={t.onboardingPlacePlaceholder}
-                  className="h-14 w-full rounded-2xl border border-white/[0.06] bg-[#1A1822] pl-12 pr-4 text-sm text-[#F0EBE3] outline-none placeholder:text-[#756D73]"
+                  className="lumina-input h-14 rounded-[24px] pl-12 pr-4"
                 />
               </div>
 
-              {searchingPlaces ? <p className="mt-3 text-sm text-[#756D73]">{language === 'ru' ? 'Ищем...' : 'Searching...'}</p> : null}
+              {searchingPlaces ? <p className="mt-3 text-sm text-[#8D8B9F]">{language === 'ru' ? 'Ищем место, где началась ваша история...' : 'Searching for the place where your story began...'}</p> : null}
 
               {placeResults.length ? (
-                <div className="mt-3 overflow-hidden rounded-2xl border border-white/[0.06] bg-[#1A1822]">
+                <div className="glass-card mt-3 overflow-hidden rounded-[24px]">
                   {placeResults.map((result) => (
                     <button
                       key={result.place_id}
                       type="button"
                       onClick={() => handleSelectPlace(result)}
-                      className="block w-full border-b border-white/[0.06] px-4 py-3 text-left text-sm text-[#F0EBE3] last:border-b-0"
+                      className="block w-full border-b border-white/[0.06] px-4 py-3 text-left text-sm text-[#FDFBF7] last:border-b-0"
                     >
                       {result.display_name}
                     </button>
@@ -767,13 +779,13 @@ export default function OnboardingPage() {
               ) : null}
 
               {selectedPlace ? (
-                <div className="mt-4 rounded-2xl bg-[#1A1822] p-4">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[#756D73]">{language === 'ru' ? 'Выбрано' : 'Selected'}</p>
-                  <p className="mt-2 text-sm leading-6 text-[#F0EBE3]">{selectedPlace.name}</p>
+                <div className="glass-card mt-4 rounded-[24px] p-4">
+                  <p className="lumina-label">{language === 'ru' ? 'Выбрано' : 'Selected'}</p>
+                  <p className="mt-2 text-sm leading-6 text-[#FDFBF7]">{selectedPlace.name}</p>
                 </div>
               ) : null}
 
-              {errorMessage ? <p className="mt-4 text-sm text-[#C87B8A]">{errorMessage}</p> : null}
+              {errorMessage ? <p className="mt-4 text-sm text-[#C8A4A4]">{errorMessage}</p> : null}
 
               <div className="mt-auto pt-8">
                 <button
@@ -781,7 +793,6 @@ export default function OnboardingPage() {
                   disabled={!selectedPlace || submitting}
                   onClick={persistProfile}
                   className={ctaClasses(!selectedPlace || submitting)}
-                  style={sharedButtonStyle}
                 >
                   {t.onboardingContinue}
                 </button>
@@ -790,23 +801,24 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 11 ? (
-            <section className="flex flex-1 flex-col justify-center">
-              <div className="rounded-[16px] bg-[#1A1822] p-5">
-                <h2 className="font-heading text-[38px] leading-none text-[#F0EBE3]">{t.onboardingAnalyzingTitle}</h2>
-                <p className="mt-3 text-sm text-[#9A9298]">{t.onboardingAnalyzingSubtitle}</p>
+            <section className="animate-fadeInUp flex flex-1 flex-col justify-center">
+              <div className="glass-card rounded-[28px] p-5">
+                <p className="lumina-label">{language === 'ru' ? 'Идет настройка карты' : 'Calibrating your chart'}</p>
+                <h2 className="mt-3 font-heading text-[38px] leading-none text-[#FDFBF7]">{t.onboardingAnalyzingTitle}</h2>
+                <p className="mt-3 text-sm leading-6 text-[#8D8B9F]">{t.onboardingAnalyzingSubtitle}</p>
                 <div className="mt-8 space-y-5">
                   {analyzingItems.map((item, index) => (
                     <div key={item}>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-[#F0EBE3]">{item}</span>
-                        <span className="text-[#C8A96E]">{analysisProgress[index] ?? 0}%</span>
+                        <span className="text-[#FDFBF7]">{item}</span>
+                        <span className="text-[#C8A4A4]">{analysisProgress[index] ?? 0}%</span>
                       </div>
                       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#23202E]">
                         <div
                           className="h-full rounded-full transition-[width] duration-200"
                           style={{
                             width: `${analysisProgress[index] ?? 0}%`,
-                            backgroundImage: 'linear-gradient(135deg, #C8A96E, #E8D5B5)',
+                            backgroundImage: 'linear-gradient(135deg, rgba(200,164,164,0.95), rgba(192,189,214,0.92))',
                           }}
                         />
                       </div>
@@ -815,7 +827,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-white/[0.06] bg-[#14111B] px-5 py-4">
+              <div className="glass-card mt-6 rounded-[24px] px-5 py-4">
                 <p
                   className={`text-sm leading-6 text-[#B7AEB4] transition-opacity duration-300 ${
                     factVisible ? 'opacity-100' : 'opacity-0'
@@ -828,10 +840,10 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 12 ? (
-            <section className="flex flex-1 flex-col justify-center">
+            <section className="animate-fadeInUp flex flex-1 flex-col justify-center">
               <div className="text-center">
-                <span className="text-lg text-[#C8A96E]">✦</span>
-                <h2 className="mt-3 font-heading text-[36px] leading-none text-[#C8A96E]">
+                <p className="lumina-label">{language === 'ru' ? 'Ваши три светила' : 'Your three lights'}</p>
+                <h2 className="mt-3 font-heading text-[36px] leading-none text-[#FDFBF7]">
                   {t.onboardingBigThreeTitle}
                 </h2>
               </div>
@@ -841,21 +853,21 @@ export default function OnboardingPage() {
                   return (
                     <div
                       key={card.label}
-                      className={`rounded-2xl bg-[#1A1822] p-5 transition-all duration-500 ${
+                      className={`glass-card rounded-[24px] p-5 transition-all duration-500 ${
                         bigThreeVisible[index] ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                       }`}
                     >
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[#756D73]">{card.label}</p>
-                      <p className="mt-1 font-heading text-[28px] text-[#F0EBE3]">
+                      <p className="lumina-label">{card.label}</p>
+                      <p className="mt-1 font-heading text-[28px] text-[#FDFBF7]">
                         {translateSign(card.sign, language)}
                       </p>
-                      <p className="mt-1 text-sm text-[#9A9298]">{description}</p>
+                      <p className="mt-1 text-sm leading-6 text-[#8D8B9F]">{description}</p>
                     </div>
                   );
                 })}
               </div>
               <div className="mt-8">
-                <button type="button" onClick={() => router.push('/')} className={ctaClasses()} style={sharedButtonStyle}>
+                <button type="button" onClick={() => router.push('/')} className={ctaClasses()}>
                   {t.onboardingBigThreeCta}
                 </button>
               </div>

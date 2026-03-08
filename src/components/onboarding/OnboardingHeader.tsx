@@ -17,13 +17,13 @@ export default function OnboardingHeader({
   showLanguageToggle = false,
 }: OnboardingHeaderProps) {
   return (
-    <header className="flex items-center justify-between gap-4 px-5 pb-8 pt-5 sm:px-8">
+    <header className="flex items-center justify-between gap-4 px-6 pb-8 pt-6">
       <div className="flex min-w-[40px] justify-start">
         {onBack ? (
           <button
             type="button"
             onClick={onBack}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.06] bg-[#1A1822] text-[#F0EBE3]"
+            className="profile-btn"
             aria-label="Go back"
           >
             <ArrowLeft size={18} />
@@ -31,18 +31,26 @@ export default function OnboardingHeader({
         ) : null}
       </div>
 
-      <div className="flex items-center gap-2">
-        {Array.from({ length: totalSteps }, (_, index) => {
-          const step = index + 1;
-          const active = step === currentStep;
-          return (
-            <span
-              key={step}
-              className="h-2 w-2 rounded-full transition-colors"
-              style={{ backgroundColor: active ? '#C8A96E' : '#3A343E' }}
-            />
-          );
-        })}
+      <div className="flex flex-col items-center gap-3 text-center">
+        <p className="font-body text-[11px] font-medium uppercase tracking-[2px] text-[#C8A4A4]">
+          {currentStep} / {totalSteps}
+        </p>
+        <div className="flex items-center gap-2">
+          {Array.from({ length: totalSteps }, (_, index) => {
+            const step = index + 1;
+            const active = step === currentStep;
+            return (
+              <span
+                key={step}
+                className="h-2 w-2 rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: active ? '#C8A4A4' : 'rgba(192, 189, 214, 0.22)',
+                  transform: active ? 'scale(1.15)' : 'scale(1)',
+                }}
+              />
+            );
+          })}
+        </div>
       </div>
 
       <div className="flex min-w-[40px] justify-end">

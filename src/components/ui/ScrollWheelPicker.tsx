@@ -9,7 +9,7 @@ type ScrollWheelPickerProps = {
   ariaLabel?: string;
 };
 
-const ITEM_HEIGHT = 44;
+const ITEM_HEIGHT = 52;
 const VISIBLE_ITEMS = 5;
 const SIDE_PADDING = ((VISIBLE_ITEMS - 1) / 2) * ITEM_HEIGHT;
 
@@ -69,18 +69,19 @@ export default function ScrollWheelPicker({
   };
 
   return (
-    <div className="relative w-full">
+    <div className="lumina-picker relative w-full">
       <div
         className="pointer-events-none absolute inset-x-0 z-10"
         style={{ top: SIDE_PADDING, height: ITEM_HEIGHT }}
       >
-        <div className="absolute inset-x-0 top-0 h-px" style={{ backgroundColor: 'rgba(200,169,110,0.2)' }} />
-        <div className="absolute inset-x-0 bottom-0 h-px" style={{ backgroundColor: 'rgba(200,169,110,0.2)' }} />
+        <div className="lumina-picker-window absolute inset-0" />
+        <div className="lumina-picker-line absolute top-0" />
+        <div className="lumina-picker-line absolute bottom-0" />
       </div>
       <div
         ref={containerRef}
         aria-label={ariaLabel}
-        className="scrollbar-none overflow-y-auto overscroll-contain [-ms-overflow-style:none] [mask-image:linear-gradient(180deg,transparent_0%,black_18%,black_82%,transparent_100%)] [scrollbar-width:none]"
+        className="scrollbar-none overflow-y-auto overscroll-contain [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{
           height: ITEM_HEIGHT * VISIBLE_ITEMS,
           paddingTop: SIDE_PADDING,
@@ -96,13 +97,13 @@ export default function ScrollWheelPicker({
           const distance = Math.abs(index - boundedIndex);
           const scale = distance === 0 ? 1 : distance === 1 ? 0.92 : 0.84;
           const opacity = distance === 0 ? 1 : distance === 1 ? 0.78 : 0.52;
-          const color = distance === 0 ? '#F0EBE3' : distance === 1 ? '#9A9298' : '#756D73';
+          const color = distance === 0 ? '#FDFBF7' : distance === 1 ? '#C0BDD6' : '#8D8B9F';
 
           return (
             <button
               key={`${item}-${index}`}
               type="button"
-              className="flex w-full items-center justify-center bg-transparent px-2 text-center font-sans transition-transform duration-150"
+              className="flex w-full items-center justify-center bg-transparent px-3 text-center font-body transition-transform duration-200"
               style={{
                 height: ITEM_HEIGHT,
                 scrollSnapAlign: 'center',
@@ -110,8 +111,9 @@ export default function ScrollWheelPicker({
                 color,
                 opacity,
                 transform: `scale(${scale})`,
-                fontSize: distance === 0 ? 18 : 16,
+                fontSize: distance === 0 ? 19 : 16,
                 fontWeight: distance === 0 ? 500 : 400,
+                letterSpacing: distance === 0 ? '0.01em' : '0',
               }}
               onClick={() => onChange(index)}
             >

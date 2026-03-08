@@ -17,18 +17,18 @@ export default function AnalyzingSteps({ items, completedCount }: AnalyzingSteps
         return (
           <div
             key={item}
-            className="flex items-center justify-between rounded-2xl bg-[#1A1822] px-4 py-4 transition-opacity duration-300"
+            className="glass-card flex items-center justify-between rounded-[24px] px-4 py-4 transition-opacity duration-300"
             style={{ opacity: completed || active ? 1 : 0.5 }}
           >
-            <span className="text-sm text-[#F0EBE3]">{item}</span>
+            <span className="text-sm text-[#FDFBF7]">{item}</span>
             <span
               className="flex h-6 w-6 items-center justify-center rounded-full border"
               style={{
-                borderColor: completed ? 'rgba(200,169,110,0.4)' : 'rgba(240,235,227,0.08)',
-                backgroundColor: completed ? 'rgba(200,169,110,0.14)' : 'transparent',
+                borderColor: completed ? 'rgba(200,164,164,0.38)' : 'rgba(253,251,247,0.08)',
+                backgroundColor: completed ? 'rgba(200,164,164,0.14)' : 'transparent',
               }}
             >
-              {completed ? <Check size={14} color="#C8A96E" /> : null}
+              {completed ? <Check size={14} color="#C8A4A4" /> : null}
             </span>
           </div>
         );

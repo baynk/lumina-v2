@@ -3,14 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --lumina-bg: #080c1f;
-  --lumina-bg-alt: #0f1433;
-  --lumina-accent: #c4b5fd;
-  --lumina-accent-bright: #a78bfa;
-  --lumina-accent-muted: #8b7dcf;
-  --lumina-soft: #e8e0f6;
-  --lumina-text: #f5f0eb;
-  --lumina-muted: #c8bfb6;
+  --bg-primary: #0e0d14;
+  --bg-secondary: #1a1822;
+  --bg-tertiary: #23202e;
+  --surface-elevated: #2d2838;
+  --accent-gold: #c8a96e;
+  --accent-gold-light: #e8d5b5;
+  --accent-purple: #9b7ec8;
+  --accent-amber: #d4922a;
+  --accent-rose: #c87b8a;
+  --accent-teal: #5ebaa8;
+  --text-primary: #f0ebe3;
+  --text-secondary: #9a9298;
+  --text-tertiary: #756d73;
+  --text-muted: #4a4260;
+  --lumina-bg: var(--bg-primary);
+  --lumina-bg-alt: var(--bg-secondary);
+  --lumina-accent: var(--accent-gold);
+  --lumina-accent-bright: var(--accent-gold-light);
+  --lumina-accent-muted: var(--accent-purple);
+  --lumina-soft: var(--text-primary);
+  --lumina-text: var(--text-primary);
+  --lumina-muted: var(--text-secondary);
 }
 
 * {
@@ -24,9 +38,12 @@ html {
 body {
   margin: 0;
   overflow-x: hidden;
-  background: radial-gradient(circle at 30% -10%, rgba(139, 125, 207, 0.09), transparent 50%),
-    radial-gradient(circle at 90% 15%, rgba(167, 139, 250, 0.08), transparent 45%),
-    linear-gradient(180deg, var(--lumina-bg) 0%, var(--lumina-bg-alt) 100%);
+  background-color: #0e0d14;
+  background-image:
+    radial-gradient(circle at 24% -8%, rgba(200, 123, 138, 0.1), transparent 46%),
+    radial-gradient(circle at 82% 10%, rgba(212, 146, 42, 0.11), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(94, 186, 168, 0.06), transparent 40%),
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 52%, var(--bg-tertiary) 100%);
   color: var(--lumina-text);
 }
 
@@ -42,11 +59,11 @@ textarea {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: radial-gradient(2px 2px at 10% 20%, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1px 1px at 30% 80%, rgba(255, 255, 255, 0.45), transparent),
-    radial-gradient(2px 2px at 60% 35%, rgba(255, 255, 255, 0.28), transparent),
-    radial-gradient(1px 1px at 75% 60%, rgba(255, 255, 255, 0.38), transparent),
-    radial-gradient(2px 2px at 90% 10%, rgba(255, 255, 255, 0.2), transparent);
+  background-image: radial-gradient(2px 2px at 10% 20%, rgba(232, 213, 181, 0.4), transparent),
+    radial-gradient(1px 1px at 30% 80%, rgba(200, 169, 110, 0.45), transparent),
+    radial-gradient(2px 2px at 60% 35%, rgba(240, 235, 227, 0.22), transparent),
+    radial-gradient(1px 1px at 75% 60%, rgba(155, 126, 200, 0.32), transparent),
+    radial-gradient(2px 2px at 90% 10%, rgba(94, 186, 168, 0.22), transparent);
   animation: driftStars 20s linear infinite;
 }
 
@@ -55,11 +72,11 @@ textarea {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(1px 1px at 15% 45%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 45% 15%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 80% 70%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 55% 90%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 25% 65%, rgba(255, 255, 255, 0.35), transparent);
+  background-image: radial-gradient(1px 1px at 15% 45%, rgba(232, 213, 181, 0.46), transparent),
+    radial-gradient(1px 1px at 45% 15%, rgba(200, 123, 138, 0.32), transparent),
+    radial-gradient(1px 1px at 80% 70%, rgba(240, 235, 227, 0.26), transparent),
+    radial-gradient(1px 1px at 55% 90%, rgba(212, 146, 42, 0.34), transparent),
+    radial-gradient(1px 1px at 25% 65%, rgba(94, 186, 168, 0.24), transparent);
   animation: twinkle 4s ease-in-out infinite alternate;
 }
 
@@ -68,8 +85,9 @@ textarea {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background: radial-gradient(circle at 70% 30%, rgba(26, 16, 64, 0.55), transparent 55%),
-    radial-gradient(circle at 15% 70%, rgba(167, 139, 250, 0.08), transparent 45%);
+  background: radial-gradient(circle at 72% 28%, rgba(45, 40, 56, 0.72), transparent 54%),
+    radial-gradient(circle at 20% 72%, rgba(155, 126, 200, 0.08), transparent 44%),
+    radial-gradient(circle at 88% 82%, rgba(200, 169, 110, 0.06), transparent 30%);
 }
 
 @keyframes driftStars {
@@ -87,15 +105,15 @@ textarea {
 .glass-card {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  background: rgba(139, 125, 207, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(45, 40, 56, 0.44);
+  border: 1px solid rgba(232, 213, 181, 0.1);
   border-radius: 1rem;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(167, 139, 250, 0.18);
-  box-shadow: 0 0 20px rgba(167, 139, 250, 0.06), 0 0 40px rgba(167, 139, 250, 0.03);
+  border-color: rgba(200, 169, 110, 0.24);
+  box-shadow: 0 0 20px rgba(200, 169, 110, 0.08), 0 0 40px rgba(155, 126, 200, 0.05);
 }
 
 .lumina-label {
@@ -109,8 +127,8 @@ textarea {
   width: 100%;
   min-height: 48px;
   border-radius: 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(8, 12, 31, 0.55);
+  border: 1px solid rgba(232, 213, 181, 0.14);
+  background: rgba(26, 24, 34, 0.74);
   color: var(--lumina-text);
   padding: 0.75rem 0.95rem;
   outline: none;
@@ -118,13 +136,13 @@ textarea {
 }
 
 .lumina-input:focus {
-  border-color: rgba(167, 139, 250, 0.7);
-  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.18), 0 0 24px rgba(167, 139, 250, 0.12);
-  background: rgba(8, 12, 31, 0.75);
+  border-color: rgba(200, 169, 110, 0.72);
+  box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.16), 0 0 24px rgba(155, 126, 200, 0.12);
+  background: rgba(35, 32, 46, 0.9);
 }
 
 .lumina-input::placeholder {
-  color: rgba(200, 191, 182, 0.6);
+  color: rgba(154, 146, 152, 0.6);
 }
 
 .lumina-button {
@@ -133,15 +151,15 @@ textarea {
   padding: 0.75rem 1.25rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: #ffffff;
-  background-image: linear-gradient(120deg, var(--lumina-accent-bright), var(--lumina-accent));
-  box-shadow: 0 12px 34px rgba(167, 139, 250, 0.28);
+  color: #0e0d14;
+  background-image: linear-gradient(120deg, var(--accent-gold-light), var(--accent-gold), var(--accent-amber));
+  box-shadow: 0 12px 34px rgba(200, 169, 110, 0.28);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .lumina-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 0 25px rgba(167, 139, 250, 0.4), 0 15px 40px rgba(167, 139, 250, 0.3);
+  box-shadow: 0 0 25px rgba(200, 169, 110, 0.28), 0 15px 40px rgba(212, 146, 42, 0.24);
 }
 
 .lumina-button:disabled {
@@ -151,32 +169,32 @@ textarea {
 
 .lumina-card {
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(232, 213, 181, 0.08);
+  background: rgba(45, 40, 56, 0.42);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .lumina-card:hover {
-  border-color: rgba(196, 181, 253, 0.35);
-  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(200, 169, 110, 0.3);
+  background: rgba(45, 40, 56, 0.52);
 }
 
 .lumina-section-title {
   font-size: 0.72rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(200, 191, 182, 0.4);
+  color: rgba(117, 109, 115, 0.7);
 }
 
 .skeleton {
   border-radius: 0.8rem;
   background: linear-gradient(
     90deg,
-    rgba(139, 125, 207, 0.06) 25%,
-    rgba(139, 125, 207, 0.12) 37%,
-    rgba(139, 125, 207, 0.06) 63%
+    rgba(45, 40, 56, 0.45) 25%,
+    rgba(200, 169, 110, 0.12) 37%,
+    rgba(45, 40, 56, 0.45) 63%
   );
   background-size: 400% 100%;
   animation: shimmer 1.8s ease infinite;
@@ -196,8 +214,8 @@ textarea {
   height: 110px;
   width: 110px;
   border-radius: 9999px;
-  background: radial-gradient(circle at 30% 30%, #f0eaff, #e8e0f6);
-  box-shadow: 0 0 26px rgba(196, 181, 253, 0.26);
+  background: radial-gradient(circle at 30% 30%, #f4ede3, #e8d5b5);
+  box-shadow: 0 0 26px rgba(200, 169, 110, 0.22);
 }
 
 .lumina-moon-shadow {
@@ -205,7 +223,7 @@ textarea {
   height: 110px;
   width: 110px;
   border-radius: 9999px;
-  background: linear-gradient(180deg, #080c1f, #0f1433);
+  background: linear-gradient(180deg, #0e0d14, #1a1822);
   transition: transform 0.35s ease;
 }
 

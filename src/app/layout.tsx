@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Serif_Display, Playfair_Display, Inter } from 'next/font/google';
+import { Cormorant_Garamond, Playfair_Display, Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
@@ -12,9 +12,9 @@ import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com';
 
-const dmSerif = DM_Serif_Display({
-  subsets: ['latin', 'latin-ext'],
-  weight: '400',
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
+  weight: ['400', '500', '600'],
   variable: '--font-heading',
   display: 'swap',
 });
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#080c1f',
+  themeColor: '#0E0D14',
 };
 
 export default function RootLayout({
@@ -114,10 +114,10 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${dmSerif.variable} ${playfair.variable} ${inter.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${playfair.variable} ${inter.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#080C1F" />
+        <meta name="theme-color" content="#0E0D14" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
@@ -127,7 +127,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationSchema) }}
         />
       </head>
-      <body className="min-h-screen bg-midnight text-warmWhite font-body antialiased">
+      <body className="min-h-screen bg-bg-primary text-text-primary font-body antialiased">
         <ServiceWorkerRegistrar />
         <Analytics />
         <SpeedInsights />

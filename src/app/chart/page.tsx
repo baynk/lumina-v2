@@ -93,7 +93,7 @@ function DailyTip({ sunSign, moonSign, language }: { sunSign: string; moonSign: 
   return (
     <section className="glass-card p-5 sm:p-6 animate-stagger-4">
       <p className="lumina-label mb-3">{t}</p>
-      <p className="text-sm leading-relaxed text-cream">{language === 'ru' ? tip.ru : tip.en}</p>
+      <p className="text-sm leading-relaxed text-[#8D8B9F]">{language === 'ru' ? tip.ru : tip.en}</p>
     </section>
   );
 }
@@ -283,10 +283,12 @@ export default function ChartPage() {
 
   if (loadingChart) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-6">
+      <div className="lumina-screen flex min-h-screen items-center justify-center px-6">
+        <div className="aura left-[-20%] top-[10%] h-[260px] w-[260px] bg-[#5A438A]/35" />
+        <div className="aura bottom-[-10%] right-[-12%] h-[280px] w-[280px] bg-[#18244D]/35" />
         <div className="text-center">
-          <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
-          <p className="mt-3 text-cream">{t.loadingChart}</p>
+          <p className="font-heading text-3xl text-[#FDFBF7]">Lumina</p>
+          <p className="mt-3 text-[#8D8B9F]">{t.loadingChart}</p>
         </div>
       </div>
     );
@@ -317,22 +319,27 @@ export default function ChartPage() {
     };
 
     return (
-      <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-6 sm:px-6">
+      <div className="lumina-screen">
+        <div className="aura left-[-24%] top-[8%] h-[250px] w-[250px] bg-[#5A438A]/35" />
+        <div className="aura right-[-20%] top-[28%] h-[270px] w-[270px] bg-[#18244D]/35" />
+        <div className="aura bottom-[-12%] left-[18%] h-[240px] w-[240px] bg-[#2E1B54]/35" />
+        <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-6 sm:px-6">
         <header className="animate-fadeInUp text-center mb-6">
-          <p className="font-heading text-3xl text-lumina-soft">✦</p>
-          <h2 className="mt-3 font-heading text-2xl text-cream/90">
-            {language === 'ru' ? 'Ваша карта ждёт' : 'Your chart awaits'}
+          <p className="lumina-label">{language === 'ru' ? 'Натальная карта' : 'Natal chart'}</p>
+          <h2 className="mt-3 font-heading text-2xl text-[#FDFBF7]">
+            {language === 'ru' ? 'Ваша карта уже дышит в небе' : 'Your chart is already breathing in the sky'}
           </h2>
-          <p className="mt-2 text-sm text-cream/50">
+          <p className="mt-2 text-sm text-[#8D8B9F]">
             {language === 'ru'
-              ? 'Введите данные рождения, чтобы увидеть вашу натальную карту'
-              : 'Enter your birth details to see your natal chart'}
+              ? 'Введите данные рождения, и Lumina раскроет ваш личный небесный ритм.'
+              : 'Enter your birth details and Lumina will reveal your personal sky pattern.'}
           </p>
         </header>
         <BirthDataForm
           onComplete={handleTeaserSubmit}
           submitLabel={language === 'ru' ? 'Показать мою карту' : 'Show my chart'}
         />
+      </div>
       </div>
     );
   }
@@ -344,11 +351,15 @@ export default function ChartPage() {
     const nameLabel = teaserData.name || (language === 'ru' ? 'друг' : 'friend');
 
     return (
-      <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-6 sm:px-6">
+      <div className="lumina-screen">
+        <div className="aura left-[-22%] top-[10%] h-[250px] w-[250px] bg-[#5A438A]/35" />
+        <div className="aura right-[-20%] top-[30%] h-[270px] w-[270px] bg-[#18244D]/35" />
+        <div className="aura bottom-[-10%] left-[16%] h-[230px] w-[230px] bg-[#2E1B54]/35" />
+        <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-6 sm:px-6">
         {/* Teaser: visible key insights */}
         <header className="animate-fadeInUp text-center">
           {sunPlanet && <ZodiacImage sign={sunPlanet.sign} size={80} className="mx-auto opacity-90" />}
-          <h1 className="mt-4 font-heading text-3xl text-lumina-soft">
+          <h1 className="mt-4 font-heading text-3xl text-[#FDFBF7]">
             {language === 'ru' ? `${nameLabel}, вы — ${translateSign(sunPlanet?.sign || 'Aries', language)}` : `${nameLabel}, you are a ${sunPlanet?.sign || 'Aries'}`}
           </h1>
         </header>
@@ -358,8 +369,8 @@ export default function ChartPage() {
             <div className="glass-card p-4 text-center">
               <p className="lumina-label">{language === 'ru' ? 'Луна' : 'Moon'}</p>
               <ZodiacImage sign={moonPlanet.sign} size={32} className="mx-auto mt-2 opacity-80" />
-              <p className="mt-2 text-sm font-medium text-cream">{translateSign(moonPlanet.sign, language)}</p>
-              <p className="mt-1 text-[11px] text-cream/50">
+              <p className="mt-2 font-heading text-lg text-[#FDFBF7]">{translateSign(moonPlanet.sign, language)}</p>
+              <p className="mt-1 text-[11px] text-[#8D8B9F]">
                 {language === 'ru' ? 'Ваши эмоции и интуиция' : 'Your emotions & intuition'}
               </p>
             </div>
@@ -368,8 +379,8 @@ export default function ChartPage() {
             <div className="glass-card p-4 text-center">
               <p className="lumina-label">{language === 'ru' ? 'Восходящий' : 'Rising'}</p>
               <ZodiacImage sign={risingSign.sign} size={32} className="mx-auto mt-2 opacity-80" />
-              <p className="mt-2 text-sm font-medium text-cream">{translateSign(risingSign.sign, language)}</p>
-              <p className="mt-1 text-[11px] text-cream/50">
+              <p className="mt-2 font-heading text-lg text-[#FDFBF7]">{translateSign(risingSign.sign, language)}</p>
+              <p className="mt-1 text-[11px] text-[#8D8B9F]">
                 {language === 'ru' ? 'Как вас видят другие' : 'How others see you'}
               </p>
             </div>
@@ -382,13 +393,13 @@ export default function ChartPage() {
             <div className="space-y-4">
               <div className="glass-card p-5">
                 <p className="lumina-label mb-3">{language === 'ru' ? 'Ваш ежедневный гороскоп' : 'Your daily horoscope'}</p>
-                <p className="text-sm text-cream/80">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
+                <p className="text-sm text-[#8D8B9F]">The rest of your sky is already taking shape. A little further in, the full story begins to speak.</p>
               </div>
               <div className="glass-card p-5">
                 <p className="lumina-label mb-3">{language === 'ru' ? 'Позиции планет' : 'Planetary positions'}</p>
                 <div className="space-y-2">
                   {['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'].map((p) => (
-                    <div key={p} className="flex justify-between text-sm text-cream/70">
+                    <div key={p} className="flex justify-between text-sm text-[#8D8B9F]">
                       <span>{p}</span><span>Aquarius 15°42&apos;</span>
                     </div>
                   ))}
@@ -398,7 +409,7 @@ export default function ChartPage() {
                 <p className="lumina-label mb-3">{language === 'ru' ? 'Аспекты сегодня' : 'Today&apos;s aspects'}</p>
                 <div className="space-y-2">
                   {['Sun Conjunction Mars', 'Moon Trine Jupiter', 'Venus Square Saturn'].map((a) => (
-                    <p key={a} className="text-sm text-cream/70">{a}</p>
+                    <p key={a} className="text-sm text-[#8D8B9F]">{a}</p>
                   ))}
                 </div>
               </div>
@@ -406,14 +417,15 @@ export default function ChartPage() {
           </BlurGate>
         </div>
       </div>
+      </div>
     );
   }
 
   if (error || !natalChart || !dailyData) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-6">
+      <div className="lumina-screen flex min-h-screen items-center justify-center px-6">
         <div className="glass-card max-w-md p-6 text-center">
-          <p className="text-cream">{error || t.noBirthData}</p>
+          <p className="text-[#8D8B9F]">{error || t.noBirthData}</p>
           <button className="lumina-button mt-5 w-full" onClick={() => router.push('/')}>
             {t.backToHome}
           </button>
@@ -423,20 +435,23 @@ export default function ChartPage() {
   }
 
   return (
-    <>
+    <div className="lumina-screen">
+      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/35" />
+      <div className="aura right-[-24%] top-[22%] h-[300px] w-[300px] bg-[#18244D]/32" />
+      <div className="aura bottom-[-14%] left-[18%] h-[280px] w-[280px] bg-[#2E1B54]/34" />
       <div className="mx-auto max-w-6xl px-4 pb-10 pt-0 sm:px-6">
         {/* Header */}
         <header className="mb-6 flex items-center justify-between">
-          <button onClick={() => router.push('/')} className="min-h-11 rounded-full px-4 text-sm text-cream hover:text-warmWhite">
+          <button onClick={() => router.push('/')} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
             ← {t.back}
           </button>
-          <p className="font-heading text-xl text-lumina-soft">Lumina</p>
+          <p className="font-heading text-xl text-[#FDFBF7]">Lumina</p>
           <div className="w-16" />
         </header>
 
         {/* Tabs */}
         <div className="mb-6 flex justify-center">
-          <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-1 backdrop-blur overflow-x-auto">
+          <div className="inline-flex overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1 backdrop-blur">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -444,8 +459,8 @@ export default function ChartPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`relative min-h-11 rounded-full px-4 text-sm transition sm:px-5 whitespace-nowrap ${
                   activeTab === tab.key
-                    ? 'bg-gradient-to-r from-lumina-accent-bright to-lumina-accent font-semibold text-white'
-                    : 'text-cream hover:text-warmWhite'
+                    ? 'bg-[rgba(253,251,247,0.9)] font-medium text-[#0B0814]'
+                    : 'text-[#8D8B9F] hover:text-[#FDFBF7]'
                 }`}
               >
                 {tab.label}
@@ -460,8 +475,8 @@ export default function ChartPage() {
           {activeTab === 'today' && (
             <>
               <section className="mb-6 text-center animate-stagger-1">
-                <p className="text-sm text-cream/60 capitalize">{todayFormatted}</p>
-                {profile?.name && <p className="mt-1 text-warmWhite">{profile.name}</p>}
+                <p className="text-sm capitalize text-[#8D8B9F]">{todayFormatted}</p>
+                {profile?.name && <p className="mt-1 text-[#FDFBF7]">{profile.name}</p>}
               </section>
 
               {/* Today's Energy / Horoscope */}
@@ -475,7 +490,7 @@ export default function ChartPage() {
                     <div className="skeleton h-4 w-9/12" />
                   </div>
                 ) : (
-                  <p className="leading-relaxed text-warmWhite">{horoscope || t.horoscopeFallback}</p>
+                  <p className="leading-relaxed text-[#FDFBF7]">{horoscope || t.horoscopeFallback}</p>
                 )}
               </section>
 
@@ -486,14 +501,14 @@ export default function ChartPage() {
                   <div className="animate-float">
                     <MoonPhaseVisual illumination={dailyData.moon.illumination} phase={dailyData.moon.phase} />
                   </div>
-                  <p className="flex items-center gap-2 text-lg text-lumina-soft">
+                  <p className="flex items-center gap-2 font-heading text-2xl text-[#FDFBF7]">
                     <span>{translateMoonPhase(dailyData.moon.phase, language)}</span>
                     <ZodiacSvg sign={dailyData.moon.sign} />
                   </p>
-                  <p className="text-sm text-cream">{translateSign(dailyData.moon.sign, language)}</p>
-                  <p className="text-sm text-cream">{t.illumination}: {dailyData.moon.illumination}%</p>
+                  <p className="badge">{translateSign(dailyData.moon.sign, language)}</p>
+                  <p className="text-sm text-[#8D8B9F]">{t.illumination}: {dailyData.moon.illumination}%</p>
                   <div className="mt-1 h-1.5 w-full rounded-full bg-white/10">
-                    <div className="h-full rounded-full bg-lumina-accent" style={{ width: `${dailyData.moon.illumination}%` }} aria-hidden="true" />
+                    <div className="h-full rounded-full bg-[linear-gradient(90deg,#C8A4A4,#C0BDD6)]" style={{ width: `${dailyData.moon.illumination}%` }} aria-hidden="true" />
                   </div>
                 </div>
               </section>
@@ -503,12 +518,12 @@ export default function ChartPage() {
                 <p className="lumina-label mb-3">{t.todaysAspects}</p>
                 <div className="space-y-3">
                   {dailyData.aspects.map((aspect, idx) => (
-                    <div key={`${aspect.aspect}-${idx}`} className="rounded-xl bg-white/5 p-3">
-                      <p className="flex items-center gap-2 text-sm font-semibold text-lumina-soft">
+                    <div key={`${aspect.aspect}-${idx}`} className="rounded-[22px] border border-white/[0.06] bg-white/[0.03] p-3">
+                      <p className="flex items-center gap-2 text-sm font-medium text-[#FDFBF7]">
                         <AspectSvg type={aspect.type} />
                         <span>{translateAspectType(aspect.type, language)}</span>
                       </p>
-                      <p className="mt-1 text-sm text-warmWhite">{formatAspectDescription(aspect, language, dailyPlanetSigns)}</p>
+                      <p className="mt-1 text-sm text-[#8D8B9F]">{formatAspectDescription(aspect, language, dailyPlanetSigns)}</p>
                     </div>
                   ))}
                 </div>
@@ -518,7 +533,7 @@ export default function ChartPage() {
               <div className="mb-6 text-center animate-stagger-4">
                 <a
                   href="/consultation"
-                  className="text-sm text-cream/60 hover:text-lumina-accent transition"
+                  className="text-sm text-[#8D8B9F] transition hover:text-[#C0BDD6]"
                 >
                   {t.ctaDecoded}
                 </a>
@@ -533,36 +548,39 @@ export default function ChartPage() {
           {activeTab === 'summary' && (
             <>
               <section className="glass-card mb-6 p-5 sm:p-6 animate-stagger-1">
-                <p className="mb-6 text-center text-sm text-cream/70">
+                <p className="mb-6 text-center text-sm text-[#8D8B9F]">
                   {language === 'en'
                     ? `You are a ${translateSign(natalChart.zodiacSign, language)} with a ${translateSign(moonSign || '', language)} heart and a ${translateSign(natalChart.risingSign, language)} face to the world.`
                     : `Ты — ${translateSign(natalChart.zodiacSign, language)} с сердцем ${translateSignGenitive(moonSign || '')} и лицом ${translateSignGenitive(natalChart.risingSign)} для мира.`}
                 </p>
                 <p className="lumina-label mb-4 text-center">{t.bigThree}</p>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="rounded-xl bg-white/5 p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-cream mb-3">{t.sun}</p>
+                    <div className="rounded-[22px] border border-white/[0.06] bg-white/[0.03] p-4 text-center">
+                    <p className="lumina-label mb-3">{t.sun}</p>
                     <div className="flex justify-center mb-2">
                       <ZodiacSvg sign={natalChart.zodiacSign} size={72} />
                     </div>
-                    <p className="font-heading text-lg sm:text-xl text-lumina-soft">{translateSign(natalChart.zodiacSign, language)}</p>
-                    <p className="mt-1 text-[10px] leading-tight text-cream/50">{getPlanetWhyItMatters('Sun', language)}</p>
+                    <p className="font-heading text-lg sm:text-xl text-[#FDFBF7]">{translateSign(natalChart.zodiacSign, language)}</p>
+                    <p className="mt-3 badge">{translateSign(natalChart.zodiacSign, language)}</p>
+                    <p className="mt-2 text-[10px] leading-tight text-[#8D8B9F]">{getPlanetWhyItMatters('Sun', language)}</p>
                   </div>
-                  <div className="rounded-xl bg-white/5 p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-cream mb-3">{t.moon}</p>
+                  <div className="rounded-[22px] border border-white/[0.06] bg-white/[0.03] p-4 text-center">
+                    <p className="lumina-label mb-3">{t.moon}</p>
                     <div className="flex justify-center mb-2">
                       <ZodiacSvg sign={moonSign || ''} size={72} />
                     </div>
-                    <p className="font-heading text-lg sm:text-xl text-lumina-soft">{translateSign(moonSign || '', language)}</p>
-                    <p className="mt-1 text-[10px] leading-tight text-cream/50">{getPlanetWhyItMatters('Moon', language)}</p>
+                    <p className="font-heading text-lg sm:text-xl text-[#FDFBF7]">{translateSign(moonSign || '', language)}</p>
+                    <p className="mt-3 badge">{translateSign(moonSign || '', language)}</p>
+                    <p className="mt-2 text-[10px] leading-tight text-[#8D8B9F]">{getPlanetWhyItMatters('Moon', language)}</p>
                   </div>
-                  <div className="rounded-xl bg-white/5 p-4 text-center">
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-cream mb-3">{t.rising}</p>
+                  <div className="rounded-[22px] border border-white/[0.06] bg-white/[0.03] p-4 text-center">
+                    <p className="lumina-label mb-3">{t.rising}</p>
                     <div className="flex justify-center mb-2">
                       <ZodiacSvg sign={natalChart.risingSign} size={72} />
                     </div>
-                    <p className="font-heading text-lg sm:text-xl text-lumina-soft">{translateSign(natalChart.risingSign, language)}</p>
-                    <p className="mt-1 text-[10px] leading-tight text-cream/50">{language === 'en' ? 'Your mask — how the world sees you' : 'Твоя маска — как тебя видит мир'}</p>
+                    <p className="font-heading text-lg sm:text-xl text-[#FDFBF7]">{translateSign(natalChart.risingSign, language)}</p>
+                    <p className="mt-3 badge">{translateSign(natalChart.risingSign, language)}</p>
+                    <p className="mt-2 text-[10px] leading-tight text-[#8D8B9F]">{language === 'en' ? 'Your mask, your first shimmer in the room.' : 'Твоя маска, первое сияние, которое замечает мир.'}</p>
                   </div>
                 </div>
                 <div className="mt-5 flex flex-col items-center gap-3">
@@ -571,7 +589,7 @@ export default function ChartPage() {
                   </button>
                   <a
                     href="/consultation"
-                    className="text-sm text-cream/50 hover:text-lumina-accent transition"
+                    className="text-sm text-[#8D8B9F] transition hover:text-[#C0BDD6]"
                   >
                     {t.ctaPersonalReading} →
                   </a>
@@ -582,9 +600,9 @@ export default function ChartPage() {
                 <p className="lumina-label mb-4">{t.currentTransits}</p>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   {dailyData.planets.map((planet) => (
-                    <div key={`transit-${planet.planet}`} className="rounded-xl bg-white/5 p-3 text-center">
-                      <p className="text-sm text-warmWhite">{translatePlanet(planet.planet, language)}</p>
-                      <p className="mt-1 flex items-center justify-center gap-2 text-lumina-soft">
+                    <div key={`transit-${planet.planet}`} className="rounded-[22px] border border-white/[0.06] bg-white/[0.03] p-3 text-center">
+                      <p className="text-sm text-[#FDFBF7]">{translatePlanet(planet.planet, language)}</p>
+                      <p className="mt-1 flex items-center justify-center gap-2 text-[#C0BDD6]">
                         <ZodiacSvg sign={planet.sign} />
                         <span>{translateSign(planet.sign, language)}</span>
                       </p>
@@ -605,23 +623,24 @@ export default function ChartPage() {
                     key={planet.planet}
                     type="button"
                     onClick={() => openPlanetExplanation(planet.planet, planet.sign, planet.house)}
-                    className={`block rounded-xl border border-white/10 bg-white/5 p-4 text-left transition hover:border-lumina-accent/40 ${
+                    className={`block rounded-[22px] border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-white/[0.16] ${
                       idx < 5 ? 'animate-stagger-2' : 'animate-stagger-3'
                     }`}
                   >
-                    <p className="text-sm uppercase tracking-[0.13em] text-cream">
+                    <p className="lumina-label">
                       <span className="inline-flex items-center gap-1.5">
                         <PlanetSvg planet={planet.planet} />
                         <span>{translatePlanet(planet.planet, language)}</span>
                       </span>
                     </p>
-                    <p className="mt-0.5 text-xs text-cream/50">{getPlanetWhyItMatters(planet.planet, language)}</p>
+                    <p className="mt-0.5 text-xs text-[#8D8B9F]">{getPlanetWhyItMatters(planet.planet, language)}</p>
                     <div className="mt-2 flex items-center gap-3">
                       <ZodiacSvg sign={planet.sign} size={44} />
-                      <span className="font-heading text-lg text-lumina-soft">{translateSign(planet.sign, language)}</span>
+                      <span className="font-heading text-lg text-[#FDFBF7]">{translateSign(planet.sign, language)}</span>
                     </div>
-                    <p className="mt-1 text-sm text-cream">{Number.parseFloat(planet.degrees).toFixed(1)}° • {t.house} {planet.house}</p>
-                    <p className="mt-2 text-xs text-cream/70">{t.tapToLearnMore}</p>
+                    <p className="mt-2 badge">{translateSign(planet.sign, language)}</p>
+                    <p className="mt-2 text-sm text-[#8D8B9F]">{Number.parseFloat(planet.degrees).toFixed(1)}° • {t.house} {planet.house}</p>
+                    <p className="mt-2 text-xs text-[#8D8B9F]">{t.tapToLearnMore}</p>
                   </button>
                 ))}
               </div>
@@ -638,18 +657,19 @@ export default function ChartPage() {
                     key={house.house}
                     type="button"
                     onClick={() => openHouseExplanation(house.house, house.sign)}
-                    className={`rounded-xl border border-white/10 bg-white/5 p-4 text-left transition hover:border-lumina-accent/40 ${
+                    className={`rounded-[22px] border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-white/[0.16] ${
                       idx < 6 ? 'animate-stagger-2' : 'animate-stagger-3'
                     }`}
                   >
-                    <p className="text-sm uppercase tracking-[0.13em] text-cream">{t.house} {house.house}</p>
-                    <p className="mt-0.5 text-xs text-cream/50">{getHouseTheme(house.house, language)}</p>
-                    <p className="mt-1 flex items-center gap-2 text-lg text-lumina-soft">
+                    <p className="lumina-label">{t.house} {house.house}</p>
+                    <p className="mt-0.5 text-xs text-[#8D8B9F]">{getHouseTheme(house.house, language)}</p>
+                    <p className="mt-1 flex items-center gap-2 font-heading text-lg text-[#FDFBF7]">
                       <ZodiacSvg sign={house.sign} />
                       <span>{translateSign(house.sign, language)}</span>
                     </p>
-                    <p className="mt-1 text-sm text-cream">{t.houseCusp}: {Number.parseFloat(house.degrees).toFixed(1)}°</p>
-                    <p className="mt-2 text-xs text-cream/70">{t.tapToLearnMore}</p>
+                    <p className="mt-2 badge">{translateSign(house.sign, language)}</p>
+                    <p className="mt-2 text-sm text-[#8D8B9F]">{t.houseCusp}: {Number.parseFloat(house.degrees).toFixed(1)}°</p>
+                    <p className="mt-2 text-xs text-[#8D8B9F]">{t.tapToLearnMore}</p>
                   </button>
                 ))}
               </div>
@@ -660,40 +680,42 @@ export default function ChartPage() {
 
       {/* Share Card Modal */}
       {showShareCard && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 px-4 py-6" onClick={() => setShowShareCard(false)}>
-          <div className="w-full max-w-sm rounded-t-2xl sm:rounded-2xl border-2 border-lumina-accent/40 bg-[#080c1f] p-8 text-center animate-slideUp sm:animate-fadeInUp" onClick={(event) => event.stopPropagation()}>
-            <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
-            {profile?.name && <p className="mt-2 text-warmWhite">{profile.name}</p>}
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#0B0814]/85 px-4 py-6 sm:items-center" onClick={() => setShowShareCard(false)}>
+          <div className="glass-card relative w-full max-w-sm rounded-t-[28px] p-8 text-center animate-slideUp sm:rounded-[28px] sm:animate-fadeInUp" onClick={(event) => event.stopPropagation()}>
+            <div className="aura left-[-26%] top-[-14%] h-[180px] w-[180px] bg-[#5A438A]/28" />
+            <div className="aura right-[-18%] bottom-[-18%] h-[180px] w-[180px] bg-[#18244D]/24" />
+            <p className="relative font-heading text-3xl text-[#FDFBF7]">Lumina</p>
+            {profile?.name && <p className="relative mt-2 text-[#FDFBF7]">{profile.name}</p>}
             <div className="mt-6 space-y-4 text-left">
-              <div className="rounded-xl bg-white/5 p-3">
-                <p className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.13em] text-cream">
+              <div className="rounded-[22px] border border-white/[0.06] bg-white/[0.03] p-3">
+                <p className="lumina-label inline-flex items-center gap-1.5">
                   <PlanetSvg planet="Sun" />
                   <span>{t.sun}</span>
                 </p>
-                <p className="mt-1 flex items-center gap-2 text-lumina-soft">
+                <p className="mt-2 flex items-center gap-2 text-[#C0BDD6]">
                   <ZodiacSvg sign={natalChart.zodiacSign} size={32} />
-                  <span className="font-heading text-lg">{translateSign(natalChart.zodiacSign, language)}</span>
+                  <span className="font-heading text-lg text-[#FDFBF7]">{translateSign(natalChart.zodiacSign, language)}</span>
                 </p>
               </div>
-              <div className="rounded-xl bg-white/5 p-3">
-                <p className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.13em] text-cream">
+              <div className="rounded-[22px] border border-white/[0.06] bg-white/[0.03] p-3">
+                <p className="lumina-label inline-flex items-center gap-1.5">
                   <PlanetSvg planet="Moon" />
                   <span>{t.moon}</span>
                 </p>
-                <p className="mt-1 flex items-center gap-2 text-lumina-soft">
+                <p className="mt-2 flex items-center gap-2 text-[#C0BDD6]">
                   <ZodiacSvg sign={moonSign || ''} size={32} />
-                  <span className="font-heading text-lg">{translateSign(moonSign || '', language)}</span>
+                  <span className="font-heading text-lg text-[#FDFBF7]">{translateSign(moonSign || '', language)}</span>
                 </p>
               </div>
-              <div className="rounded-xl bg-white/5 p-3">
-                <p className="text-xs uppercase tracking-[0.13em] text-cream">↑ {t.rising}</p>
-                <p className="mt-1 flex items-center gap-2 text-lumina-soft">
+              <div className="rounded-[22px] border border-white/[0.06] bg-white/[0.03] p-3">
+                <p className="lumina-label">↑ {t.rising}</p>
+                <p className="mt-2 flex items-center gap-2 text-[#C0BDD6]">
                   <ZodiacSvg sign={natalChart.risingSign} size={32} />
-                  <span className="font-heading text-lg">{translateSign(natalChart.risingSign, language)}</span>
+                  <span className="font-heading text-lg text-[#FDFBF7]">{translateSign(natalChart.risingSign, language)}</span>
                 </p>
               </div>
             </div>
-            <p className="mt-6 text-xs tracking-[0.18em] text-cream/70">luminastrology.com</p>
+            <p className="mt-6 text-xs tracking-[0.18em] text-[#8D8B9F]">luminastrology.com</p>
 
             {/* Share buttons */}
             <div className="mt-5 flex gap-3">
@@ -716,7 +738,7 @@ export default function ChartPage() {
               </button>
               <button
                 type="button"
-                className="min-h-11 flex-1 rounded-full border border-lumina-accent/30 px-4 text-sm text-cream transition hover:border-lumina-accent/60"
+                className="min-h-11 flex-1 rounded-full border border-white/[0.08] px-4 text-sm text-[#8D8B9F] transition hover:border-white/[0.16] hover:text-[#FDFBF7]"
                 onClick={() => setShowShareCard(false)}
               >
                 {t.closeModal}
@@ -735,6 +757,6 @@ export default function ChartPage() {
         house={explainState?.house}
         language={language}
       />
-    </>
+    </div>
   );
 }

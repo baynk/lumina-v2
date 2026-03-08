@@ -88,9 +88,9 @@ const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com
 /* ─── Benefit Card ─── */
 function BenefitCard({ icon, text }: { icon: string; text: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
+    <div className="glass-card flex items-start gap-3 rounded-[24px] p-4">
       <span className="mt-0.5 text-lg">{icon}</span>
-      <p className="text-sm leading-relaxed text-cream/80">{text}</p>
+      <p className="text-sm leading-relaxed text-[#8D8B9F]">{text}</p>
     </div>
   );
 }
@@ -119,10 +119,10 @@ function PersonCard({
 
   return (
     <section className="glass-card overflow-hidden">
-      {/* Card header with gradient accent */}
-      <div className="border-b border-white/[0.06] bg-gradient-to-r from-lumina-accent/10 to-transparent px-5 py-4 sm:px-6">
-        <h2 className="font-heading text-xl text-warmWhite">{title}</h2>
-        <p className="mt-0.5 text-xs text-cream/50">{subtitle}</p>
+      <div className="border-b border-white/[0.06] bg-gradient-to-r from-[#C8A4A4]/10 to-transparent px-5 py-4 sm:px-6">
+        <p className="lumina-label mb-2">{personKey === 'A' ? (t.synastryPersonA || 'Person A') : (t.synastryPersonB || 'Person B')}</p>
+        <h2 className="font-heading text-xl text-[#FDFBF7]">{title}</h2>
+        <p className="mt-0.5 text-xs text-[#8D8B9F]">{subtitle}</p>
       </div>
 
       <div className="space-y-4 p-5 sm:p-6">
@@ -203,12 +203,12 @@ function PersonCard({
             required
           />
           {state.searchResults.length > 0 && (
-            <div className="absolute z-40 bottom-full mb-1 w-full max-h-48 overflow-y-auto overflow-hidden rounded-xl border border-white/10 bg-[#0f1433]/95 backdrop-blur-md shadow-xl">
+            <div className="absolute bottom-full z-40 mb-1 max-h-48 w-full overflow-hidden overflow-y-auto rounded-[22px] border border-white/10 bg-[rgba(20,17,33,0.94)] shadow-xl backdrop-blur-md">
               {state.searchResults.map((item) => (
                 <button
                   key={item.place_id}
                   type="button"
-                  className="block min-h-11 w-full border-b border-white/5 px-3 py-3 text-left text-sm text-warmWhite transition hover:bg-white/10"
+                  className="block min-h-11 w-full border-b border-white/5 px-3 py-3 text-left text-sm text-[#FDFBF7] transition hover:bg-white/10"
                   onClick={() => selectLocation(item, personKey)}
                 >
                   {item.display_name}
@@ -216,13 +216,13 @@ function PersonCard({
               ))}
             </div>
           )}
-          {state.searching && <p className="mt-2 text-xs text-cream/40">{t.synastrySearching}</p>}
+          {state.searching && <p className="mt-2 text-xs text-[#8D8B9F]">{t.synastrySearching}</p>}
         </div>
 
         {state.selectedLocationName && (
-          <div className="flex items-center gap-2 rounded-xl border border-lumina-accent/20 bg-lumina-accent/5 px-3 py-2">
-            <span className="text-xs text-lumina-soft">📍</span>
-            <p className="text-xs text-cream/75">{state.selectedLocationName}</p>
+          <div className="flex items-center gap-2 rounded-[20px] border border-white/[0.08] bg-white/[0.03] px-3 py-2">
+            <span className="text-xs text-[#C0BDD6]">📍</span>
+            <p className="text-xs text-[#C0BDD6]">{state.selectedLocationName}</p>
           </div>
         )}
       </div>
@@ -755,15 +755,22 @@ export default function SynastryPage() {
     const moonB = result.synastry.personBChart.planets.find((p) => p.planet === 'Moon');
 
     return (
-      <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 animate-fadeInUp">
+      <div className="lumina-screen">
+        <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
+        <div className="aura right-[-22%] top-[24%] h-[290px] w-[290px] bg-[#18244D]/32" />
+        <div className="aura bottom-[-12%] left-[18%] h-[260px] w-[260px] bg-[#2E1B54]/34" />
+        <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 animate-fadeInUp">
         {/* Results Header */}
         <div className="mb-8 text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-lumina-accent/70 mb-2">
-            {language === 'ru' ? 'Ваша совместимость' : 'Your Relationship Reading'}
+          <p className="lumina-label mb-2">
+            {language === 'ru' ? 'Ваше поле совместимости' : 'Your compatibility field'}
           </p>
-          <h1 className="font-heading text-3xl sm:text-4xl text-lumina-soft mb-1">
+          <h1 className="mb-1 font-heading text-3xl text-[#FDFBF7] sm:text-4xl">
             {nameA} & {nameB}
           </h1>
+          <p className="text-sm text-[#8D8B9F]">
+            {language === 'ru' ? 'Там, где ваши ритмы встречаются, рождается история.' : 'Where your rhythms meet, a new story starts to speak.'}
+          </p>
         </div>
 
         {/* Big Three Comparison */}
@@ -774,19 +781,19 @@ export default function SynastryPage() {
               { name: nameB, sun: sunB, moon: moonB, rising: result.synastry.personBChart.risingSign },
             ].map((person) => (
               <div key={person.name} className="p-5 text-center">
-                <p className="text-xs uppercase tracking-[0.15em] text-cream/50 mb-3">{person.name}</p>
+                <p className="lumina-label mb-3">{person.name}</p>
                 <div className="space-y-2">
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-cream/40">{t.sun}</p>
-                    <p className="text-sm font-medium text-warmWhite">{language === 'ru' ? translateSign(person.sun?.sign || '', language) : person.sun?.sign}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#8D8B9F]">{t.sun}</p>
+                    <p className="text-sm font-medium text-[#FDFBF7]">{language === 'ru' ? translateSign(person.sun?.sign || '', language) : person.sun?.sign}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-cream/40">{t.moon}</p>
-                    <p className="text-sm font-medium text-warmWhite">{language === 'ru' ? translateSign(person.moon?.sign || '', language) : person.moon?.sign}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#8D8B9F]">{t.moon}</p>
+                    <p className="text-sm font-medium text-[#FDFBF7]">{language === 'ru' ? translateSign(person.moon?.sign || '', language) : person.moon?.sign}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-cream/40">{t.rising}</p>
-                    <p className="text-sm font-medium text-warmWhite">{language === 'ru' ? translateSign(person.rising, language) : person.rising}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-[#8D8B9F]">{t.rising}</p>
+                    <p className="text-sm font-medium text-[#FDFBF7]">{language === 'ru' ? translateSign(person.rising, language) : person.rising}</p>
                   </div>
                 </div>
               </div>
@@ -796,13 +803,13 @@ export default function SynastryPage() {
 
         {/* Radar Chart */}
         <section className="glass-card mb-6 p-6">
-          <p className="text-center text-xs uppercase tracking-[0.15em] text-cream/50 mb-4">{t.synastryCompatibilityWheel}</p>
+          <p className="lumina-label mb-4 text-center">{t.synastryCompatibilityWheel}</p>
           <RadarChart values={radarValues} />
           <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {radarValues.map((item) => (
-              <div key={item.label} className="flex items-center justify-between rounded-lg bg-white/[0.04] px-3 py-2">
-                <span className="text-xs text-cream/60">{item.label}</span>
-                <span className="text-sm font-medium text-lumina-soft">{item.value}%</span>
+              <div key={item.label} className="flex items-center justify-between rounded-[18px] border border-white/[0.06] bg-white/[0.04] px-3 py-2">
+                <span className="text-xs text-[#8D8B9F]">{item.label}</span>
+                <span className="badge px-3 py-1">{item.value}%</span>
               </div>
             ))}
           </div>
@@ -818,9 +825,9 @@ export default function SynastryPage() {
                 className="flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-white/[0.02]"
               >
                 <span className="text-base">{section.icon}</span>
-                <span className="flex-1 text-sm font-medium text-warmWhite">{section.title}</span>
+                <span className="flex-1 text-sm font-medium text-[#FDFBF7]">{section.title}</span>
                 <svg
-                  className={`h-4 w-4 text-cream/40 transition-transform ${openSection === section.key ? 'rotate-180' : ''}`}
+                  className={`h-4 w-4 text-[#8D8B9F] transition-transform ${openSection === section.key ? 'rotate-180' : ''}`}
                   fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -828,7 +835,7 @@ export default function SynastryPage() {
               </button>
               {openSection === section.key && (
                 <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 animate-fadeInUp">
-                  <p className="text-sm leading-relaxed text-cream/85">{section.text}</p>
+                  <p className="text-sm leading-relaxed text-[#8D8B9F]">{section.text}</p>
                 </div>
               )}
             </div>
@@ -837,22 +844,22 @@ export default function SynastryPage() {
 
         {/* Key Aspects */}
         <section className="glass-card mb-6 p-5 sm:p-6">
-          <p className="text-xs uppercase tracking-[0.15em] text-cream/50 mb-4">{t.synastryKeyAspects}</p>
+          <p className="lumina-label mb-4">{t.synastryKeyAspects}</p>
           <div className="space-y-3">
             {result.synastry.crossAspects.slice(0, 8).map((aspect, idx) => (
-              <div key={`${aspect.planetA}-${aspect.planetB}-${idx}`} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <div key={`${aspect.planetA}-${aspect.planetB}-${idx}`} className="rounded-[22px] border border-white/[0.06] bg-white/[0.02] p-4">
                 <div className="mb-2 flex items-center gap-2">
                   <span className={`inline-block h-2 w-2 rounded-full ${
                     ['trine', 'sextile'].includes(aspect.type.toLowerCase()) ? 'bg-emerald-400' :
-                    ['square', 'opposition'].includes(aspect.type.toLowerCase()) ? 'bg-amber-400' :
-                    'bg-lumina-accent'
+                    ['square', 'opposition'].includes(aspect.type.toLowerCase()) ? 'bg-[#C8A4A4]' :
+                    'bg-[#C0BDD6]'
                   }`} />
-                  <p className="text-xs uppercase tracking-[0.12em] text-lumina-soft">
+                  <p className="text-xs uppercase tracking-[0.12em] text-[#C0BDD6]">
                     {translatePlanet(aspect.planetA, language)} {translateAspectType(aspect.type, language)} {translatePlanet(aspect.planetB, language)}
                   </p>
-                  <span className="text-[10px] text-cream/30">{aspect.orb.toFixed(1)}°</span>
+                  <span className="text-[10px] text-[#8D8B9F]">{aspect.orb.toFixed(1)}°</span>
                 </div>
-                <p className="text-sm leading-relaxed text-cream/80">
+                <p className="text-sm leading-relaxed text-[#8D8B9F]">
                   {language === 'ru'
                     ? `${translatePlanet(aspect.planetA, language)} в ${translateSign(aspect.signA, language)} — ${translateAspectType(aspect.type, language).toLowerCase()} — ${translatePlanet(aspect.planetB, language)} в ${translateSign(aspect.signB, language)}. ${translateSynastryAspectMeaning(aspect.type, language)}`
                     : `Your ${aspect.planetA} in ${aspect.signA} ${aspect.type.toLowerCase()}s their ${aspect.planetB} in ${aspect.signB}. ${aspect.meaning}`
@@ -881,8 +888,8 @@ export default function SynastryPage() {
           type="button"
           onClick={handleShareLink}
           disabled={shareLinkLoading}
-          className={`mb-4 w-full rounded-2xl border py-3.5 text-sm font-medium transition disabled:opacity-50 ${
-            shareLinkStatus ? 'border-green-400/30 bg-green-400/[0.06] text-green-300' : 'border-purple-400/20 bg-purple-400/[0.06] text-purple-300 hover:bg-purple-400/10'
+          className={`mb-4 w-full rounded-full border py-3.5 text-sm font-medium transition disabled:opacity-50 ${
+            shareLinkStatus ? 'border-white/[0.12] bg-white/[0.08] text-[#FDFBF7]' : 'border-white/[0.08] bg-white/[0.03] text-[#C0BDD6] hover:bg-white/[0.08]'
           }`}
         >
           {shareLinkLoading
@@ -890,14 +897,14 @@ export default function SynastryPage() {
             : shareLinkStatus || (language === 'ru' ? '🔗 Поделиться ссылкой' : '🔗 Share Link')}
         </button>
         {shareUrl && (
-          <p className="mb-4 -mt-2 text-center text-[11px] text-cream/30 break-all">{shareUrl}</p>
+          <p className="mb-4 -mt-2 break-all text-center text-[11px] text-[#8D8B9F]">{shareUrl}</p>
         )}
         <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
           <button
             type="button"
             onClick={handleShareWhatsApp}
             disabled={shareLinkLoading}
-            className="w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm text-cream/85 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-[22px] border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm text-[#C0BDD6] transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {language === 'ru' ? '💬 Отправить в WhatsApp' : '💬 Share on WhatsApp'}
           </button>
@@ -905,7 +912,7 @@ export default function SynastryPage() {
             type="button"
             onClick={handleShareTelegram}
             disabled={shareLinkLoading}
-            className="w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm text-cream/85 transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-[22px] border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm text-[#C0BDD6] transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {language === 'ru' ? '✈️ Отправить в Telegram' : '✈️ Share on Telegram'}
           </button>
@@ -924,35 +931,41 @@ export default function SynastryPage() {
         <button
           type="button"
           onClick={() => { setResult(null); setPartnerSaved(false); try { localStorage.removeItem('lumina_synastry_result'); localStorage.removeItem('lumina_synastry_names'); } catch {} }}
-          className="mt-6 w-full rounded-2xl border border-white/10 bg-white/[0.03] py-3 text-sm text-cream/70 transition hover:bg-white/[0.06] hover:text-warmWhite"
+          className="mt-6 w-full rounded-full border border-white/10 bg-white/[0.03] py-3 text-sm text-[#8D8B9F] transition hover:bg-white/[0.06] hover:text-[#FDFBF7]"
         >
           {language === 'ru' ? '← Новый расчёт' : '← New Reading'}
         </button>
 
         {toastMessage && (
-          <div className="fixed bottom-6 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-xl border border-lumina-accent/30 bg-[#111633]/95 px-4 py-3 text-center text-sm text-warmWhite shadow-xl backdrop-blur">
+          <div className="fixed bottom-6 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-[22px] border border-white/[0.08] bg-[rgba(20,17,33,0.94)] px-4 py-3 text-center text-sm text-[#FDFBF7] shadow-xl backdrop-blur">
             {toastMessage}
           </div>
         )}
+      </div>
       </div>
     );
   }
 
   // ─── FORM VIEW ───
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
+    <div className="lumina-screen">
+      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
+      <div className="aura right-[-22%] top-[24%] h-[290px] w-[290px] bg-[#18244D]/32" />
+      <div className="aura bottom-[-12%] left-[18%] h-[260px] w-[260px] bg-[#2E1B54]/34" />
+      <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
       {/* Hero */}
       <div className="mb-10 text-center animate-fadeInUp">
         <button
           type="button"
           onClick={() => router.push('/')}
-          className="mb-6 inline-flex items-center gap-1 text-sm text-cream/50 transition hover:text-cream/80"
+          className="mb-6 inline-flex items-center gap-1 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]"
         >
           ← {t.back}
         </button>
-        <h1 className="font-heading text-4xl sm:text-5xl text-lumina-soft mb-3">{t.synastryTitle}</h1>
-        <p className="text-lg text-cream/60 mb-6">{t.synastrySubtitle}</p>
-        <p className="mx-auto max-w-lg text-sm leading-relaxed text-cream/50">{t.synastryHeroText}</p>
+        <p className="lumina-label mb-3">{language === 'ru' ? 'Синастрия' : 'Synastry'}</p>
+        <h1 className="mb-3 font-heading text-4xl text-[#FDFBF7] sm:text-5xl">{t.synastryTitle}</h1>
+        <p className="mb-6 text-lg text-[#C0BDD6]">{t.synastrySubtitle}</p>
+        <p className="mx-auto max-w-lg text-sm leading-relaxed text-[#8D8B9F]">{t.synastryHeroText}</p>
       </div>
 
       {/* Benefits */}
@@ -968,7 +981,7 @@ export default function SynastryPage() {
         {/* Partner quick-select (above forms, full width) */}
         {session?.user && savedPartners.length > 1 && (
           <section className="glass-card p-4 sm:p-5 mb-4">
-            <p className="mb-3 text-xs font-medium uppercase tracking-wider text-cream/40">
+            <p className="lumina-label mb-3">
               {language === 'ru' ? 'Выбрать партнёра' : 'Select saved partner'}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -977,9 +990,9 @@ export default function SynastryPage() {
                   key={partner.id}
                   type="button"
                   onClick={() => fillPersonBFromPartner(partner)}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-left transition hover:border-lumina-accent/35 hover:bg-white/[0.06]"
+                  className="rounded-[22px] border border-white/10 bg-white/[0.03] px-4 py-2.5 text-left transition hover:border-white/[0.16] hover:bg-white/[0.06]"
                 >
-                  <p className="text-sm font-medium text-warmWhite">{partner.partner_name}</p>
+                  <p className="text-sm font-medium text-[#FDFBF7]">{partner.partner_name}</p>
                 </button>
               ))}
             </div>
@@ -1017,7 +1030,7 @@ export default function SynastryPage() {
               <button
                 type="button"
                 onClick={() => setShowConnectCode(true)}
-                className="text-xs text-lumina-accent/50 hover:text-lumina-accent/80 transition"
+                className="text-xs text-[#C0BDD6] transition hover:text-[#FDFBF7]"
               >
                 {language === 'ru' ? 'Подключить по коду партнёра' : 'Connect with partner code'}
               </button>
@@ -1041,18 +1054,18 @@ export default function SynastryPage() {
                 </button>
               </div>
             )}
-            {connectionsError && <p className="mt-2 text-xs text-rose-300">{connectionsError}</p>}
+            {connectionsError && <p className="mt-2 text-xs text-[#C8A4A4]">{connectionsError}</p>}
           </div>
         )}
 
         <button
           type="submit"
           disabled={!canSubmit || loading}
-          className="mt-6 w-full rounded-2xl bg-gradient-to-r from-lumina-accent-bright to-lumina-accent px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-white shadow-lg shadow-lumina-accent/20 transition hover:shadow-lumina-accent/40 disabled:opacity-40 disabled:cursor-not-allowed lg:max-w-md lg:mx-auto"
+          className="lumina-button mt-6 w-full px-8 py-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 lg:mx-auto lg:max-w-md"
         >
           {loading ? t.synastryLoading : t.synastryRun}
         </button>
-        {error && <p className="mt-3 text-center text-sm text-rose-300">{error}</p>}
+        {error && <p className="mt-3 text-center text-sm text-[#C8A4A4]">{error}</p>}
       </form>
 
       {/* Loading skeleton */}
@@ -1063,15 +1076,16 @@ export default function SynastryPage() {
             <div className="h-2 w-2 rounded-full bg-lumina-accent animate-pulse" style={{ animationDelay: '0.2s' }} />
             <div className="h-2 w-2 rounded-full bg-lumina-accent animate-pulse" style={{ animationDelay: '0.4s' }} />
           </div>
-          <p className="text-center text-sm text-cream/50">{t.synastryLoading}</p>
+          <p className="text-center text-sm text-[#8D8B9F]">{t.synastryLoading}</p>
         </section>
       )}
 
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-xl border border-lumina-accent/30 bg-[#111633]/95 px-4 py-3 text-center text-sm text-warmWhite shadow-xl backdrop-blur">
+        <div className="fixed bottom-6 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-[22px] border border-white/[0.08] bg-[rgba(20,17,33,0.94)] px-4 py-3 text-center text-sm text-[#FDFBF7] shadow-xl backdrop-blur">
           {toastMessage}
         </div>
       )}
+    </div>
     </div>
   );
 }

@@ -121,7 +121,7 @@ async function generateGuidance(dailyData: ReturnType<typeof calculateDailyCeles
 - Пафос и "красивость" ради красивости
 - Тире (—) не больше одного на весь текст
 
-Русский язык: "во Льве", "во Рыбах". Перед остальными знаками "в".
+Русский язык: "во Льве" (но "в Рыбах", не "во Рыбах"). "Во" только перед "Льве". Перед остальными знаками "в".
 
 ДАННЫЕ НА СЕГОДНЯ (${moscowDate}):
 - Луна: ${moonPhase} ${prep} ${moonSign} (${dailyData.moon.illumination}% освещённости)

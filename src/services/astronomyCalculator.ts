@@ -314,25 +314,78 @@ export function calculateDailyCelestialData(now: Date = new Date()): DailyCelest
 
 /**
  * Calculate moon phase and illumination
+ *
+ * Uses astronomy-engine's SearchMoonPhase to find exact phase moments
+ * (new moon, first quarter, full moon, last quarter) and classifies
+ * based on proximity rather than crude 45° angle buckets.
+ *
+ * "New Moon" / "Full Moon" / "First Quarter" / "Last Quarter" labels
+ * are only applied within ±1 day of the exact moment. Otherwise the
+ * intermediate names (Waxing Crescent, Waxing Gibbous, etc.) are used.
  */
 function calculateMoonPhase(time: Astronomy.AstroTime): { phaseName: string; illumination: number } {
-  // Calculate moon phase
   const moonPhase = Astronomy.MoonPhase(time);
   const moonIllumination = Astronomy.Illumination('Moon' as Astronomy.Body, time);
-
-  // Calculate illumination percentage
   const illumination = Math.round(moonIllumination.phase_fraction * 100);
 
-  // Determine phase name based on angle
-  let phaseName = 'New Moon';
-  if (moonPhase < 45) phaseName = 'New Moon';
-  else if (moonPhase < 90) phaseName = 'Waxing Crescent';
-  else if (moonPhase < 135) phaseName = 'First Quarter';
-  else if (moonPhase < 180) phaseName = 'Waxing Gibbous';
-  else if (moonPhase < 225) phaseName = 'Full Moon';
-  else if (moonPhase < 270) phaseName = 'Waning Gibbous';
-  else if (moonPhase < 315) phaseName = 'Last Quarter';
-  else phaseName = 'Waning Crescent';
+  // Find the nearest key phase moments by searching both backward and forward
+  const DAY_MS = 86400000;
+  const now = time.date.getTime();
+
+  const phases = [
+    { angle: 0, name: 'New Moon' },
+    { angle: 90, name: 'First Quarter' },
+    { angle: 180, name: 'Full Moon' },
+    { angle: 270, name: 'Last Quarter' },
+  ];
+
+  // For each key phase, find the nearest occurrence (before or after now)
+  let closestPhase = '';
+  let closestDistance = Infinity;
+
+  // Key phases are ~7.4 days apart (29.5-day cycle / 4).
+  // Search ±10 days to reliably find the nearest past and next future key phase.
+  for (const phase of phases) {
+    // Search backward: start from 10 days ago, look within 10 days → finds most recent past occurrence
+    try {
+      const pastStart = Astronomy.MakeTime(new Date(now - 10 * DAY_MS));
+      const pastFound = Astronomy.SearchMoonPhase(phase.angle, pastStart, 11);
+      if (pastFound) {
+        const distance = Math.abs(pastFound.date.getTime() - now);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestPhase = phase.name;
+        }
+      }
+    } catch { /* no match in range */ }
+
+    // Search forward: start from now, look within 10 days → finds next upcoming occurrence
+    try {
+      const futureFound = Astronomy.SearchMoonPhase(phase.angle, time, 10);
+      if (futureFound) {
+        const distance = Math.abs(futureFound.date.getTime() - now);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestPhase = phase.name;
+        }
+      }
+    } catch { /* no match in range */ }
+  }
+
+  // Only label as a key phase if we're within 1 day of the exact moment
+  const isNearKeyPhase = closestDistance < DAY_MS;
+
+  let phaseName: string;
+
+  if (isNearKeyPhase && closestPhase) {
+    phaseName = closestPhase;
+  } else {
+    // Use the phase angle for intermediate classification
+    if (moonPhase < 90) phaseName = 'Waxing Crescent';
+    else if (moonPhase < 180) phaseName = 'Waxing Gibbous';
+    else if (moonPhase < 270) phaseName = 'Waning Gibbous';
+    else phaseName = 'Waning Crescent';
+  }
 
   return { phaseName, illumination };
 }

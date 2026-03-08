@@ -390,6 +390,11 @@ export default function LandingPage() {
     return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }, [language]);
 
+  useEffect(() => {
+    if (checkingProfile || existingProfile) return;
+    router.replace('/onboarding');
+  }, [checkingProfile, existingProfile, router]);
+
   if (checkingProfile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -550,6 +555,14 @@ export default function LandingPage() {
         onCtaClick={() => setShowLanding(false)}
         onConsultationClick={() => router.push('/consultation')}
       />
+    );
+  }
+
+  if (!existingProfile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-5">
+        <p className="text-sm text-[#9A9298]">{language === 'ru' ? 'Переходим к онбордингу...' : 'Redirecting to onboarding...'}</p>
+      </div>
     );
   }
 

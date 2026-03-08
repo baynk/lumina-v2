@@ -4,11 +4,8 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import AppProviders from '@/components/providers/AppProviders';
-import Footer from '@/components/Footer';
-import UserMenu from '@/components/UserMenu';
-import LanguageToggle from '@/components/LanguageToggle';
-import BottomNav from '@/components/BottomNav';
 import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
+import AppShell from '@/components/AppShell';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com';
 
@@ -134,13 +131,7 @@ export default function RootLayout({
         <AppProviders>
           <div className="star-field" aria-hidden="true" />
           <div className="celestial-gradient" aria-hidden="true" />
-          <nav className="fixed right-3 top-3 z-50 flex items-center gap-2 sm:right-6 sm:top-4 sm:gap-3">
-            <LanguageToggle />
-            <UserMenu />
-          </nav>
-          <main className="relative z-10 min-h-screen pb-24 pt-14 sm:pb-0 sm:pt-16">{children}</main>
-          <BottomNav />
-          <Footer />
+          <AppShell>{children}</AppShell>
         </AppProviders>
       </body>
     </html>

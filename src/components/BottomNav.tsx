@@ -1,60 +1,17 @@
 'use client';
 
-import { type ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Calendar, CircleDot, Heart, Home, User } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { hasProfile } from '@/lib/profile';
 
 type NavItem = {
   href: string;
   label: string;
-  icon: (active: boolean) => ReactNode;
+  icon: typeof Home;
 };
-
-function HomeIcon({ active }: { active: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`h-5 w-5 ${active ? 'text-lumina-accent' : 'text-cream/70'}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M3 10.5L12 3l9 7.5" />
-      <path d="M5.5 9.8V20h13V9.8" />
-    </svg>
-  );
-}
-
-function ChartIcon({ active }: { active: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`h-5 w-5 ${active ? 'text-lumina-accent' : 'text-cream/70'}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-      <circle cx="12" cy="12" r="8" />
-      <path d="M12 6.7l1.2 2.5 2.8.4-2 1.9.5 2.8-2.5-1.3-2.5 1.3.5-2.8-2-1.9 2.8-.4L12 6.7z" />
-    </svg>
-  );
-}
-
-function HeartIcon({ active }: { active: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`h-5 w-5 ${active ? 'text-lumina-accent' : 'text-cream/70'}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M12 20.5s-7.5-4.8-7.5-10.3C4.5 7.5 6.7 5.8 9 5.8c1.6 0 2.5.7 3 1.5.5-.8 1.4-1.5 3-1.5 2.3 0 4.5 1.7 4.5 4.4 0 5.5-7.5 10.3-7.5 10.3z" />
-    </svg>
-  );
-}
-
-function CalendarIcon({ active }: { active: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`h-5 w-5 ${active ? 'text-lumina-accent' : 'text-cream/70'}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="4" y="5.5" width="16" height="14" rx="2.2" />
-      <path d="M4 9.5h16" />
-      <path d="M8 3.8v3.4M16 3.8v3.4" />
-    </svg>
-  );
-}
-
-function PersonIcon({ active }: { active: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" className={`h-5 w-5 ${active ? 'text-lumina-accent' : 'text-cream/70'}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-      <circle cx="12" cy="8" r="3.2" />
-      <path d="M5.5 20c0-3.2 2.9-5.5 6.5-5.5s6.5 2.3 6.5 5.5" />
-    </svg>
-  );
-}
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -76,30 +33,44 @@ export default function BottomNav() {
     };
   }, [pathname]);
 
+  if (!visible) return null;
+
   const items: NavItem[] = [
-    { href: '/', label: t.bottomNavHome, icon: (active) => <HomeIcon active={active} /> },
-    { href: '/chart', label: t.bottomNavChart, icon: (active) => <ChartIcon active={active} /> },
-    { href: '/synastry', label: t.bottomNavCompatibility, icon: (active) => <HeartIcon active={active} /> },
-    { href: '/calendar', label: t.bottomNavCalendar, icon: (active) => <CalendarIcon active={active} /> },
-    { href: '/profile', label: t.bottomNavProfile, icon: (active) => <PersonIcon active={active} /> },
+    { href: '/', label: t.bottomNavToday, icon: Home },
+    { href: '/chart', label: t.bottomNavChart, icon: CircleDot },
+    { href: '/synastry', label: t.bottomNavCompatibility, icon: Heart },
+    { href: '/calendar', label: t.bottomNavCalendar, icon: Calendar },
+    { href: '/profile', label: t.bottomNavProfile, icon: User },
   ];
 
   const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(`${href}/`));
 
   return (
-    <nav className="fixed bottom-3 left-1/2 z-40 w-[calc(100%-1rem)] -translate-x-1/2 rounded-2xl border border-white/[0.08] bg-[#0f1433]/70 px-3 py-2 backdrop-blur-xl md:hidden">
-      <ul className="grid grid-cols-5 gap-1">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 border-t bg-[#1A1822] pb-safe"
+      style={{ borderTopColor: 'rgba(240,235,227,0.05)' }}
+    >
+      <ul className="grid grid-cols-5">
         {items.map((item) => {
           const active = isActive(item.href);
+          const Icon = item.icon;
+
           return (
             <li key={item.href}>
-              <a
+              <Link
                 href={item.href}
-                className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-xl text-[10px] transition ${active ? 'bg-white/[0.08] text-lumina-accent' : 'text-cream/65 hover:text-cream'}`}
+                className="flex min-h-[64px] flex-col items-center justify-center gap-1 px-2 pt-2 text-center font-sans"
+                style={{ color: active ? '#C8A96E' : '#9A9298' }}
               >
-                {item.icon(active)}
-                <span>{item.label}</span>
-              </a>
+                <div className="flex flex-col items-center">
+                  <Icon size={20} strokeWidth={1.9} />
+                  <span
+                    className={`mt-1 h-1.5 w-1.5 rounded-full transition-opacity ${active ? 'opacity-100' : 'opacity-0'}`}
+                    style={{ backgroundColor: '#C8A96E' }}
+                  />
+                </div>
+                <span className="text-[10px] leading-none">{item.label}</span>
+              </Link>
             </li>
           );
         })}

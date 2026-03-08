@@ -123,7 +123,7 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
   const shortSub = subtitle.length > 140 ? subtitle.slice(0, 137).replace(/\s+\S*$/, '') + '…' : subtitle;
 
   // Color for score
-  const barColor = (v: number) => v >= 75 ? '#A78BFA' : v >= 50 ? '#8B73C8' : v >= 30 ? '#6B5FA0' : '#4A3F7A';
+  const barColor = (v: number) => v >= 75 ? '#C8A4A4' : v >= 50 ? '#8B73C8' : v >= 30 ? '#6B5FA0' : '#4A3F7A';
 
   return (
     <div className="glass-card p-4 sm:p-5">

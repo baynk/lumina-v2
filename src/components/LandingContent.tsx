@@ -227,12 +227,12 @@ function ZodiacWheel() {
 function CelestialDivider() {
   return (
     <div className="flex items-center justify-center gap-3 py-2">
-      <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#A78BFA]/15" />
-      <svg width="20" height="20" viewBox="0 0 20 20" className="text-[#A78BFA]/20">
+      <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#C8A4A4]/15" />
+      <svg width="20" height="20" viewBox="0 0 20 20" className="text-[#C8A4A4]/20">
         <circle cx="10" cy="10" r="3" fill="currentColor" />
         <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="0.5" />
       </svg>
-      <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#A78BFA]/15" />
+      <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#C8A4A4]/15" />
     </div>
   );
 }
@@ -315,7 +315,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
           ].map((item) => (
             <div key={item.a}>
               <p className="text-[13px] lg:text-[17px] xl:text-[19px] font-heading">
-                <span className="text-[#A78BFA]/70">{item.a}</span>
+                <span className="text-[#C8A4A4]/70">{item.a}</span>
                 <span className="text-cream/30"> · </span>
                 <span className="text-cream/50">{item.b}</span>
               </p>
@@ -335,7 +335,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
               { tag: t.ben3Tag, title: t.ben3Title, p: t.ben3P },
             ].map((ben, i) => (
               <div key={i} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 lg:p-8">
-                <p className="text-[10px] lg:text-[11px] tracking-[0.3em] uppercase text-[#A78BFA]/40 font-medium">{ben.tag}</p>
+                <p className="text-[10px] lg:text-[11px] tracking-[0.3em] uppercase text-[#C8A4A4]/40 font-medium">{ben.tag}</p>
                 <h2 className="mt-3 font-heading text-xl sm:text-2xl lg:text-2xl xl:text-3xl text-cream/90 leading-snug">
                   {ben.title}
                 </h2>
@@ -365,8 +365,8 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
               { n: '03', title: t.step3, desc: t.step3d },
             ].map((step) => (
               <div key={step.n} className="flex gap-5 lg:flex-col lg:text-center lg:items-center">
-                <div className="flex-shrink-0 w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#A78BFA]/20 flex items-center justify-center">
-                  <span className="text-[13px] lg:text-[15px] font-heading text-[#A78BFA]/50">{step.n}</span>
+                <div className="flex-shrink-0 w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#C8A4A4]/20 flex items-center justify-center">
+                  <span className="text-[13px] lg:text-[15px] font-heading text-[#C8A4A4]/50">{step.n}</span>
                 </div>
                 <div>
                   <h3 className="text-[15px] lg:text-[18px] xl:text-[20px] font-semibold text-cream/80">{step.title}</h3>
@@ -381,12 +381,12 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
       {/* ═══ PRECISION + CTA combined ═══ */}
       <section className="relative z-10 py-16 sm:py-20 lg:py-24 px-6 lg:px-12">
         <div className="mx-auto max-w-2xl lg:max-w-3xl text-center">
-          <p className="text-[10px] lg:text-[12px] tracking-[0.3em] uppercase text-[#A78BFA]/30">✦</p>
+          <p className="text-[10px] lg:text-[12px] tracking-[0.3em] uppercase text-[#C8A4A4]/30">✦</p>
           <h2 className="mt-4 font-heading text-2xl lg:text-3xl xl:text-4xl text-cream/70">{t.precTitle}</h2>
           <p className="mt-5 text-[14px] lg:text-[17px] xl:text-[18px] leading-[1.9] text-cream/35">{t.precP}</p>
           <button
             onClick={goToApp}
-            className="mt-10 rounded-full bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6] px-10 sm:px-16 lg:px-18 py-4 sm:py-5 lg:py-5 text-[15px] sm:text-[16px] lg:text-[17px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
+            className="mt-10 rounded-full bg-gradient-to-r from-[#C8A4A4] to-[#5A438A] px-10 sm:px-16 lg:px-18 py-4 sm:py-5 lg:py-5 text-[15px] sm:text-[16px] lg:text-[17px] font-medium text-[#0B0814] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
           >
             {t.heroCta}
           </button>
@@ -399,11 +399,11 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
         <div className="mx-auto max-w-3xl lg:max-w-4xl">
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-8 lg:p-10 lg:flex lg:gap-10 lg:items-start">
             {/* Avatar placeholder */}
-            <div className="mx-auto mb-6 lg:mb-0 lg:mx-0 flex-shrink-0 w-24 h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-[#A78BFA]/20 to-[#8B5CF6]/10 flex items-center justify-center">
-              <span className="font-heading text-3xl lg:text-4xl text-[#A78BFA]/40">IR</span>
+            <div className="mx-auto mb-6 lg:mb-0 lg:mx-0 flex-shrink-0 w-24 h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-[#C8A4A4]/20 to-[#5A438A]/10 flex items-center justify-center">
+              <span className="font-heading text-3xl lg:text-4xl text-[#C8A4A4]/40">IR</span>
             </div>
             <div className="text-center lg:text-left">
-              <p className="text-[10px] lg:text-[11px] tracking-[0.3em] uppercase text-[#A78BFA]/40 font-medium">
+              <p className="text-[10px] lg:text-[11px] tracking-[0.3em] uppercase text-[#C8A4A4]/40 font-medium">
                 {language === 'ru' ? 'Ваш астролог' : 'Your Astrologer'}
               </p>
               <h3 className="mt-2 font-heading text-2xl lg:text-3xl text-cream/90">Iryna Rudas</h3>
@@ -422,7 +422,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
               </p>
               <button
                 onClick={goToConsultation}
-                className="mt-6 text-[13px] lg:text-[14px] text-[#A78BFA]/60 hover:text-[#A78BFA]/90 transition tracking-wider font-medium"
+                className="mt-6 text-[13px] lg:text-[14px] text-[#C8A4A4]/60 hover:text-[#C8A4A4]/90 transition tracking-wider font-medium"
               >
                 {language === 'ru' ? 'Записаться на консультацию →' : 'Book a consultation →'}
               </button>
@@ -433,7 +433,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
 
       {/* ═══ FINAL CTA ═══ */}
       <section className="relative z-10 py-20 lg:py-28 px-6 text-center">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] lg:w-[500px] lg:h-[500px] rounded-full bg-[#A78BFA]/[0.02] blur-[80px] lg:blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] lg:w-[500px] lg:h-[500px] rounded-full bg-[#C8A4A4]/[0.02] blur-[80px] lg:blur-[100px] pointer-events-none" />
         <div className="relative">
           <p className="font-heading text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-cream/40 italic max-w-lg lg:max-w-2xl mx-auto leading-relaxed">
             {t.finalTitle}
@@ -441,7 +441,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
           <p className="mt-3 text-[14px] lg:text-[16px] xl:text-[18px] text-cream/25">{t.finalP}</p>
           <button
             onClick={goToApp}
-            className="mt-8 rounded-full bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6] px-10 sm:px-14 lg:px-16 py-4 sm:py-5 text-[15px] sm:text-[16px] lg:text-[17px] font-medium text-[#080C1F] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
+            className="mt-8 rounded-full bg-gradient-to-r from-[#C8A4A4] to-[#5A438A] px-10 sm:px-14 lg:px-16 py-4 sm:py-5 text-[15px] sm:text-[16px] lg:text-[17px] font-medium text-[#0B0814] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
           >
             {t.finalCta}
           </button>
@@ -450,7 +450,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
 
       {/* ═══ FOOTER ═══ */}
       <footer className="relative z-10 py-10 lg:py-14 text-center">
-        <p className="font-heading text-lg lg:text-xl tracking-[0.15em] text-[#A78BFA]/15">LUMINA</p>
+        <p className="font-heading text-lg lg:text-xl tracking-[0.15em] text-[#C8A4A4]/15">LUMINA</p>
         <p className="mt-2 text-[10px] lg:text-[12px] text-cream/10 tracking-wider">JPL DE421 · Equal House System</p>
       </footer>
     </div>

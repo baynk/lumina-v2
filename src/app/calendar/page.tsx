@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, Moon, RotateCcw, RotateCw, Sun } from 'lucide-react';
 import CalendarView from '@/components/CalendarView';
 import MoonPhaseVisual from '@/components/MoonPhaseVisual';
 import { useLanguage } from '@/context/LanguageContext';
@@ -43,13 +44,11 @@ function sameDay(left: Date, right: Date): boolean {
   );
 }
 
-function eventIcon(event: CelestialEvent): string {
-  if (event.type === 'new_moon') return '🌑';
-  if (event.type === 'full_moon') return '🌕';
-  if (event.type === 'eclipse') return '🌘';
-  if (event.type === 'season_change') return '☀️';
-  if (event.type === 'retrograde_start') return '↺';
-  return '↻';
+function eventIcon(event: CelestialEvent) {
+  if (event.type === 'season_change') return Sun;
+  if (event.type === 'retrograde_start') return RotateCcw;
+  if (event.type === 'retrograde_end') return RotateCw;
+  return Moon;
 }
 
 export default function CalendarPage() {
@@ -75,13 +74,13 @@ export default function CalendarPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
-      <div className="aura right-[-20%] top-[24%] h-[280px] w-[280px] bg-[#18244D]/32" />
-      <div className="aura bottom-[-12%] left-[16%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
+      <div className="aura aura-blue right-[-20%] top-[24%] h-[280px] w-[280px]" />
+      <div className="aura aura-indigo bottom-[-12%] left-[16%] h-[250px] w-[250px]" />
       <div className="mx-auto max-w-4xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
         <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
-          ← {t.back}
+          <span className="inline-flex items-center gap-2"><ArrowLeft size={16} strokeWidth={1.5} />{t.back}</span>
         </button>
         <h1 className="font-heading text-3xl text-[#FDFBF7]">{copy.title}</h1>
         <div className="w-14" />
@@ -113,6 +112,7 @@ export default function CalendarPage() {
               ? getRetrogradeProgress(event.retrogradePeriod, new Date())
               : 0;
             const showMoon = event.type === 'new_moon' || event.type === 'full_moon';
+            const EventIcon = eventIcon(event);
 
             return (
               <article key={`${event.type}-${event.date.toISOString()}-${event.title.en}`} className="glass-card p-4">
@@ -127,8 +127,8 @@ export default function CalendarPage() {
                       })}
                     </p>
                     <h3 className="mt-1 font-heading text-xl text-[#FDFBF7]">
-                      <span className="mr-2" aria-hidden="true">
-                        {eventIcon(event)}
+                      <span className="mr-2 inline-flex align-middle text-[#C8A4A4]" aria-hidden="true">
+                        <EventIcon size={18} strokeWidth={1.5} />
                       </span>
                       {event.title[language]}
                     </h3>

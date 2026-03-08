@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ChevronDown, Flame, Infinity, MessageCircle, Sparkles, Sprout, Waves } from 'lucide-react';
 import RadarChart from '@/components/RadarChart';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -101,7 +102,7 @@ export default function PublicCompatibilityPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
         <p className="text-lg text-cream/60">{error || 'Not found'}</p>
-        <Link href="/" className="lumina-button">Discover Your Compatibility →</Link>
+        <Link href="/" className="lumina-button">Discover Your Compatibility</Link>
       </div>
     );
   }
@@ -120,12 +121,12 @@ export default function PublicCompatibilityPage() {
   ];
 
   const sections = [
-    { key: 'overallConnection' as const, title: 'Overall Connection', icon: '✦', text: interpretation.overallConnection },
-    { key: 'communicationStyle' as const, title: 'Communication', icon: '💬', text: interpretation.communicationStyle },
-    { key: 'emotionalCompatibility' as const, title: 'Emotional Depth', icon: '🌊', text: interpretation.emotionalCompatibility },
-    { key: 'attractionChemistry' as const, title: 'Chemistry & Attraction', icon: '🔥', text: interpretation.attractionChemistry },
-    { key: 'growthChallenges' as const, title: 'Growth & Challenges', icon: '🌱', text: interpretation.growthChallenges },
-    { key: 'longTermPotential' as const, title: 'Long-Term Potential', icon: '♾️', text: interpretation.longTermPotential },
+    { key: 'overallConnection' as const, title: 'Overall Connection', icon: Sparkles, text: interpretation.overallConnection },
+    { key: 'communicationStyle' as const, title: 'Communication', icon: MessageCircle, text: interpretation.communicationStyle },
+    { key: 'emotionalCompatibility' as const, title: 'Emotional Depth', icon: Waves, text: interpretation.emotionalCompatibility },
+    { key: 'attractionChemistry' as const, title: 'Chemistry & Attraction', icon: Flame, text: interpretation.attractionChemistry },
+    { key: 'growthChallenges' as const, title: 'Growth & Challenges', icon: Sprout, text: interpretation.growthChallenges },
+    { key: 'longTermPotential' as const, title: 'Long-Term Potential', icon: Infinity, text: interpretation.longTermPotential },
   ];
 
   const sunA = result.synastry.personAChart.planets.find((p) => p.planet === 'Sun');
@@ -215,12 +216,9 @@ export default function PublicCompatibilityPage() {
                 onClick={() => setOpenSection(openSection === section.key ? ('' as keyof SynastryNarrative) : section.key)}
                 className="flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-white/[0.02]"
               >
-                <span className="text-base">{section.icon}</span>
+                <section.icon className="text-[#C8A4A4]" size={18} strokeWidth={1.5} />
                 <span className="flex-1 text-sm font-medium text-warmWhite">{section.title}</span>
-                <svg className={`h-4 w-4 text-cream/40 transition-transform ${openSection === section.key ? 'rotate-180' : ''}`}
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDown className={`h-4 w-4 text-cream/40 transition-transform ${openSection === section.key ? 'rotate-180' : ''}`} strokeWidth={1.5} />
               </button>
               {openSection === section.key && (
                 <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 animate-fadeInUp">

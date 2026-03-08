@@ -100,7 +100,7 @@ export default function PlacementDetailClient({ placement, planetSymbol, zodiacS
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-r from-lumina-accent-bright to-lumina-accent px-5 text-sm font-semibold text-white transition hover:opacity-90"
+              className="lumina-button inline-flex min-h-11 items-center justify-center px-5 text-sm font-semibold transition hover:opacity-90"
             >
               {copy.ctaChart}
             </Link>

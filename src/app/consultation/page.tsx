@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, ArrowRight, MessageCircle, Moon, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile } from '@/lib/profile';
 
@@ -135,7 +136,7 @@ export default function ConsultationPage() {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center px-4">
         <div className="max-w-md text-center animate-fadeInUp">
-          <div className="mb-6 text-6xl animate-float">✨</div>
+          <div className="mb-6 flex justify-center text-[#C8A4A4] animate-float"><Sparkles size={40} strokeWidth={1.5} /></div>
           <h1 className="mb-4 font-heading text-3xl text-[#FDFBF7]">
             {language === 'ru' ? 'Спасибо!' : 'Thank you!'}
           </h1>
@@ -148,7 +149,10 @@ export default function ConsultationPage() {
             {language === 'ru' ? 'Проверьте папку "Спам", если не получите ответ.' : 'Check your spam folder if you don\'t hear from us.'}
           </p>
           <button type="button" onClick={() => router.push('/')} className="lumina-button px-8">
-            {language === 'ru' ? '← На главную' : '← Back to Lumina'}
+            <span className="inline-flex items-center gap-2">
+              <ArrowLeft size={16} strokeWidth={1.5} />
+              <span>{language === 'ru' ? 'На главную' : 'Back to Lumina'}</span>
+            </span>
           </button>
         </div>
       </div>
@@ -157,14 +161,14 @@ export default function ConsultationPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
-      <div className="aura right-[-20%] top-[24%] h-[280px] w-[280px] bg-[#18244D]/32" />
-      <div className="aura bottom-[-12%] left-[16%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
+      <div className="aura aura-blue right-[-20%] top-[24%] h-[280px] w-[280px]" />
+      <div className="aura aura-indigo bottom-[-12%] left-[16%] h-[250px] w-[250px]" />
       <div className="mx-auto max-w-2xl px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
         <button onClick={() => selectedType ? setSelectedType(null) : router.back()} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
-          ← {language === 'ru' ? 'Назад' : 'Back'}
+          <span className="inline-flex items-center gap-2"><ArrowLeft size={16} strokeWidth={1.5} />{language === 'ru' ? 'Назад' : 'Back'}</span>
         </button>
         <p className="font-heading text-xl text-[#FDFBF7]">Lumina</p>
         <div className="w-20" />
@@ -190,7 +194,7 @@ export default function ConsultationPage() {
             onClick={() => setSelectedType('written')}
             className="glass-card group p-6 text-left transition hover:border-white/[0.16]"
           >
-            <div className="text-3xl mb-3">💬</div>
+            <MessageCircle className="mb-3 text-[#8D8B9F]" size={28} strokeWidth={1.5} />
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Письменный разбор' : 'Written Reading'}
             </h3>
@@ -214,7 +218,7 @@ export default function ConsultationPage() {
                 {language === 'ru' ? 'Популярный' : 'Popular'}
               </span>
             </div>
-            <div className="text-3xl mb-3">☽</div>
+            <Moon className="mb-3 text-[#8D8B9F]" size={28} strokeWidth={1.5} />
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Личная сессия' : 'Personal Session'}
             </h3>
@@ -234,7 +238,7 @@ export default function ConsultationPage() {
             onClick={() => setSelectedType('video-60')}
             className="glass-card group p-6 text-left transition hover:border-white/[0.16]"
           >
-            <div className="text-3xl mb-3">✦</div>
+            <Sparkles className="mb-3 text-[#C8A4A4]" size={28} strokeWidth={1.5} />
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Глубокий разбор' : 'Deep Dive'}
             </h3>
@@ -255,7 +259,11 @@ export default function ConsultationPage() {
       {(selectedType === 'video-40' || selectedType === 'video-60') && (
         <div className="animate-fadeInUp">
           <div className="glass-card p-6 sm:p-8 text-center mb-6">
-            <div className="text-4xl mb-4">{selectedType === 'video-40' ? '☽' : '✦'}</div>
+            <div className="mb-4 flex justify-center">
+              {selectedType === 'video-40'
+                ? <Moon className="text-[#8D8B9F]" size={30} strokeWidth={1.5} />
+                : <Sparkles className="text-[#C8A4A4]" size={30} strokeWidth={1.5} />}
+            </div>
             <h2 className="font-heading text-xl text-lumina-soft mb-2">
               {selectedType === 'video-40'
                 ? (language === 'ru' ? 'Личная сессия · 40 мин' : 'Personal Session · 40 min')
@@ -272,8 +280,8 @@ export default function ConsultationPage() {
               rel="noopener noreferrer"
               className="lumina-button inline-flex items-center gap-2 px-8"
             >
-              {language === 'ru' ? 'Выбрать время' : 'Choose a Time'}
-              <span className="text-sm">→</span>
+              <span>{language === 'ru' ? 'Выбрать время' : 'Choose a Time'}</span>
+              <ArrowRight size={16} strokeWidth={1.5} />
             </a>
             <p className="text-xs text-cream/40 mt-4">
               {selectedType === 'video-40' ? '€35' : '€55'} · {language === 'ru' ? 'Оплата при бронировании' : 'Payment at booking'}
@@ -285,8 +293,8 @@ export default function ConsultationPage() {
             <div className="rounded-xl bg-lumina-accent/5 border border-lumina-accent/20 p-4 text-center">
               <p className="text-xs text-lumina-soft">
                 {language === 'ru'
-                  ? '✦ Заполните форму ниже, чтобы астролог подготовилась к вашей сессии'
-                  : '✦ Fill out the form below so your astrologer can prepare for your session'}
+                  ? 'Заполните форму ниже, чтобы астролог подготовилась к вашей сессии'
+                  : 'Fill out the form below so your astrologer can prepare for your session'}
               </p>
             </div>
 
@@ -439,7 +447,12 @@ export default function ConsultationPage() {
               >
                 {submitting
                   ? '...'
-                  : (language === 'ru' ? 'Отправить и выбрать время →' : 'Submit & Choose a Time →')}
+                  : (
+                    <span className="inline-flex items-center gap-2">
+                      <span>{language === 'ru' ? 'Отправить и выбрать время' : 'Submit & Choose a Time'}</span>
+                      <ArrowRight size={16} strokeWidth={1.5} />
+                    </span>
+                  )}
               </button>
               {submitError && <p className="text-center text-xs text-red-300">{submitError}</p>}
               <p className="text-center text-[10px] text-cream/30">
@@ -456,7 +469,7 @@ export default function ConsultationPage() {
       {selectedType === 'written' && (
         <div className="space-y-5 animate-fadeInUp">
           <div className="glass-card p-5 text-center">
-            <div className="text-3xl mb-2">💬</div>
+            <div className="mb-2 flex justify-center"><MessageCircle className="text-[#8D8B9F]" size={28} strokeWidth={1.5} /></div>
             <h2 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Письменный разбор · €25' : 'Written Reading · €25'}
             </h2>

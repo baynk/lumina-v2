@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import html2canvas from 'html2canvas';
+import { ArrowLeft, ArrowUp, Calendar, Moon, Share2, Sparkles, Star, Sun } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile, saveProfile, clearProfile, type UserProfileLocal, type RelationshipStatus, type Interest, type Gender } from '@/lib/profile';
 import { calculateNatalChart } from '@/services/astronomyCalculator';
@@ -300,7 +301,7 @@ export default function ProfilePage() {
 
     try {
       await navigator.clipboard.writeText(`${text}\n${shareUrl}`);
-      setShareStatus(language === 'ru' ? '✓ Скопировано' : '✓ Copied');
+      setShareStatus(language === 'ru' ? 'Скопировано' : 'Copied');
     } catch { setShareStatus(''); }
     setTimeout(() => setShareStatus(''), 2000);
   };
@@ -308,8 +309,8 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center">
-        <div className="aura left-[-22%] top-[8%] h-[260px] w-[260px] bg-[#5A438A]/34" />
-        <div className="aura right-[-18%] bottom-[-10%] h-[280px] w-[280px] bg-[#18244D]/34" />
+        <div className="aura aura-violet left-[-22%] top-[8%] h-[260px] w-[260px]" />
+        <div className="aura aura-blue right-[-18%] bottom-[-10%] h-[280px] w-[280px]" />
         <p className="font-heading text-3xl text-[#FDFBF7]">Lumina</p>
       </div>
     );
@@ -318,9 +319,9 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="lumina-screen">
-        <div className="aura left-[-24%] top-[8%] h-[270px] w-[270px] bg-[#5A438A]/34" />
-        <div className="aura right-[-18%] top-[30%] h-[250px] w-[250px] bg-[#18244D]/32" />
-        <div className="aura bottom-[-10%] left-[16%] h-[240px] w-[240px] bg-[#2E1B54]/34" />
+        <div className="aura aura-violet left-[-24%] top-[8%] h-[270px] w-[270px]" />
+        <div className="aura aura-blue right-[-18%] top-[30%] h-[250px] w-[250px]" />
+        <div className="aura aura-indigo bottom-[-10%] left-[16%] h-[240px] w-[240px]" />
         <div className="mx-auto w-full max-w-md px-4 pb-28 pt-12 sm:px-6">
         <div className="text-center">
           <p className="lumina-label">{language === 'ru' ? 'Профиль Lumina' : 'Lumina profile'}</p>
@@ -337,23 +338,23 @@ export default function ProfilePage() {
         <div className="mt-8 space-y-3">
           {[
             {
-              icon: '🌟',
+              icon: Star,
               en: 'Personalized natal chart with full planetary positions',
               ru: 'Персональная натальная карта с позициями всех планет',
             },
             {
-              icon: '📅',
+              icon: Calendar,
               en: 'Daily horoscope tailored to your birth data',
               ru: 'Ежедневный гороскоп на основе ваших данных рождения',
             },
             {
-              icon: '💫',
+              icon: Sparkles,
               en: 'Compatibility analysis with anyone',
               ru: 'Анализ совместимости с любым человеком',
             },
           ].map((item) => (
-            <div key={item.icon} className="glass-card flex items-start gap-3 rounded-[22px] p-3.5">
-              <span className="text-lg">{item.icon}</span>
+            <div key={item.en} className="glass-card flex items-start gap-3 rounded-[22px] p-3.5">
+              <item.icon className="mt-0.5 text-[#8D8B9F]" size={18} strokeWidth={1.5} />
               <p className="text-sm text-[#8D8B9F]">{language === 'ru' ? item.ru : item.en}</p>
             </div>
           ))}
@@ -382,14 +383,14 @@ export default function ProfilePage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
-      <div className="aura right-[-18%] top-[20%] h-[260px] w-[260px] bg-[#18244D]/32" />
-      <div className="aura bottom-[-12%] left-[18%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
+      <div className="aura aura-blue right-[-18%] top-[20%] h-[260px] w-[260px]" />
+      <div className="aura aura-indigo bottom-[-12%] left-[18%] h-[250px] w-[250px]" />
       <div className="mx-auto max-w-lg px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
         <button onClick={() => router.push('/chart')} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
-          ← {t.back}
+          <span className="inline-flex items-center gap-2"><ArrowLeft size={16} strokeWidth={1.5} />{t.back}</span>
         </button>
         <p className="font-heading text-xl text-[#FDFBF7]">{t.profile}</p>
         <div className="w-20" />
@@ -406,12 +407,14 @@ export default function ProfilePage() {
           </p>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: language === 'ru' ? 'Солнце' : 'Sun', sign: bigThree.sun, icon: '☀️' },
-              { label: language === 'ru' ? 'Луна' : 'Moon', sign: bigThree.moon, icon: '🌙' },
-              { label: language === 'ru' ? 'Восходящий' : 'Rising', sign: bigThree.rising, icon: '⬆️' },
+              { label: language === 'ru' ? 'Солнце' : 'Sun', sign: bigThree.sun, icon: Sun },
+              { label: language === 'ru' ? 'Луна' : 'Moon', sign: bigThree.moon, icon: Moon },
+              { label: language === 'ru' ? 'Восходящий' : 'Rising', sign: bigThree.rising, icon: ArrowUp },
             ].map((item) => (
               <div key={item.label} className="rounded-[22px] border border-white/10 bg-white/[0.03] p-3 text-center">
-                <p className="text-lg">{ZODIAC_SYMBOLS[item.sign] || item.icon}</p>
+                <div className="flex justify-center">
+                  {ZODIAC_SYMBOLS[item.sign] ? <p className="text-lg">{ZODIAC_SYMBOLS[item.sign]}</p> : <item.icon className="text-[#C8A4A4]" size={18} strokeWidth={1.5} />}
+                </div>
                 <p className="mt-1 text-sm font-medium text-[#FDFBF7]">{language === 'ru' ? translateSign(item.sign, 'ru') : item.sign}</p>
                 <p className="text-[10px] uppercase tracking-wider text-[#8D8B9F]">{item.label}</p>
               </div>
@@ -428,7 +431,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="font-heading text-lg text-[#FDFBF7]">
-                    {language === 'ru' ? `Связь с ${partner.partner_name}` : `Connected with ${partner.partner_name}`} ✦
+                    {language === 'ru' ? `Связь с ${partner.partner_name}` : `Connected with ${partner.partner_name}`}
                   </p>
                   <p className="text-xs text-[#8D8B9F]">
                     {partner.partner_birth_place || (partner.is_linked ? partner.linked_birth_place : '') || ''}
@@ -445,12 +448,14 @@ export default function ProfilePage() {
               {partnerBigThree && (
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   {[
-                    { label: language === 'ru' ? 'Солнце' : 'Sun', sign: partnerBigThree.sun, icon: '☀️' },
-                    { label: language === 'ru' ? 'Луна' : 'Moon', sign: partnerBigThree.moon, icon: '🌙' },
-                    { label: language === 'ru' ? 'Восходящий' : 'Rising', sign: partnerBigThree.rising, icon: '⬆️' },
+                    { label: language === 'ru' ? 'Солнце' : 'Sun', sign: partnerBigThree.sun, icon: Sun },
+                    { label: language === 'ru' ? 'Луна' : 'Moon', sign: partnerBigThree.moon, icon: Moon },
+                    { label: language === 'ru' ? 'Восходящий' : 'Rising', sign: partnerBigThree.rising, icon: ArrowUp },
                   ].map((item) => (
                     <div key={item.label} className="rounded-[22px] border border-white/10 bg-white/[0.03] p-2.5 text-center">
-                      <p className="text-lg">{ZODIAC_SYMBOLS[item.sign] || item.icon}</p>
+                      <div className="flex justify-center">
+                        {ZODIAC_SYMBOLS[item.sign] ? <p className="text-lg">{ZODIAC_SYMBOLS[item.sign]}</p> : <item.icon className="text-[#C8A4A4]" size={18} strokeWidth={1.5} />}
+                      </div>
                       <p className="mt-0.5 text-xs font-medium text-[#FDFBF7]">{language === 'ru' ? translateSign(item.sign, 'ru') : item.sign}</p>
                       <p className="text-[9px] uppercase tracking-wider text-[#8D8B9F]">{item.label}</p>
                     </div>
@@ -465,7 +470,7 @@ export default function ProfilePage() {
                     ref={compatCardRef}
                     className="glass-card relative overflow-hidden rounded-[28px] p-5"
                   >
-                    <div className="aura left-[-18%] top-[-18%] h-[160px] w-[160px] bg-[#5A438A]/24" />
+                    <div className="aura aura-violet left-[-18%] top-[-18%] h-[160px] w-[160px]" />
                     <div className="relative z-10 flex items-center justify-between">
                       <div className="text-center flex-1">
                         <p className="text-3xl">{ZODIAC_SYMBOLS[bigThree.sun]}</p>
@@ -489,7 +494,10 @@ export default function ProfilePage() {
                     disabled={!!shareStatus && shareStatus.includes('...')}
                     className="mt-3 w-full rounded-full border border-white/10 bg-white/[0.03] py-2.5 text-xs text-[#8D8B9F] transition hover:bg-white/[0.06] hover:text-[#FDFBF7] disabled:opacity-50"
                   >
-                    {shareStatus || (language === 'ru' ? '📤 Поделиться' : '📤 Share')}
+                    <span className="inline-flex items-center gap-2">
+                      <Share2 size={14} strokeWidth={1.5} />
+                      <span>{shareStatus || (language === 'ru' ? 'Поделиться' : 'Share')}</span>
+                    </span>
                   </button>
                 </>
               )}
@@ -523,7 +531,7 @@ export default function ProfilePage() {
                 disabled={!connectionCode}
                 className="text-xs text-[#8D8B9F] transition hover:text-[#FDFBF7] disabled:opacity-30"
               >
-                {copiedCode ? '✓' : (language === 'ru' ? 'Копировать' : 'Copy')}
+                {copiedCode ? (language === 'ru' ? 'Скопировано' : 'Copied') : (language === 'ru' ? 'Копировать' : 'Copy')}
               </button>
             </div>
           </div>

@@ -284,8 +284,8 @@ export default function ChartPage() {
   if (loadingChart) {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center px-6">
-        <div className="aura left-[-20%] top-[10%] h-[260px] w-[260px] bg-[#5A438A]/35" />
-        <div className="aura bottom-[-10%] right-[-12%] h-[280px] w-[280px] bg-[#18244D]/35" />
+        <div className="aura aura-violet left-[-20%] top-[10%] h-[260px] w-[260px]" />
+        <div className="aura aura-blue bottom-[-10%] right-[-12%] h-[280px] w-[280px]" />
         <div className="text-center">
           <p className="font-heading text-3xl text-[#FDFBF7]">Lumina</p>
           <p className="mt-3 text-[#8D8B9F]">{t.loadingChart}</p>
@@ -320,9 +320,9 @@ export default function ChartPage() {
 
     return (
       <div className="lumina-screen">
-        <div className="aura left-[-24%] top-[8%] h-[250px] w-[250px] bg-[#5A438A]/35" />
-        <div className="aura right-[-20%] top-[28%] h-[270px] w-[270px] bg-[#18244D]/35" />
-        <div className="aura bottom-[-12%] left-[18%] h-[240px] w-[240px] bg-[#2E1B54]/35" />
+        <div className="aura aura-violet left-[-24%] top-[8%] h-[250px] w-[250px]" />
+        <div className="aura aura-blue right-[-20%] top-[28%] h-[270px] w-[270px]" />
+        <div className="aura aura-indigo bottom-[-12%] left-[18%] h-[240px] w-[240px]" />
         <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-6 sm:px-6">
         <header className="animate-fadeInUp text-center mb-6">
           <p className="lumina-label">{language === 'ru' ? 'Натальная карта' : 'Natal chart'}</p>
@@ -352,9 +352,9 @@ export default function ChartPage() {
 
     return (
       <div className="lumina-screen">
-        <div className="aura left-[-22%] top-[10%] h-[250px] w-[250px] bg-[#5A438A]/35" />
-        <div className="aura right-[-20%] top-[30%] h-[270px] w-[270px] bg-[#18244D]/35" />
-        <div className="aura bottom-[-10%] left-[16%] h-[230px] w-[230px] bg-[#2E1B54]/35" />
+        <div className="aura aura-violet left-[-22%] top-[10%] h-[250px] w-[250px]" />
+        <div className="aura aura-blue right-[-20%] top-[30%] h-[270px] w-[270px]" />
+        <div className="aura aura-indigo bottom-[-10%] left-[16%] h-[230px] w-[230px]" />
         <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-6 sm:px-6">
         {/* Teaser: visible key insights */}
         <header className="animate-fadeInUp text-center">
@@ -436,9 +436,9 @@ export default function ChartPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/35" />
-      <div className="aura right-[-24%] top-[22%] h-[300px] w-[300px] bg-[#18244D]/32" />
-      <div className="aura bottom-[-14%] left-[18%] h-[280px] w-[280px] bg-[#2E1B54]/34" />
+      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
+      <div className="aura aura-blue right-[-24%] top-[22%] h-[300px] w-[300px]" />
+      <div className="aura aura-indigo bottom-[-14%] left-[18%] h-[280px] w-[280px]" />
       <div className="mx-auto max-w-6xl px-4 pb-10 pt-0 sm:px-6">
         {/* Header */}
         <header className="mb-6 flex items-center justify-between">
@@ -682,8 +682,8 @@ export default function ChartPage() {
       {showShareCard && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#0B0814]/85 px-4 py-6 sm:items-center" onClick={() => setShowShareCard(false)}>
           <div className="glass-card relative w-full max-w-sm rounded-t-[28px] p-8 text-center animate-slideUp sm:rounded-[28px] sm:animate-fadeInUp" onClick={(event) => event.stopPropagation()}>
-            <div className="aura left-[-26%] top-[-14%] h-[180px] w-[180px] bg-[#5A438A]/28" />
-            <div className="aura right-[-18%] bottom-[-18%] h-[180px] w-[180px] bg-[#18244D]/24" />
+            <div className="aura aura-violet left-[-26%] top-[-14%] h-[180px] w-[180px]" />
+            <div className="aura aura-blue right-[-18%] bottom-[-18%] h-[180px] w-[180px]" />
             <p className="relative font-heading text-3xl text-[#FDFBF7]">Lumina</p>
             {profile?.name && <p className="relative mt-2 text-[#FDFBF7]">{profile.name}</p>}
             <div className="mt-6 space-y-4 text-left">
@@ -723,7 +723,7 @@ export default function ChartPage() {
                 type="button"
                 className="lumina-button flex-1 text-sm"
                 onClick={async () => {
-                  const shareText = `✨ My Lumina Chart ✨\n☉ ${t.sun}: ${translateSign(natalChart.zodiacSign, language)}\n☽ ${t.moon}: ${translateSign(moonSign || '', language)}\n↑ ${t.rising}: ${translateSign(natalChart.risingSign, language)}\n\nDiscover yours → luminastrology.com`;
+                  const shareText = `My Lumina Chart\nSun: ${translateSign(natalChart.zodiacSign, language)}\nMoon: ${translateSign(moonSign || '', language)}\nRising: ${translateSign(natalChart.risingSign, language)}\n\nDiscover yours → luminastrology.com`;
                   if (navigator.share) {
                     try {
                       await navigator.share({ title: 'My Lumina Chart', text: shareText, url: 'https://luminastrology.com' });

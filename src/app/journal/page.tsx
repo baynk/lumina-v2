@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { Moon, Sparkles } from 'lucide-react';
 import MoonPhaseVisual from '@/components/MoonPhaseVisual';
 import { calculateDailyCelestialData } from '@/lib/astronomyCalculator';
 import { useLanguage } from '@/context/LanguageContext';
@@ -60,18 +61,6 @@ function parseLocalPayload(raw: string): JournalSections {
 
 function firstLine(text: string): string {
   return text.split('\n').map((line) => line.trim()).find((line) => line.length > 0) || text.trim();
-}
-
-function phaseEmoji(phase: string): string {
-  const normalized = phase.toLowerCase();
-  if (normalized.includes('new')) return '🌑';
-  if (normalized.includes('waxing crescent')) return '🌒';
-  if (normalized.includes('first quarter')) return '🌓';
-  if (normalized.includes('waxing gibbous')) return '🌔';
-  if (normalized.includes('full')) return '🌕';
-  if (normalized.includes('waning gibbous')) return '🌖';
-  if (normalized.includes('last quarter') || normalized.includes('third quarter')) return '🌗';
-  return '🌘';
 }
 
 function isReleaseMoon(phase: string): boolean {
@@ -336,9 +325,9 @@ export default function JournalPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
-      <div className="aura right-[-20%] top-[24%] h-[280px] w-[280px] bg-[#18244D]/32" />
-      <div className="aura bottom-[-12%] left-[16%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
+      <div className="aura aura-blue right-[-20%] top-[24%] h-[280px] w-[280px]" />
+      <div className="aura aura-indigo bottom-[-12%] left-[16%] h-[250px] w-[250px]" />
       <div className="mx-auto max-w-3xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
         <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
@@ -354,7 +343,7 @@ export default function JournalPage() {
           <div className="animate-float">
             <MoonPhaseVisual illumination={moonIllumination} phase={moonPhase} />
           </div>
-          <p className="mt-2 font-heading text-2xl text-[#FDFBF7]">{phaseEmoji(moonPhase)} {translateMoonPhase(moonPhase, language)}</p>
+          <p className="mt-2 inline-flex items-center gap-2 font-heading text-2xl text-[#FDFBF7]"><Moon className="text-[#C8A4A4]" size={22} strokeWidth={1.5} />{translateMoonPhase(moonPhase, language)}</p>
           <p className="mt-1 text-xs text-[#8D8B9F]">{t.illumination}: {moonIllumination}%</p>
           <div className="mt-3 h-2 w-full max-w-xs overflow-hidden rounded-full bg-white/10">
             <div className="h-full rounded-full bg-lumina-accent transition-all duration-700" style={{ width: `${moonIllumination}%` }} aria-hidden="true" />
@@ -414,7 +403,7 @@ export default function JournalPage() {
 
       {loadingRitual || ritual ? (
         <section className="glass-card mt-6 overflow-hidden border-lumina-accent/30 bg-gradient-to-br from-[#181336]/70 via-[#111633]/65 to-[#1b1540]/70 p-6 animate-stagger-3">
-          <p className="font-heading text-2xl text-lumina-soft">{language === 'ru' ? '✦ Лунный ритуал' : '✦ Moon Ritual'}</p>
+          <p className="inline-flex items-center gap-2 font-heading text-2xl text-lumina-soft"><Sparkles className="text-[#C8A4A4]" size={20} strokeWidth={1.5} />{language === 'ru' ? 'Лунный ритуал' : 'Moon Ritual'}</p>
           {loadingRitual ? (
             <div className="mt-4 space-y-2">
               <div className="skeleton h-4 w-full" />
@@ -455,7 +444,7 @@ export default function JournalPage() {
                     <p className="text-xs text-[#8D8B9F]">
                       {new Date(`${item.date}T12:00:00`).toLocaleDateString(language === 'ru' ? 'ru-RU' : 'en-US')}
                     </p>
-                    <p className="text-sm text-[#FDFBF7]">{phaseEmoji(item.moonPhase)} {translateMoonPhase(item.moonPhase, language)}</p>
+                    <p className="inline-flex items-center gap-2 text-sm text-[#FDFBF7]"><Moon className="text-[#C8A4A4]" size={16} strokeWidth={1.5} />{translateMoonPhase(item.moonPhase, language)}</p>
                   </div>
                   <p className="mt-2 text-sm text-[#C0BDD6]">{firstLine(item.entries.reflection || item.entries.intention || '').slice(0, 160)}</p>
                 </button>

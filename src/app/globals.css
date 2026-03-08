@@ -41,9 +41,9 @@ body {
   overflow-x: hidden;
   background-color: var(--bg-void);
   background-image:
-    radial-gradient(circle at 18% 12%, rgba(90, 67, 138, 0.16), transparent 34%),
-    radial-gradient(circle at 82% 10%, rgba(24, 36, 77, 0.14), transparent 30%),
-    radial-gradient(circle at 55% 85%, rgba(46, 27, 84, 0.18), transparent 34%),
+    radial-gradient(circle at 18% 12%, rgba(90, 67, 138, 0.24), transparent 34%),
+    radial-gradient(circle at 82% 10%, rgba(24, 36, 77, 0.22), transparent 30%),
+    radial-gradient(circle at 55% 85%, rgba(46, 27, 84, 0.26), transparent 34%),
     linear-gradient(180deg, var(--bg-base) 0%, #090612 55%, var(--bg-void) 100%);
   color: var(--lumina-text);
   font-family: var(--font-body), sans-serif;
@@ -106,10 +106,16 @@ textarea {
 }
 
 .glass-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   background: linear-gradient(135deg, var(--bg-card-start), var(--bg-card-end));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(253, 251, 247, 0.05),
+    0 24px 60px rgba(4, 3, 10, 0.26);
   border-radius: 28px;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
@@ -131,7 +137,7 @@ textarea {
   width: 100%;
   min-height: 48px;
   border-radius: 20px;
-  border: 1px solid rgba(253, 251, 247, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(20, 17, 33, 0.74);
   color: var(--lumina-text);
   padding: 0.75rem 0.95rem;
@@ -140,7 +146,7 @@ textarea {
 }
 
 .lumina-input:focus {
-  border-color: rgba(253, 251, 247, 0.18);
+  border-color: rgba(253, 251, 247, 0.14);
   box-shadow: 0 0 0 3px rgba(90, 67, 138, 0.18), 0 0 24px rgba(90, 67, 138, 0.12);
   background: rgba(20, 17, 33, 0.9);
 }
@@ -174,10 +180,16 @@ textarea {
 }
 
 .lumina-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   background: linear-gradient(135deg, var(--bg-card-start), var(--bg-card-end));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(253, 251, 247, 0.05),
+    0 24px 60px rgba(4, 3, 10, 0.26);
   border-radius: 28px;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
@@ -274,7 +286,9 @@ textarea {
   position: absolute;
   border-radius: 9999px;
   filter: blur(90px);
-  opacity: 0.35;
+  opacity: 0.48;
+  pointer-events: none;
+  z-index: 0;
   animation: breathe 10s infinite alternate ease-in-out;
 }
 
@@ -471,12 +485,52 @@ textarea {
 
 .lumina-screen {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top, rgba(90, 67, 138, 0.08), transparent 30%),
-    radial-gradient(circle at bottom, rgba(24, 36, 77, 0.1), transparent 34%),
+    radial-gradient(circle at top, rgba(90, 67, 138, 0.16), transparent 30%),
+    radial-gradient(circle at bottom, rgba(24, 36, 77, 0.18), transparent 34%),
     var(--bg-base);
+}
+
+.lumina-screen::before,
+.lumina-screen::after {
+  content: '';
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lumina-screen::before {
+  top: 8%;
+  left: -14%;
+  width: 18rem;
+  height: 18rem;
+  background: var(--aura-violet);
+}
+
+.lumina-screen::after {
+  right: -12%;
+  bottom: 12%;
+  width: 18rem;
+  height: 18rem;
+  background: var(--aura-blue);
+}
+
+.aura-violet {
+  background: var(--aura-violet);
+}
+
+.aura-indigo {
+  background: var(--aura-indigo);
+}
+
+.aura-blue {
+  background: var(--aura-blue);
 }
 
 .lumina-screen-content {

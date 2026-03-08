@@ -96,7 +96,7 @@ export default function ShareCard({ type, title, subtitle, bullets, cta = 'lumin
     // Absolute fallback
     try {
       await navigator.clipboard.writeText(`${shareText}\n${url}`);
-      setStatus('Copied ✓');
+      setStatus('Copied');
     } catch { setStatus(''); }
     setTimeout(() => setStatus(''), 2500);
   };

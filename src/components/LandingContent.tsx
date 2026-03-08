@@ -1,7 +1,8 @@
 'use client';
 
-import { useLanguage } from '@/context/LanguageContext';
 import { useEffect, useRef } from 'react';
+import { Calendar, Moon, Sparkles, Sun } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 /* ─── Translations ────────────────────────────── */
 const T = {
@@ -259,6 +260,9 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
       }} />
+      <div className="aura aura-violet fixed left-[-8%] top-[8%] h-[320px] w-[320px] z-0" />
+      <div className="aura aura-blue fixed right-[-10%] top-[24%] h-[340px] w-[340px] z-0" />
+      <div className="aura aura-indigo fixed bottom-[6%] left-[24%] h-[300px] w-[300px] z-0" />
       <StarCanvas />
 
       {/* ═══ HERO ═══ */}
@@ -330,11 +334,12 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
         <div className="mx-auto max-w-5xl lg:max-w-6xl">
           <div className="grid gap-8 sm:gap-6 lg:grid-cols-3 lg:gap-10">
             {[
-              { tag: t.ben1Tag, title: t.ben1Title, p: t.ben1P },
-              { tag: t.ben2Tag, title: t.ben2Title, p: t.ben2P },
-              { tag: t.ben3Tag, title: t.ben3Title, p: t.ben3P },
+              { tag: t.ben1Tag, title: t.ben1Title, p: t.ben1P, icon: Moon },
+              { tag: t.ben2Tag, title: t.ben2Title, p: t.ben2P, icon: Sun },
+              { tag: t.ben3Tag, title: t.ben3Title, p: t.ben3P, icon: Calendar },
             ].map((ben, i) => (
-              <div key={i} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 lg:p-8">
+              <div key={i} className="glass-card rounded-[28px] p-6 lg:p-8">
+                <ben.icon className="text-[#8D8B9F]" size={20} strokeWidth={1.5} />
                 <p className="text-[10px] lg:text-[11px] tracking-[0.3em] uppercase text-[#C8A4A4]/40 font-medium">{ben.tag}</p>
                 <h2 className="mt-3 font-heading text-xl sm:text-2xl lg:text-2xl xl:text-3xl text-cream/90 leading-snug">
                   {ben.title}
@@ -381,12 +386,12 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
       {/* ═══ PRECISION + CTA combined ═══ */}
       <section className="relative z-10 py-16 sm:py-20 lg:py-24 px-6 lg:px-12">
         <div className="mx-auto max-w-2xl lg:max-w-3xl text-center">
-          <p className="text-[10px] lg:text-[12px] tracking-[0.3em] uppercase text-[#C8A4A4]/30">✦</p>
+          <div className="flex justify-center text-[#C8A4A4]/70"><Sparkles size={18} strokeWidth={1.5} /></div>
           <h2 className="mt-4 font-heading text-2xl lg:text-3xl xl:text-4xl text-cream/70">{t.precTitle}</h2>
           <p className="mt-5 text-[14px] lg:text-[17px] xl:text-[18px] leading-[1.9] text-cream/35">{t.precP}</p>
           <button
             onClick={goToApp}
-            className="mt-10 rounded-full bg-gradient-to-r from-[#C8A4A4] to-[#5A438A] px-10 sm:px-16 lg:px-18 py-4 sm:py-5 lg:py-5 text-[15px] sm:text-[16px] lg:text-[17px] font-medium text-[#0B0814] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
+            className="lumina-button mt-10 px-10 sm:px-16 lg:px-18 py-4 sm:py-5 lg:py-5 text-[15px] sm:text-[16px] lg:text-[17px]"
           >
             {t.heroCta}
           </button>
@@ -397,7 +402,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
       {/* ═══ PRACTITIONER PROFILE ═══ */}
       <section className="relative z-10 py-16 sm:py-20 lg:py-24 px-6 lg:px-12">
         <div className="mx-auto max-w-3xl lg:max-w-4xl">
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 sm:p-8 lg:p-10 lg:flex lg:gap-10 lg:items-start">
+          <div className="glass-card rounded-[28px] p-6 sm:p-8 lg:p-10 lg:flex lg:gap-10 lg:items-start">
             {/* Avatar placeholder */}
             <div className="mx-auto mb-6 lg:mb-0 lg:mx-0 flex-shrink-0 w-24 h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-[#C8A4A4]/20 to-[#5A438A]/10 flex items-center justify-center">
               <span className="font-heading text-3xl lg:text-4xl text-[#C8A4A4]/40">IR</span>
@@ -441,7 +446,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
           <p className="mt-3 text-[14px] lg:text-[16px] xl:text-[18px] text-cream/25">{t.finalP}</p>
           <button
             onClick={goToApp}
-            className="mt-8 rounded-full bg-gradient-to-r from-[#C8A4A4] to-[#5A438A] px-10 sm:px-14 lg:px-16 py-4 sm:py-5 text-[15px] sm:text-[16px] lg:text-[17px] font-medium text-[#0B0814] shadow-[0_0_30px_rgba(168,139,250,0.15)] transition hover:shadow-[0_0_40px_rgba(168,139,250,0.25)]"
+            className="lumina-button mt-8 px-10 sm:px-14 lg:px-16 py-4 sm:py-5 text-[15px] sm:text-[16px] lg:text-[17px]"
           >
             {t.finalCta}
           </button>

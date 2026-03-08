@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { ArrowLeft, ChevronDown, Flame, Infinity, Link2, LucideIcon, MapPin, MessageCircle, Send, Sparkles, Sprout, Waves } from 'lucide-react';
 import ShareCard from '@/components/ShareCard';
 import RadarChart from '@/components/RadarChart';
 import { useLanguage } from '@/context/LanguageContext';
@@ -86,10 +87,10 @@ const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com
 // RadarChart extracted to @/components/RadarChart
 
 /* ─── Benefit Card ─── */
-function BenefitCard({ icon, text }: { icon: string; text: string }) {
+function BenefitCard({ icon: Icon, text }: { icon: LucideIcon; text: string }) {
   return (
     <div className="glass-card flex items-start gap-3 rounded-[24px] p-4">
-      <span className="mt-0.5 text-lg">{icon}</span>
+      <Icon className="mt-0.5 shrink-0 text-[#8D8B9F]" size={18} strokeWidth={1.5} />
       <p className="text-sm leading-relaxed text-[#8D8B9F]">{text}</p>
     </div>
   );
@@ -221,7 +222,7 @@ function PersonCard({
 
         {state.selectedLocationName && (
           <div className="flex items-center gap-2 rounded-[20px] border border-white/[0.08] bg-white/[0.03] px-3 py-2">
-            <span className="text-xs text-[#C0BDD6]">📍</span>
+            <MapPin className="text-[#C0BDD6]" size={14} strokeWidth={1.5} />
             <p className="text-xs text-[#C0BDD6]">{state.selectedLocationName}</p>
           </div>
         )}
@@ -555,13 +556,13 @@ export default function SynastryPage() {
       setPartnerSaved(true);
       setToastMessage(
         language === 'ru'
-          ? `✓ Сохранено: ${personB.name || 'Партнер'}`
-          : `✓ Saved: ${personB.name || 'Partner'}`
+          ? `Сохранено: ${personB.name || 'Партнер'}`
+          : `Saved: ${personB.name || 'Partner'}`
       );
       await loadConnections();
     } catch (err) {
       console.error('Save partner error:', err);
-      setToastMessage(language === 'ru' ? '❌ Не удалось сохранить' : '❌ Unable to save');
+      setToastMessage(language === 'ru' ? 'Не удалось сохранить' : 'Unable to save');
     } finally {
       setSavePartnerLoading(false);
     }
@@ -676,19 +677,19 @@ export default function SynastryPage() {
         try { cachedNames = JSON.parse(localStorage.getItem('lumina_synastry_names') || '{}'); } catch {}
         const nA = personA.name || cachedNames.a || '';
         const nB = personB.name || cachedNames.b || '';
-        await navigator.share({ title: 'Lumina Compatibility', text: `✦ ${nA} & ${nB}`, url });
-        setShareLinkStatus(language === 'ru' ? '✓ Ссылка скопирована' : '✓ Link copied');
+        await navigator.share({ title: 'Lumina Compatibility', text: `${nA} & ${nB}`, url });
+        setShareLinkStatus(language === 'ru' ? 'Ссылка скопирована' : 'Link copied');
         setTimeout(() => setShareLinkStatus(''), 3000);
         return;
       } catch (e) {
         if ((e as Error).name === 'AbortError') {
-          setShareLinkStatus(language === 'ru' ? '✓ Ссылка скопирована' : '✓ Link copied');
+          setShareLinkStatus(language === 'ru' ? 'Ссылка скопирована' : 'Link copied');
           setTimeout(() => setShareLinkStatus(''), 3000);
           return;
         }
       }
     }
-    setShareLinkStatus(language === 'ru' ? '✓ Ссылка скопирована' : '✓ Link copied');
+    setShareLinkStatus(language === 'ru' ? 'Ссылка скопирована' : 'Link copied');
     setTimeout(() => setShareLinkStatus(''), 3000);
   };
 
@@ -697,8 +698,8 @@ export default function SynastryPage() {
     if (!url) return;
     const { nameA, nameB } = getShareNames();
     const text = language === 'ru'
-      ? `✨ Наша совместимость в Lumina: ${nameA} & ${nameB}\n${url}`
-      : `✨ Our Lumina compatibility reading: ${nameA} & ${nameB}\n${url}`;
+      ? `Наша совместимость в Lumina: ${nameA} & ${nameB}\n${url}`
+      : `Our Lumina compatibility reading: ${nameA} & ${nameB}\n${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
@@ -707,8 +708,8 @@ export default function SynastryPage() {
     if (!url) return;
     const { nameA, nameB } = getShareNames();
     const text = language === 'ru'
-      ? `✨ Наша совместимость в Lumina: ${nameA} & ${nameB}`
-      : `✨ Our Lumina compatibility reading: ${nameA} & ${nameB}`;
+      ? `Наша совместимость в Lumina: ${nameA} & ${nameB}`
+      : `Our Lumina compatibility reading: ${nameA} & ${nameB}`;
     window.open(
       `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
       '_blank',
@@ -716,14 +717,14 @@ export default function SynastryPage() {
     );
   };
 
-  const sections: { key: keyof SynastryNarrative; title: string; icon: string; text: string }[] = result
+  const sections: { key: keyof SynastryNarrative; title: string; icon: LucideIcon; text: string }[] = result
     ? [
-        { key: 'overallConnection', title: t.synastryOverallConnection, icon: '✦', text: result.interpretation.overallConnection },
-        { key: 'communicationStyle', title: t.synastryCommunication, icon: '💬', text: result.interpretation.communicationStyle },
-        { key: 'emotionalCompatibility', title: t.synastryEmotional, icon: '🌊', text: result.interpretation.emotionalCompatibility },
-        { key: 'attractionChemistry', title: t.synastryChemistry, icon: '🔥', text: result.interpretation.attractionChemistry },
-        { key: 'growthChallenges', title: t.synastryGrowth, icon: '🌱', text: result.interpretation.growthChallenges },
-        { key: 'longTermPotential', title: t.synastryLongTerm, icon: '♾️', text: result.interpretation.longTermPotential },
+        { key: 'overallConnection', title: t.synastryOverallConnection, icon: Sparkles, text: result.interpretation.overallConnection },
+        { key: 'communicationStyle', title: t.synastryCommunication, icon: MessageCircle, text: result.interpretation.communicationStyle },
+        { key: 'emotionalCompatibility', title: t.synastryEmotional, icon: Waves, text: result.interpretation.emotionalCompatibility },
+        { key: 'attractionChemistry', title: t.synastryChemistry, icon: Flame, text: result.interpretation.attractionChemistry },
+        { key: 'growthChallenges', title: t.synastryGrowth, icon: Sprout, text: result.interpretation.growthChallenges },
+        { key: 'longTermPotential', title: t.synastryLongTerm, icon: Infinity, text: result.interpretation.longTermPotential },
       ]
     : [];
 
@@ -756,9 +757,9 @@ export default function SynastryPage() {
 
     return (
       <div className="lumina-screen">
-        <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
-        <div className="aura right-[-22%] top-[24%] h-[290px] w-[290px] bg-[#18244D]/32" />
-        <div className="aura bottom-[-12%] left-[18%] h-[260px] w-[260px] bg-[#2E1B54]/34" />
+        <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
+        <div className="aura aura-blue right-[-22%] top-[24%] h-[290px] w-[290px]" />
+        <div className="aura aura-indigo bottom-[-12%] left-[18%] h-[260px] w-[260px]" />
         <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 animate-fadeInUp">
         {/* Results Header */}
         <div className="mb-8 text-center">
@@ -824,14 +825,9 @@ export default function SynastryPage() {
                 onClick={() => setOpenSection(openSection === section.key ? ('' as keyof SynastryNarrative) : section.key)}
                 className="flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-white/[0.02]"
               >
-                <span className="text-base">{section.icon}</span>
+                <section.icon className="text-[#C8A4A4]" size={18} strokeWidth={1.5} />
                 <span className="flex-1 text-sm font-medium text-[#FDFBF7]">{section.title}</span>
-                <svg
-                  className={`h-4 w-4 text-[#8D8B9F] transition-transform ${openSection === section.key ? 'rotate-180' : ''}`}
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDown className={`h-4 w-4 text-[#8D8B9F] transition-transform ${openSection === section.key ? 'rotate-180' : ''}`} strokeWidth={1.5} />
               </button>
               {openSection === section.key && (
                 <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 animate-fadeInUp">
@@ -892,9 +888,12 @@ export default function SynastryPage() {
             shareLinkStatus ? 'border-white/[0.12] bg-white/[0.08] text-[#FDFBF7]' : 'border-white/[0.08] bg-white/[0.03] text-[#C0BDD6] hover:bg-white/[0.08]'
           }`}
         >
-          {shareLinkLoading
-            ? (language === 'ru' ? 'Создаём ссылку...' : 'Creating link...')
-            : shareLinkStatus || (language === 'ru' ? '🔗 Поделиться ссылкой' : '🔗 Share Link')}
+          <span className="inline-flex items-center gap-2">
+            <Link2 size={16} strokeWidth={1.5} />
+            <span>{shareLinkLoading
+              ? (language === 'ru' ? 'Создаём ссылку...' : 'Creating link...')
+              : shareLinkStatus || (language === 'ru' ? 'Поделиться ссылкой' : 'Share Link')}</span>
+          </span>
         </button>
         {shareUrl && (
           <p className="mb-4 -mt-2 break-all text-center text-[11px] text-[#8D8B9F]">{shareUrl}</p>
@@ -906,7 +905,10 @@ export default function SynastryPage() {
             disabled={shareLinkLoading}
             className="w-full rounded-[22px] border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm text-[#C0BDD6] transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {language === 'ru' ? '💬 Отправить в WhatsApp' : '💬 Share on WhatsApp'}
+            <span className="inline-flex items-center gap-2">
+              <MessageCircle size={16} strokeWidth={1.5} />
+              <span>{language === 'ru' ? 'Отправить в WhatsApp' : 'Share on WhatsApp'}</span>
+            </span>
           </button>
           <button
             type="button"
@@ -914,7 +916,10 @@ export default function SynastryPage() {
             disabled={shareLinkLoading}
             className="w-full rounded-[22px] border border-white/12 bg-white/[0.03] px-4 py-2.5 text-sm text-[#C0BDD6] transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {language === 'ru' ? '✈️ Отправить в Telegram' : '✈️ Share on Telegram'}
+            <span className="inline-flex items-center gap-2">
+              <Send size={16} strokeWidth={1.5} />
+              <span>{language === 'ru' ? 'Отправить в Telegram' : 'Share on Telegram'}</span>
+            </span>
           </button>
         </div>
 
@@ -933,7 +938,10 @@ export default function SynastryPage() {
           onClick={() => { setResult(null); setPartnerSaved(false); try { localStorage.removeItem('lumina_synastry_result'); localStorage.removeItem('lumina_synastry_names'); } catch {} }}
           className="mt-6 w-full rounded-full border border-white/10 bg-white/[0.03] py-3 text-sm text-[#8D8B9F] transition hover:bg-white/[0.06] hover:text-[#FDFBF7]"
         >
-          {language === 'ru' ? '← Новый расчёт' : '← New Reading'}
+          <span className="inline-flex items-center gap-2">
+            <ArrowLeft size={16} strokeWidth={1.5} />
+            <span>{language === 'ru' ? 'Новый расчёт' : 'New Reading'}</span>
+          </span>
         </button>
 
         {toastMessage && (
@@ -949,9 +957,9 @@ export default function SynastryPage() {
   // ─── FORM VIEW ───
   return (
     <div className="lumina-screen">
-      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
-      <div className="aura right-[-22%] top-[24%] h-[290px] w-[290px] bg-[#18244D]/32" />
-      <div className="aura bottom-[-12%] left-[18%] h-[260px] w-[260px] bg-[#2E1B54]/34" />
+      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
+      <div className="aura aura-blue right-[-22%] top-[24%] h-[290px] w-[290px]" />
+      <div className="aura aura-indigo bottom-[-12%] left-[18%] h-[260px] w-[260px]" />
       <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
       {/* Hero */}
       <div className="mb-10 text-center animate-fadeInUp">
@@ -960,7 +968,8 @@ export default function SynastryPage() {
           onClick={() => router.push('/')}
           className="mb-6 inline-flex items-center gap-1 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]"
         >
-          ← {t.back}
+          <ArrowLeft size={16} strokeWidth={1.5} />
+          <span>{t.back}</span>
         </button>
         <p className="lumina-label mb-3">{language === 'ru' ? 'Синастрия' : 'Synastry'}</p>
         <h1 className="mb-3 font-heading text-4xl text-[#FDFBF7] sm:text-5xl">{t.synastryTitle}</h1>
@@ -970,10 +979,10 @@ export default function SynastryPage() {
 
       {/* Benefits */}
       <div className="mb-10 grid gap-3 sm:grid-cols-2 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-        <BenefitCard icon="💬" text={t.synastryWhy1} />
-        <BenefitCard icon="🌊" text={t.synastryWhy2} />
-        <BenefitCard icon="🔥" text={t.synastryWhy3} />
-        <BenefitCard icon="🌱" text={t.synastryWhy4} />
+        <BenefitCard icon={MessageCircle} text={t.synastryWhy1} />
+        <BenefitCard icon={Waves} text={t.synastryWhy2} />
+        <BenefitCard icon={Flame} text={t.synastryWhy3} />
+        <BenefitCard icon={Sprout} text={t.synastryWhy4} />
       </div>
 
       {/* Form */}

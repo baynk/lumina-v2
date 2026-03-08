@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import type { BirthData } from '@/lib/types';
 
@@ -243,7 +244,7 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
                   onClick={() => setTimeAccuracy(opt.value)}
                   className={`flex-1 rounded-lg py-1.5 text-[11px] transition ${
                     timeAccuracy === opt.value
-                      ? 'bg-purple-400/20 text-purple-300 border border-purple-400/30'
+                      ? 'border border-[#C8A4A4]/30 bg-[#C8A4A4]/12 text-[#FDFBF7]'
                       : 'bg-white/[0.03] text-cream/40 border border-white/[0.06] hover:text-cream/60'
                   }`}
                 >
@@ -252,10 +253,11 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
               ))}
             </div>
             {timeAccuracy === 'unknown' && (
-              <p className="mt-1.5 text-[10px] text-amber-300/60">
+              <p className="mt-1.5 flex items-center gap-1.5 text-[10px] text-[#C8A4A4]">
+                <AlertTriangle size={12} strokeWidth={1.5} />
                 {language === 'ru'
-                  ? '⚠ Без точного времени восходящий знак и дома будут неточными'
-                  : '⚠ Without exact time, Rising sign and houses will be inaccurate'}
+                  ? 'Без точного времени восходящий знак и дома будут неточными'
+                  : 'Without exact time, Rising sign and houses will be inaccurate'}
               </p>
             )}
             {timeAccuracy === 'approximate' && (

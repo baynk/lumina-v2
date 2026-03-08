@@ -199,7 +199,7 @@ export default function AstrocartographySection({ userData, clientName, clientEm
             </button>
           )}
           {nudgeSent && (
-            <p className="text-xs text-emerald-300">✓ Data request noted — follow up with {clientName}</p>
+            <p className="text-xs text-emerald-300">Data request noted. Follow up with {clientName}</p>
           )}
         </div>
       </div>

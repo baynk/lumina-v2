@@ -3,7 +3,7 @@
 import { startTransition, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Search } from 'lucide-react';
+import { Calendar, Compass, Heart, Moon, Orbit, Search, Sparkles, Sun, Waves } from 'lucide-react';
 import OnboardingHeader from '@/components/onboarding/OnboardingHeader';
 import ScrollWheelPicker from '@/components/ui/ScrollWheelPicker';
 import { useLanguage } from '@/context/LanguageContext';
@@ -392,22 +392,22 @@ export default function OnboardingPage() {
   };
 
   const featureCards = [
-    { icon: '🌙', label: t.onboardingFeatureCardForecast },
-    { icon: '⊙', label: t.onboardingFeatureCardChart },
-    { icon: '📅', label: t.onboardingFeatureCardMoon },
-    { icon: '♡', label: t.onboardingFeatureCardCompat },
+    { icon: Moon, label: t.onboardingFeatureCardForecast },
+    { icon: Sun, label: t.onboardingFeatureCardChart },
+    { icon: Calendar, label: t.onboardingFeatureCardMoon },
+    { icon: Heart, label: t.onboardingFeatureCardCompat },
   ];
   const goalCards = [
-    { key: 'path', icon: '🧭', title: t.onboardingGoalPath, description: t.onboardingGoalPathDesc },
-    { key: 'relationships', icon: '♡', title: t.onboardingGoalRelationships, description: t.onboardingGoalRelationshipsDesc },
-    { key: 'rhythms', icon: '🌙', title: t.onboardingGoalRhythms, description: t.onboardingGoalRhythmsDesc },
-    { key: 'future', icon: '✨', title: t.onboardingGoalFuture, description: t.onboardingGoalFutureDesc },
+    { key: 'path', icon: Compass, title: t.onboardingGoalPath, description: t.onboardingGoalPathDesc },
+    { key: 'relationships', icon: Heart, title: t.onboardingGoalRelationships, description: t.onboardingGoalRelationshipsDesc },
+    { key: 'rhythms', icon: Moon, title: t.onboardingGoalRhythms, description: t.onboardingGoalRhythmsDesc },
+    { key: 'future', icon: Sparkles, title: t.onboardingGoalFuture, description: t.onboardingGoalFutureDesc },
   ];
   const energyOptions = [
-    { key: 'overthinking', icon: '🌀', label: t.onboardingEnergyOverthinking },
-    { key: 'mood-swings', icon: '🎭', label: t.onboardingEnergyMoodSwings },
-    { key: 'focus', icon: '🔀', label: t.onboardingEnergyFocus },
-    { key: 'motivation', icon: '😴', label: t.onboardingEnergyMotivation },
+    { key: 'overthinking', icon: Orbit, label: t.onboardingEnergyOverthinking },
+    { key: 'mood-swings', icon: Waves, label: t.onboardingEnergyMoodSwings },
+    { key: 'focus', icon: Compass, label: t.onboardingEnergyFocus },
+    { key: 'motivation', icon: Sparkles, label: t.onboardingEnergyMotivation },
   ];
   const featureScreens = [
     {
@@ -415,8 +415,8 @@ export default function OnboardingPage() {
       subtitle: t.onboardingFeatureForecastSubtitle,
       cta: t.onboardingFeatureForecastCta,
       preview: (
-        <div className="glass-card w-full max-w-[200px] p-5 text-left text-[#FDFBF7] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-          <div className="text-3xl">🌙</div>
+          <div className="glass-card w-full max-w-[200px] p-5 text-left text-[#FDFBF7] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <Moon className="text-[#C8A4A4]" size={28} strokeWidth={1.5} />
           <p className="mt-4 font-heading text-[28px] leading-none">Луна в Рыбах</p>
           <p className="mt-4 text-xs leading-5 text-[#8D8B9F]">
             Вечер зовет выбирать мягко и слышать то, что шепчет сердце.
@@ -459,11 +459,11 @@ export default function OnboardingPage() {
       subtitle: t.onboardingFeatureCompatSubtitle,
       cta: t.onboardingFeatureCompatCta,
       preview: (
-        <div className="flex items-center justify-center gap-5 text-[#FDFBF7]">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
-            ♌
-          </div>
-          <span className="text-3xl text-[#C8A4A4]">♡</span>
+          <div className="flex items-center justify-center gap-5 text-[#FDFBF7]">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
+              ♌
+            </div>
+          <Heart className="text-[#C8A4A4]" size={28} strokeWidth={1.5} />
           <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
             ♒
           </div>
@@ -493,9 +493,9 @@ export default function OnboardingPage() {
 
   return (
     <div className="lumina-screen lumina-orb-shell" data-lang={language}>
-      <div className="aura left-[-26%] top-[8%] h-[260px] w-[260px] bg-[#5A438A]/40" />
-      <div className="aura right-[-28%] top-[34%] h-[280px] w-[280px] bg-[#18244D]/35" />
-      <div className="aura bottom-[-12%] left-[14%] h-[250px] w-[250px] bg-[#2E1B54]/35" />
+      <div className="aura aura-violet left-[-26%] top-[8%] h-[260px] w-[260px]" />
+      <div className="aura aura-blue right-[-28%] top-[34%] h-[280px] w-[280px]" />
+      <div className="aura aura-indigo bottom-[-12%] left-[14%] h-[250px] w-[250px]" />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-0">
         <OnboardingHeader
@@ -518,7 +518,7 @@ export default function OnboardingPage() {
               <div className="mt-8 grid w-full grid-cols-2 gap-3">
                 {featureCards.map((card) => (
                   <div key={card.label} className="glass-card rounded-[24px] p-4 text-left">
-                    <div className="text-xl">{card.icon}</div>
+                    <card.icon className="text-[#8D8B9F]" size={20} strokeWidth={1.5} />
                     <p className="mt-4 text-sm leading-5 text-[#FDFBF7]">{card.label}</p>
                   </div>
                 ))}
@@ -591,7 +591,7 @@ export default function OnboardingPage() {
                         backgroundColor: active ? 'rgba(200,164,164,0.08)' : undefined,
                       }}
                     >
-                      <span className="pt-1 text-xl">{goal.icon}</span>
+                      <goal.icon className="mt-0.5 shrink-0 text-[#C8A4A4]" size={18} strokeWidth={1.5} />
                       <span className="block">
                         <span className="block text-sm text-[#FDFBF7]">{goal.title}</span>
                         <span className="mt-1 block text-sm leading-5 text-[#8D8B9F]">{goal.description}</span>
@@ -632,7 +632,11 @@ export default function OnboardingPage() {
                         color: active ? '#FDFBF7' : '#8D8B9F',
                       }}
                     >
-                      <span className="text-xl">{option.icon}</span>
+                      <option.icon
+                        className={active ? 'text-[#C8A4A4]' : 'text-[#8D8B9F]'}
+                        size={18}
+                        strokeWidth={1.5}
+                      />
                       <span>{option.label}</span>
                     </button>
                   );

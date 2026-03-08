@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile } from '@/lib/profile';
 import { formatAspectDescription, translateAspectType, translatePlanet, translateSign } from '@/lib/translations';
@@ -147,13 +148,13 @@ export default function TransitsPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura left-[-24%] top-[6%] h-[280px] w-[280px] bg-[#5A438A]/34" />
-      <div className="aura right-[-20%] top-[26%] h-[280px] w-[280px] bg-[#18244D]/32" />
-      <div className="aura bottom-[-12%] left-[18%] h-[250px] w-[250px] bg-[#2E1B54]/34" />
+      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
+      <div className="aura aura-blue right-[-20%] top-[26%] h-[280px] w-[280px]" />
+      <div className="aura aura-indigo bottom-[-12%] left-[18%] h-[250px] w-[250px]" />
       <div className="mx-auto max-w-5xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
         <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
-          ← {t.back}
+          <span className="inline-flex items-center gap-2"><ArrowLeft size={16} strokeWidth={1.5} />{t.back}</span>
         </button>
         <h1 className="font-heading text-3xl text-[#FDFBF7]">{t.transitsTitle}</h1>
         <div className="w-14" />

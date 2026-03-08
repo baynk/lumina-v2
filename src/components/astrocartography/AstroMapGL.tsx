@@ -171,7 +171,7 @@ export default function AstroMapGL({ data, activePlanets, activeAngles }: AstroM
             anchor="top"
             className="astro-popup"
           >
-            <p className="text-xs font-semibold text-white">{popup.properties.label}</p>
+            <p className="text-xs font-semibold text-[#FDFBF7]">{popup.properties.label}</p>
           </Popup>
         )}
       </Map>

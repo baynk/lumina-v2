@@ -37,7 +37,7 @@ export default function UserMenu() {
 
   if (status === 'loading') {
     return (
-      <div className="flex h-8 w-8 items-center justify-center rounded-full border border-lumina-accent/30 bg-lumina-accent/20 text-xs font-semibold text-lumina-soft">
+      <div className="lumina-pill flex h-8 w-8 items-center justify-center text-xs font-semibold text-lumina-soft">
         {initials}
       </div>
     );
@@ -47,7 +47,7 @@ export default function UserMenu() {
     return (
       <button
         onClick={() => signIn('google')}
-        className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[10px] font-medium text-cream/60 transition hover:border-lumina-accent/40 hover:text-warmWhite"
+        className="lumina-pill flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.14em] text-cream/70 transition hover:border-white/20 hover:text-warmWhite"
       >
         <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />

@@ -309,9 +309,9 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center">
-        <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-        <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-        <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
+        <div className="aura aura-violet left-[42%] top-14 h-[390px] w-[390px] -translate-x-[54%]" />
+        <div className="aura aura-indigo left-[70%] top-[23rem] h-[360px] w-[360px] -translate-x-[18%] [animation-delay:-5s]" />
+        <div className="aura aura-blue left-[28%] bottom-10 h-[400px] w-[400px] -translate-x-[20%] [animation-delay:-2s]" />
         <p className="font-heading text-3xl text-[#FDFBF7]">Lumina</p>
       </div>
     );
@@ -320,9 +320,9 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="lumina-screen">
-        <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-        <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-        <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
+        <div className="aura aura-violet left-[42%] top-14 h-[390px] w-[390px] -translate-x-[54%]" />
+        <div className="aura aura-indigo left-[70%] top-[23rem] h-[360px] w-[360px] -translate-x-[18%] [animation-delay:-5s]" />
+        <div className="aura aura-blue left-[28%] bottom-10 h-[400px] w-[400px] -translate-x-[20%] [animation-delay:-2s]" />
         <div className="mx-auto w-full max-w-md px-4 pb-28 pt-12 sm:px-6">
         <div className="text-center">
           <p className="lumina-label">{language === 'ru' ? 'Профиль Lumina' : 'Lumina profile'}</p>
@@ -363,7 +363,7 @@ export default function ProfilePage() {
 
         <button
           onClick={() => signIn('google', { callbackUrl: '/profile' })}
-          className="lumina-button mt-8 w-full"
+          className="lumina-btn-google mt-8 flex w-full items-center justify-center text-sm normal-case tracking-[0.01em]"
         >
           {language === 'ru' ? 'Войти через Google' : 'Continue with Google'}
         </button>
@@ -384,14 +384,14 @@ export default function ProfilePage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
+      <div className="aura aura-violet left-[42%] top-14 h-[390px] w-[390px] -translate-x-[54%]" />
+      <div className="aura aura-indigo left-[70%] top-[23rem] h-[360px] w-[360px] -translate-x-[18%] [animation-delay:-5s]" />
+      <div className="aura aura-blue left-[28%] bottom-10 h-[400px] w-[400px] -translate-x-[20%] [animation-delay:-2s]" />
       <div className="mx-auto max-w-lg px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
-        <button onClick={() => router.push('/chart')} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
-          <span className="inline-flex items-center gap-2"><ArrowLeft size={16} strokeWidth={1.5} />{t.back}</span>
+        <button onClick={() => router.push('/chart')} className="lumina-back-btn text-sm">
+          <span className="inline-flex items-center gap-2"><ArrowLeft strokeWidth={1.8} />{t.back}</span>
         </button>
         <p className="font-heading text-xl text-[#FDFBF7]">{t.profile}</p>
         <div className="w-20" />
@@ -510,7 +510,7 @@ export default function ProfilePage() {
               </p>
               <button
                 onClick={() => router.push('/synastry')}
-                className="lumina-button px-6"
+                className="lumina-btn-primary px-6"
               >
                 {language === 'ru' ? 'Проверить совместимость' : 'Check compatibility'}
               </button>
@@ -639,7 +639,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Save Button */}
-        <button type="button" onClick={handleSave} className="lumina-button w-full">
+        <button type="button" onClick={handleSave} className="lumina-btn-primary w-full">
           {saved ? t.profileSaved : t.saveProfileBtn}
         </button>
       </section>

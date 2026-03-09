@@ -260,9 +260,9 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
       }} />
-      <div className="aura aura-violet fixed left-1/2 top-8 z-0 h-[390px] w-[390px] -translate-x-[64%]" />
-      <div className="aura aura-indigo fixed left-1/2 top-[26rem] z-0 h-[360px] w-[360px] -translate-x-[6%] [animation-delay:-5s]" />
-      <div className="aura aura-blue fixed left-1/2 bottom-10 z-0 h-[400px] w-[400px] -translate-x-[76%] [animation-delay:-2s]" />
+      <div className="aura aura-violet fixed left-[42%] top-16 z-0 h-[400px] w-[400px] -translate-x-[56%]" />
+      <div className="aura aura-indigo fixed left-[66%] top-[24rem] z-0 h-[360px] w-[360px] -translate-x-[16%] [animation-delay:-5s]" />
+      <div className="aura aura-blue fixed left-[28%] bottom-12 z-0 h-[400px] w-[400px] -translate-x-[22%] [animation-delay:-2s]" />
       <StarCanvas />
 
       {/* ═══ HERO ═══ */}
@@ -293,7 +293,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
           {/* CTA */}
           <button
             onClick={goToApp}
-            className="lumina-button mt-10 px-10 py-4 text-[15px] sm:px-14 sm:py-5 sm:text-[16px] lg:mt-12 lg:px-16 lg:py-6 lg:text-[18px]"
+            className="lumina-btn-primary mt-10 px-10 py-4 text-[15px] sm:px-14 sm:py-5 sm:text-[16px] lg:mt-12 lg:px-16 lg:py-6 lg:text-[18px]"
           >
             {t.heroCta}
           </button>
@@ -391,7 +391,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
           <p className="mt-5 text-[14px] lg:text-[17px] xl:text-[18px] leading-[1.9] text-cream/35">{t.precP}</p>
           <button
             onClick={goToApp}
-            className="lumina-button mt-10 px-10 sm:px-16 lg:px-18 py-4 sm:py-5 lg:py-5 text-[15px] sm:text-[16px] lg:text-[17px]"
+            className="lumina-btn-primary mt-10 px-10 py-4 text-[15px] sm:px-16 sm:py-5 sm:text-[16px] lg:px-18 lg:py-5 lg:text-[17px]"
           >
             {t.heroCta}
           </button>
@@ -446,7 +446,7 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
           <p className="mt-3 text-[14px] lg:text-[16px] xl:text-[18px] text-cream/25">{t.finalP}</p>
           <button
             onClick={goToApp}
-            className="lumina-button mt-8 px-10 sm:px-14 lg:px-16 py-4 sm:py-5 text-[15px] sm:text-[16px] lg:text-[17px]"
+            className="lumina-btn-primary mt-8 px-10 py-4 text-[15px] sm:px-14 sm:py-5 sm:text-[16px] lg:px-16 lg:text-[17px]"
           >
             {t.finalCta}
           </button>

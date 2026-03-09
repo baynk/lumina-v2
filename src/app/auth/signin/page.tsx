@@ -29,7 +29,7 @@ function SignInContent() {
         <div className="glass-card p-8">
           <button
             onClick={() => signIn('google', { callbackUrl })}
-            className="lumina-button flex w-full items-center justify-center gap-3 px-6 py-3.5 text-sm"
+            className="lumina-btn-google flex w-full items-center justify-center gap-3 px-6 py-3.5 text-sm normal-case tracking-[0.01em]"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -59,7 +59,7 @@ function SignInContent() {
 
         <a
           href="/"
-          className="mt-6 inline-block text-sm text-cream/50 hover:text-cream transition"
+          className="mt-6 inline-flex items-center gap-2 text-sm text-cream/50 transition hover:text-cream"
         >
           ← Back to Lumina
         </a>

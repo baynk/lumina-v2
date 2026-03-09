@@ -15,7 +15,7 @@ export default function BlurGate({ children, language }: BlurGateProps) {
         <p className="px-4 text-center font-heading text-xl text-cream/90">
           {language === 'ru' ? 'Войдите, чтобы увидеть полную карту' : 'Sign in to unlock your full chart'}
         </p>
-        <button onClick={() => signIn('google', { callbackUrl: '/chart' })} className="lumina-button mt-4">
+        <button onClick={() => signIn('google', { callbackUrl: '/chart' })} className="lumina-btn-google mt-4">
           {language === 'ru' ? 'Войти через Google' : 'Continue with Google'}
         </button>
         <p className="mt-3 px-6 text-center text-xs text-cream/40">

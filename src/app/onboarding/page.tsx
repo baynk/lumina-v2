@@ -92,7 +92,7 @@ function isValidBirthDate(year: number, monthIndex: number, day: number) {
 }
 
 function ctaClasses(disabled = false) {
-  return `lumina-button inline-flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-medium transition ${
+  return `lumina-btn-primary inline-flex min-h-12 w-full items-center justify-center rounded-full px-6 text-sm font-medium tracking-[0.18em] transition ${
     disabled ? 'opacity-40' : 'opacity-100'
   }`;
 }

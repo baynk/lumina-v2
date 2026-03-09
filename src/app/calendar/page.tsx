@@ -74,13 +74,13 @@ export default function CalendarPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
+      <div className="aura aura-violet left-[44%] top-16 h-[390px] w-[390px] -translate-x-[58%]" />
+      <div className="aura aura-indigo left-[62%] top-[26rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
+      <div className="aura aura-blue left-[30%] bottom-10 h-[400px] w-[400px] -translate-x-[24%] [animation-delay:-2s]" />
       <div className="mx-auto max-w-4xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
-        <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
-          <span className="inline-flex items-center gap-2"><ArrowLeft size={16} strokeWidth={1.5} />{t.back}</span>
+        <button type="button" onClick={() => router.push('/')} className="lumina-back-btn text-sm">
+          <span className="inline-flex items-center gap-2"><ArrowLeft strokeWidth={1.8} />{t.back}</span>
         </button>
         <h1 className="font-heading text-3xl text-[#FDFBF7]">{copy.title}</h1>
         <div className="w-14" />
@@ -103,7 +103,7 @@ export default function CalendarPage() {
         <p className="mt-4 text-sm text-[#C8A4A4]">{copy.unsupportedYear}</p>
       ) : null}
 
-      <section className="mt-6 space-y-3">
+      <section className="glass-card mt-6 space-y-3 p-4 sm:p-5">
         <p className="lumina-section-title">{listLabel}</p>
         {listEvents.length ? (
           listEvents.map((event) => {

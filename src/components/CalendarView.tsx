@@ -66,7 +66,7 @@ export default function CalendarView({
         <button
           type="button"
           onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
-          className="profile-btn"
+          className="profile-btn text-lg"
           aria-label={language === 'ru' ? 'Предыдущий месяц' : 'Previous month'}
         >
           ←
@@ -75,7 +75,7 @@ export default function CalendarView({
         <button
           type="button"
           onClick={() => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
-          className="profile-btn"
+          className="profile-btn text-lg"
           aria-label={language === 'ru' ? 'Следующий месяц' : 'Next month'}
         >
           →
@@ -120,12 +120,12 @@ export default function CalendarView({
                 {date.getDate()}
               </span>
               {dayEvents.length ? (
-                <span className="absolute bottom-1.5 left-1.5 flex items-center gap-1">
+                <span className="absolute bottom-1.5 left-1.5 flex items-center gap-1.5">
                   {dayEvents.slice(0, 3).map((event, idx) => (
                     <span
                       key={`${event.type}-${idx}`}
-                      className="h-1.5 w-1.5 rounded-full"
-                      style={{ backgroundColor: event.color }}
+                      className="h-1.5 w-1.5 rounded-full sm:h-1.5 sm:w-1.5"
+                      style={{ backgroundColor: event.color, width: '6px', height: '6px' }}
                       aria-hidden="true"
                     />
                   ))}

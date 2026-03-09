@@ -153,8 +153,8 @@ export default function TransitsPage() {
       <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
       <div className="mx-auto max-w-5xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
-        <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
-          <span className="inline-flex items-center gap-2"><ArrowLeft size={16} strokeWidth={1.5} />{t.back}</span>
+        <button type="button" onClick={() => router.push('/')} className="lumina-back-btn text-sm">
+          <span className="inline-flex items-center gap-2"><ArrowLeft strokeWidth={1.8} />{t.back}</span>
         </button>
         <h1 className="font-heading text-3xl text-[#FDFBF7]">{t.transitsTitle}</h1>
         <div className="w-14" />
@@ -164,7 +164,7 @@ export default function TransitsPage() {
         <p className="lumina-section-title">{t.transitsHeroLabel}</p>
         <h2 className="mt-2 font-heading text-3xl text-[#FDFBF7]">{t.transitsHeroTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-[#8D8B9F]">{t.transitsHeroDescription}</p>
-        <button type="button" onClick={runTransits} disabled={loading || !birthData} className="lumina-button mt-5 w-full sm:w-auto">
+        <button type="button" onClick={runTransits} disabled={loading || !birthData} className="lumina-btn-primary mt-5 w-full sm:w-auto">
           {loading ? t.transitsLoading : t.transitsRun}
         </button>
       </section>

@@ -403,9 +403,9 @@ export default function LandingPage() {
     return (
       <div className="px-0 pb-24 sm:px-6 sm:pb-28">
         <section className="relative mx-auto min-h-screen w-full max-w-md overflow-hidden bg-bg-base sm:mt-6 sm:min-h-[calc(100dvh-3rem)] sm:rounded-[36px] sm:border sm:border-bg-frame">
-          <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" aria-hidden="true" />
-          <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" aria-hidden="true" />
-          <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" aria-hidden="true" />
+          <div className="aura aura-violet left-[42%] top-16 h-[390px] w-[390px] -translate-x-[56%]" aria-hidden="true" />
+          <div className="aura aura-indigo left-[66%] top-[24rem] h-[360px] w-[360px] -translate-x-[16%] [animation-delay:-5s]" aria-hidden="true" />
+          <div className="aura aura-blue left-[28%] bottom-12 h-[400px] w-[400px] -translate-x-[22%] [animation-delay:-2s]" aria-hidden="true" />
 
           <div className="relative z-10 flex min-h-screen flex-col px-6 pb-[100px] pt-10 sm:min-h-[calc(100dvh-3rem)]">
             <header className="flex items-center justify-between">
@@ -489,7 +489,7 @@ export default function LandingPage() {
                 <button
                   type="button"
                   onClick={() => router.push('/journal')}
-                  className="lumina-button mt-2 flex w-full items-center justify-center gap-2 px-4 py-4 text-[14px]"
+                  className="lumina-btn-primary mt-2 flex w-full items-center justify-center gap-2 px-4 py-4 text-[14px] tracking-[0.14em]"
                 >
                   <span>{homeCopy.ritualButton}</span>
                   <ChevronRight size={16} strokeWidth={1.7} />
@@ -545,7 +545,7 @@ export default function LandingPage() {
           <button
             type="button"
             onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="lumina-button mt-6 w-full lg:hidden"
+            className="lumina-btn-primary mt-6 w-full lg:hidden"
           >
             {t.homeBeginJourney}
           </button>

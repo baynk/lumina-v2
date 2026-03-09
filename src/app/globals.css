@@ -181,7 +181,7 @@ textarea {
 }
 
 .lumina-input::placeholder {
-  color: rgba(154, 146, 152, 0.6);
+  color: rgba(154, 146, 152, 0.85);
 }
 
 .lumina-btn-primary,

@@ -106,21 +106,25 @@ export default function CalendarView({
               key={key}
               type="button"
               onClick={() => onSelectDate(date)}
-              className={`relative h-14 rounded-xl border p-1.5 text-left transition ${
+              className={`relative flex h-14 flex-col items-center justify-center rounded-xl border p-1.5 text-center transition ${
                 selected
                   ? 'border-white/[0.16] bg-white/[0.08] shadow-[0_0_0_1px_rgba(253,251,247,0.08)]'
                   : 'border-white/10 bg-white/[0.03] hover:border-white/[0.16]'
               }`}
             >
               <span
-                className={`text-sm ${
-                  isToday ? 'font-semibold text-[#C8A4A4]' : selected ? 'text-[#FDFBF7]' : 'text-[#C0BDD6]'
+                className={`inline-flex min-h-7 min-w-7 items-center justify-center rounded-full px-1.5 text-sm ${
+                  isToday
+                    ? 'bg-[#FDFBF7] text-[#0B0814] shadow-[0_0_0_2px_rgba(253,251,247,0.28),0_0_24px_rgba(253,251,247,0.12)]'
+                    : selected
+                      ? 'font-semibold text-[#FDFBF7]'
+                      : 'text-[#C0BDD6]'
                 }`}
               >
                 {date.getDate()}
               </span>
               {dayEvents.length ? (
-                <span className="absolute bottom-1.5 left-1.5 flex items-center gap-1.5">
+                <span className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
                   {dayEvents.slice(0, 3).map((event, idx) => (
                     <span
                       key={`${event.type}-${idx}`}

@@ -78,12 +78,13 @@ export default function CalendarPage() {
       <div className="aura aura-indigo left-[62%] top-[26rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
       <div className="aura aura-blue left-[30%] bottom-10 h-[400px] w-[400px] -translate-x-[24%] [animation-delay:-2s]" />
       <div className="mx-auto max-w-4xl px-4 pb-28 pt-2 sm:px-6">
-      <header className="mb-5 flex items-center justify-between">
-        <button type="button" onClick={() => router.push('/')} className="lumina-back-btn text-sm">
-          <span className="inline-flex items-center gap-2"><ArrowLeft strokeWidth={1.8} />{t.back}</span>
-        </button>
-        <h1 className="font-heading text-3xl text-[#FDFBF7]">{copy.title}</h1>
-        <div className="w-14" />
+      <header className="mb-5">
+        <div className="flex items-center justify-start">
+          <button type="button" onClick={() => router.push('/')} className="lumina-back-btn text-sm">
+            <span className="inline-flex items-center gap-2"><ArrowLeft strokeWidth={1.8} />{t.back}</span>
+          </button>
+        </div>
+        <h1 className="mt-4 font-heading text-3xl text-[#FDFBF7] sm:text-[2rem]">{copy.title}</h1>
       </header>
 
       <section className="glass-card mb-4 p-4 sm:p-5">

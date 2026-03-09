@@ -195,19 +195,19 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
           <div>
             <p className="lumina-label mb-2">{t.dateOfBirth}</p>
             <div className="grid grid-cols-3 gap-2">
-              <select className="lumina-input" value={day} onChange={(e) => setDay(e.target.value)} required>
+              <select className="lumina-input w-full" value={day} onChange={(e) => setDay(e.target.value)} required>
                 <option value="">{t.day}</option>
                 {days.map((item) => (
                   <option key={item} value={item}>{String(item).padStart(2, '0')}</option>
                 ))}
               </select>
-              <select className="lumina-input" value={month} onChange={(e) => setMonth(e.target.value)} required>
+              <select className="lumina-input w-full" value={month} onChange={(e) => setMonth(e.target.value)} required>
                 <option value="">{t.month}</option>
                 {months.map((item) => (
                   <option key={item} value={item}>{String(item).padStart(2, '0')}</option>
                 ))}
               </select>
-              <select className="lumina-input" value={year} onChange={(e) => setYear(e.target.value)} required>
+              <select className="lumina-input w-full" value={year} onChange={(e) => setYear(e.target.value)} required>
                 <option value="">{t.year}</option>
                 {years.map((item) => (
                   <option key={item} value={item}>{item}</option>
@@ -242,7 +242,7 @@ export default function BirthDataForm({ onComplete, submitLabel, heading }: Birt
                   key={opt.value}
                   type="button"
                   onClick={() => setTimeAccuracy(opt.value)}
-                  className={`flex-1 rounded-lg py-1.5 text-[11px] transition ${
+                  className={`flex-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[10px] sm:text-[11px] transition ${
                     timeAccuracy === opt.value
                       ? 'border border-[#C8A4A4]/30 bg-[#C8A4A4]/12 text-[#FDFBF7]'
                       : 'bg-white/[0.03] text-cream/40 border border-white/[0.06] hover:text-cream/60'

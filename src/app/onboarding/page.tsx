@@ -1,7 +1,7 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
+import { startTransition, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Calendar, Check, Compass, Heart, Moon, Orbit, Search, Sparkles, Sun, Waves } from 'lucide-react';
@@ -174,7 +174,6 @@ export default function OnboardingPage() {
   const [factVisible, setFactVisible] = useState(true);
   const [bigThreeSigns, setBigThreeSigns] = useState<{ sun: string; moon: string; rising: string } | null>(null);
   const [bigThreeVisible, setBigThreeVisible] = useState([false, false, false]);
-  const genderAdvanceTimeoutRef = useRef<number | null>(null);
 
   const monthNames = language === 'ru' ? MONTHS_RU : MONTHS_EN;
   const analyzingItems = useMemo(
@@ -197,14 +196,6 @@ export default function OnboardingPage() {
       router.replace('/');
     }
   }, [router]);
-
-  useEffect(() => {
-    return () => {
-      if (genderAdvanceTimeoutRef.current !== null) {
-        window.clearTimeout(genderAdvanceTimeoutRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     const year = YEARS[yearIndex] ?? 2000;
@@ -614,19 +605,11 @@ export default function OnboardingPage() {
                     <button
                       key={option.value}
                       type="button"
-                      onClick={() => {
-                        setGender(option.value);
-                        if (genderAdvanceTimeoutRef.current !== null) {
-                          window.clearTimeout(genderAdvanceTimeoutRef.current);
-                        }
-                        genderAdvanceTimeoutRef.current = window.setTimeout(() => {
-                          genderAdvanceTimeoutRef.current = null;
-                          startTransition(() => setStep(3));
-                        }, 600);
-                      }}
+                      onClick={() => setGender(option.value)}
                       className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 py-4 text-base transition-all duration-300`}
                       style={{
-                        borderColor: active ? 'rgba(200,164,164,0.5)' : 'rgba(253,251,247,0.04)',
+                        borderColor: active ? 'rgba(200,164,164,0.5)' : 'rgba(253,251,247,0.12)',
+                        borderWidth: active ? '1.5px' : '1px',
                         backgroundColor: active ? 'rgba(200,164,164,0.14)' : undefined,
                         boxShadow: active ? '0 0 18px rgba(200,164,164,0.16)' : 'none',
                         color: active ? '#FDFBF7' : '#8D8B9F',
@@ -634,8 +617,8 @@ export default function OnboardingPage() {
                     >
                       <span>{option.label}</span>
                       <span
-                        className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full border transition ${
-                          active ? 'border-[#C8A4A4] bg-[#C8A4A4]/20 text-[#FDFBF7]' : 'border-white/[0.12] text-transparent'
+                        className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full border-[1.5px] transition ${
+                          active ? 'border-[#C8A4A4] bg-[#C8A4A4]/20 text-[#FDFBF7]' : 'border-white/50 bg-white/[0.04] text-transparent'
                         }`}
                         aria-hidden="true"
                       >
@@ -644,6 +627,16 @@ export default function OnboardingPage() {
                     </button>
                   );
                 })}
+              </div>
+              <div className="sticky bottom-0 z-20 -mx-4 mt-auto bg-gradient-to-t from-[#0B0814] via-[#0B0814]/95 to-transparent px-4 pb-6 pt-8">
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={!gender}
+                  className={ctaClasses(!gender)}
+                >
+                  {t.onboardingContinue}
+                </button>
               </div>
             </section>
           ) : null}

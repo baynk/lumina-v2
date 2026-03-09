@@ -39,7 +39,11 @@ export default function AstrologyIndexClient({ planets, signs, planetSymbols, zo
   }[language];
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+    <div className="lumina-screen">
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6">
       <section className="glass-card p-6 sm:p-8">
         <p className="lumina-label">{copy.label}</p>
         <h1 className="mt-3 font-heading text-4xl text-lumina-soft sm:text-5xl">{copy.title}</h1>
@@ -70,7 +74,7 @@ export default function AstrologyIndexClient({ planets, signs, planetSymbols, zo
           ))}
         </div>
 
-        <section className="mt-10 rounded-2xl border border-lumina-accent/25 bg-gradient-to-r from-lumina-accent/10 to-transparent p-5">
+        <section className="mt-10 rounded-[28px] border border-lumina-accent/25 bg-gradient-to-r from-lumina-accent/10 to-transparent p-5">
           <p className="text-sm uppercase tracking-[0.14em] text-lumina-accent/75">{copy.ctaTitle}</p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -88,6 +92,7 @@ export default function AstrologyIndexClient({ planets, signs, planetSymbols, zo
           </div>
         </section>
       </section>
+      </div>
     </div>
   );
 }

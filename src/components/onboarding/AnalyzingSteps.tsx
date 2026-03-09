@@ -17,7 +17,7 @@ export default function AnalyzingSteps({ items, completedCount }: AnalyzingSteps
         return (
           <div
             key={item}
-            className="glass-card flex items-center justify-between rounded-[24px] px-4 py-4 transition-opacity duration-300"
+            className="glass-card flex items-center justify-between rounded-[28px] px-4 py-4 transition-opacity duration-300"
             style={{ opacity: completed || active ? 1 : 0.5 }}
           >
             <span className="text-sm text-[#FDFBF7]">{item}</span>

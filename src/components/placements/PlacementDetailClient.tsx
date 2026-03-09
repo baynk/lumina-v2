@@ -46,12 +46,16 @@ export default function PlacementDetailClient({ placement, planetSymbol, zodiacS
   const overviewParagraphs = placement.overview[language].split('\n\n').filter(Boolean);
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 pb-16 sm:px-6">
+    <div className="lumina-screen">
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="mx-auto w-full max-w-4xl px-4 pb-16 pt-8 sm:px-6">
       <article className="glass-card p-6 sm:p-8">
         <p className="lumina-label">{copy.sectionLabel}</p>
 
         <div className="mt-4 flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-3 rounded-2xl border border-lumina-accent/30 bg-lumina-accent/10 px-4 py-3 text-lumina-soft">
+          <div className="flex items-center gap-3 rounded-[28px] border border-lumina-accent/30 bg-lumina-accent/10 px-4 py-3 text-lumina-soft">
             <span className="text-3xl" aria-hidden="true">{planetSymbol}</span>
             <span className="text-3xl" aria-hidden="true">{zodiacSymbol}</span>
           </div>
@@ -95,7 +99,7 @@ export default function PlacementDetailClient({ placement, planetSymbol, zodiacS
           <p className="leading-relaxed text-cream/85">{placement.challenges[language]}</p>
         </section>
 
-        <section className="mt-10 rounded-2xl border border-lumina-accent/25 bg-gradient-to-r from-lumina-accent/10 to-transparent p-5">
+        <section className="mt-10 rounded-[28px] border border-lumina-accent/25 bg-gradient-to-r from-lumina-accent/10 to-transparent p-5">
           <p className="text-sm uppercase tracking-[0.14em] text-lumina-accent/75">{copy.ctaTitle}</p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -113,6 +117,7 @@ export default function PlacementDetailClient({ placement, planetSymbol, zodiacS
           </div>
         </section>
       </article>
+      </div>
     </div>
   );
 }

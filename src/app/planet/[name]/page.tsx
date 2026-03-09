@@ -53,7 +53,11 @@ export default function PlanetPage() {
   }, [englishPlanet, house, language, sign, t.explanationFallback]);
 
   return (
-    <div className="mx-auto min-h-screen max-w-3xl px-4 pb-10 pt-14 sm:pt-6 sm:px-6">
+    <div className="lumina-screen">
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="mx-auto min-h-screen max-w-3xl px-4 pb-10 pt-14 sm:px-6 sm:pt-6">
       <header className="mb-6 flex items-center justify-between">
         <button onClick={() => router.push('/chart')} className="min-h-11 rounded-full px-4 text-sm text-cream hover:text-warmWhite">
           ← {t.back}
@@ -73,7 +77,7 @@ export default function PlanetPage() {
               <span>{translateSign(sign, language)} • {t.house} {house}</span>
             </p>
 
-            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="mt-6 rounded-[28px] border border-white/10 bg-white/5 p-5">
               {loading ? (
                 <div className="space-y-3">
                   <div className="skeleton h-4 w-full" />
@@ -90,6 +94,7 @@ export default function PlanetPage() {
           <p className="text-cream">{t.notFoundPlanet}</p>
         )}
       </section>
+      </div>
     </div>
   );
 }

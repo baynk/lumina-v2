@@ -92,7 +92,10 @@ export default function PublicCompatibilityPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="lumina-screen flex min-h-screen items-center justify-center">
+        <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+        <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+        <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-lumina-accent border-t-transparent" />
       </div>
     );
@@ -100,7 +103,10 @@ export default function PublicCompatibilityPage() {
 
   if (error || !data) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
+      <div className="lumina-screen flex min-h-screen flex-col items-center justify-center gap-4 px-4">
+        <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+        <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+        <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
         <p className="text-lg text-cream/60">{error || 'Not found'}</p>
         <Link href="/" className="lumina-button">Discover Your Compatibility</Link>
       </div>
@@ -137,7 +143,10 @@ export default function PublicCompatibilityPage() {
   const risingB = result.synastry.personBChart.risingSign;
 
   return (
-    <div className="min-h-screen" style={{ background: '#080c1f' }}>
+    <div className="lumina-screen">
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
         {/* Header */}
         <div className="mb-10 text-center">

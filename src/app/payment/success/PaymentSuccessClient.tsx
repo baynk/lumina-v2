@@ -16,8 +16,11 @@ export default function PaymentSuccessClient() {
   }, [router]);
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl items-center justify-center px-4">
-      <div className="glass-card w-full p-8 text-center animate-fadeInUp">
+    <div className="lumina-screen flex min-h-screen items-center justify-center px-4">
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="glass-card relative z-10 w-full max-w-2xl p-8 text-center animate-fadeInUp">
         <p className="mb-3 text-4xl">✦</p>
         <h1 className="mb-3 font-heading text-2xl text-lumina-soft">
           {language === 'ru' ? 'Оплата прошла успешно' : 'Payment successful'}

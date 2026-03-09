@@ -10,8 +10,11 @@ function SignInContent() {
   const error = searchParams.get('error');
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm text-center animate-fadeInUp">
+    <div className="lumina-screen flex min-h-screen items-center justify-center px-4">
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="relative z-10 w-full max-w-sm text-center animate-fadeInUp">
         <p className="font-heading text-5xl text-lumina-soft mb-2">Lumina</p>
         <p className="text-sm text-cream/50 mb-8">Sign in to access your celestial profile</p>
 
@@ -26,7 +29,7 @@ function SignInContent() {
         <div className="glass-card p-8">
           <button
             onClick={() => signIn('google', { callbackUrl })}
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-medium text-warmWhite transition hover:border-lumina-accent/40 hover:bg-white/10"
+            className="lumina-button flex w-full items-center justify-center gap-3 px-6 py-3.5 text-sm"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -69,7 +72,7 @@ export default function SignInPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center">
+        <div className="lumina-screen flex min-h-screen items-center justify-center">
           <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
         </div>
       }

@@ -260,9 +260,9 @@ export default function LandingContent({ onCtaClick, onConsultationClick }: Land
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
       }} />
-      <div className="aura fixed -right-24 -top-16 z-0 h-[300px] w-[300px] bg-[#5A438A]" />
-      <div className="aura fixed -left-24 bottom-[22%] z-0 h-[280px] w-[280px] bg-[#2E1B54]" />
-      <div className="aura fixed -right-14 top-[42%] z-0 h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="aura aura-violet fixed left-1/2 top-8 z-0 h-[390px] w-[390px] -translate-x-[64%]" />
+      <div className="aura aura-indigo fixed left-1/2 top-[26rem] z-0 h-[360px] w-[360px] -translate-x-[6%] [animation-delay:-5s]" />
+      <div className="aura aura-blue fixed left-1/2 bottom-10 z-0 h-[400px] w-[400px] -translate-x-[76%] [animation-delay:-2s]" />
       <StarCanvas />
 
       {/* ═══ HERO ═══ */}

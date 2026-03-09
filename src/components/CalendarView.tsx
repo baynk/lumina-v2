@@ -82,7 +82,7 @@ export default function CalendarView({
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] text-[#8D8B9F]">
+      <div className="grid grid-cols-7 gap-1.5 text-center text-[11px] font-medium text-[#8D8B9F]">
         {weekdayLabels.map((label) => (
           <div key={label} className="py-1 uppercase tracking-[0.12em]">
             {label}

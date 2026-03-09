@@ -14,9 +14,9 @@
   --text-muted: #5c5970;
   --text-badge: #c0bdd6;
   --wordmark-sparkle: #bca8bc;
-  --aura-violet: #5a438a;
-  --aura-indigo: #2e1b54;
-  --aura-blue: #18244d;
+  --aura-violet: #7b5bbf;
+  --aura-indigo: #5a3b8e;
+  --aura-blue: #2e4080;
   --lumina-bg: var(--bg-base);
   --lumina-bg-alt: var(--bg-frame);
   --lumina-accent: var(--text-accent);
@@ -41,9 +41,9 @@ body {
   overflow-x: hidden;
   background-color: var(--bg-void);
   background-image:
-    radial-gradient(circle at 18% 12%, rgba(90, 67, 138, 0.24), transparent 34%),
-    radial-gradient(circle at 82% 10%, rgba(24, 36, 77, 0.22), transparent 30%),
-    radial-gradient(circle at 55% 85%, rgba(46, 27, 84, 0.26), transparent 34%),
+    radial-gradient(circle at 18% 12%, rgba(123, 91, 191, 0.3), transparent 36%),
+    radial-gradient(circle at 82% 10%, rgba(46, 64, 128, 0.28), transparent 32%),
+    radial-gradient(circle at 55% 85%, rgba(90, 59, 142, 0.32), transparent 36%),
     linear-gradient(180deg, var(--bg-base) 0%, #090612 55%, var(--bg-void) 100%);
   color: var(--lumina-text);
   font-family: var(--font-body), sans-serif;
@@ -92,9 +92,9 @@ textarea {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(circle at 72% 20%, rgba(90, 67, 138, 0.12), transparent 34%),
-    radial-gradient(circle at 14% 72%, rgba(46, 27, 84, 0.12), transparent 32%),
-    radial-gradient(circle at 86% 82%, rgba(24, 36, 77, 0.12), transparent 26%);
+    radial-gradient(circle at 72% 20%, rgba(123, 91, 191, 0.18), transparent 38%),
+    radial-gradient(circle at 14% 72%, rgba(90, 59, 142, 0.18), transparent 36%),
+    radial-gradient(circle at 86% 82%, rgba(46, 64, 128, 0.16), transparent 30%);
 }
 
 @keyframes driftStars {
@@ -109,22 +109,44 @@ textarea {
   }
 }
 
-.glass-card {
+.glass-card,
+.lumina-card {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    inset 0 1px 0 rgba(253, 251, 247, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 30px rgba(90, 67, 138, 0.08),
     0 24px 60px rgba(4, 3, 10, 0.22);
   border-radius: 28px;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-.glass-card:hover {
+.glass-card::before,
+.lumina-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glass-card:hover,
+.lumina-card:hover {
   transform: translateY(-4px);
   border-color: rgba(255, 255, 255, 0.16);
 }
@@ -185,26 +207,6 @@ textarea {
 .lumina-button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
-}
-
-.lumina-card {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    inset 0 1px 0 rgba(253, 251, 247, 0.1),
-    0 24px 60px rgba(4, 3, 10, 0.22);
-  border-radius: 28px;
-  transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.lumina-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.16);
 }
 
 textarea.lumina-input {
@@ -297,15 +299,16 @@ textarea.lumina-input {
 .aura {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(100px);
-  opacity: 0.55;
+  filter: blur(120px);
+  opacity: 0.66;
   pointer-events: none;
   z-index: 0;
   animation: breathe 10s infinite alternate ease-in-out;
+  mix-blend-mode: screen;
 }
 
 .aura-strong {
-  opacity: 0.65;
+  opacity: 0.72;
 }
 
 .badge {
@@ -505,8 +508,8 @@ textarea.lumina-input {
   overflow: hidden;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top, rgba(90, 67, 138, 0.16), transparent 30%),
-    radial-gradient(circle at bottom, rgba(24, 36, 77, 0.18), transparent 34%),
+    radial-gradient(circle at top, rgba(123, 91, 191, 0.22), transparent 34%),
+    radial-gradient(circle at bottom, rgba(46, 64, 128, 0.22), transparent 38%),
     var(--bg-base);
 }
 
@@ -515,8 +518,8 @@ textarea.lumina-input {
   content: '';
   position: absolute;
   border-radius: 9999px;
-  filter: blur(90px);
-  opacity: 0.24;
+  filter: blur(120px);
+  opacity: 0.3;
   pointer-events: none;
   z-index: 0;
 }
@@ -524,17 +527,19 @@ textarea.lumina-input {
 .lumina-screen::before {
   top: 8%;
   left: -14%;
-  width: 18rem;
-  height: 18rem;
+  width: 24rem;
+  height: 24rem;
   background: var(--aura-violet);
+  opacity: 0.62;
 }
 
 .lumina-screen::after {
   right: -12%;
   bottom: 12%;
-  width: 18rem;
-  height: 18rem;
+  width: 23rem;
+  height: 23rem;
   background: var(--aura-blue);
+  opacity: 0.58;
 }
 
 .aura-violet {

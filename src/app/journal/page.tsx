@@ -33,6 +33,13 @@ const EMPTY_SECTIONS: JournalSections = {
   release: '',
 };
 
+const SECTION_LABELS = {
+  intention: { en: 'Intention', ru: 'Намерение' },
+  reflection: { en: 'Reflection', ru: 'Размышление' },
+  gratitude: { en: 'Gratitude', ru: 'Благодарность' },
+  release: { en: 'Release', ru: 'Отпускание' },
+} as const;
+
 function normalizeSections(value: unknown): JournalSections {
   if (!value || typeof value !== 'object') {
     return { ...EMPTY_SECTIONS };
@@ -325,9 +332,9 @@ export default function JournalPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
-      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
-      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
+      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
+      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
       <div className="mx-auto max-w-3xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
         <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
@@ -354,7 +361,7 @@ export default function JournalPage() {
       <section className="glass-card p-5 sm:p-6 animate-stagger-2">
         <div className="space-y-4">
           <div className="transition-all duration-500">
-            <p className="font-heading text-xl text-[#FDFBF7]">Intention / Намерение</p>
+            <p className="font-heading text-xl text-[#FDFBF7]">{SECTION_LABELS.intention[language]}</p>
             <p className="mt-1 text-xs text-[#8D8B9F]">{sectionPrompt('intention', moonPhase, language)}</p>
             <textarea
               value={entry.intention}
@@ -364,7 +371,7 @@ export default function JournalPage() {
           </div>
 
           <div className="transition-all duration-500">
-            <p className="font-heading text-xl text-[#FDFBF7]">Reflection / Размышление</p>
+            <p className="font-heading text-xl text-[#FDFBF7]">{SECTION_LABELS.reflection[language]}</p>
             <p className="mt-1 text-xs text-[#8D8B9F]">{sectionPrompt('reflection', moonPhase, language)}</p>
             <textarea
               value={entry.reflection}
@@ -374,7 +381,7 @@ export default function JournalPage() {
           </div>
 
           <div className="transition-all duration-500">
-            <p className="font-heading text-xl text-[#FDFBF7]">Gratitude / Благодарность</p>
+            <p className="font-heading text-xl text-[#FDFBF7]">{SECTION_LABELS.gratitude[language]}</p>
             <p className="mt-1 text-xs text-[#8D8B9F]">{sectionPrompt('gratitude', moonPhase, language)}</p>
             <textarea
               value={entry.gratitude}
@@ -385,7 +392,7 @@ export default function JournalPage() {
 
           {showRelease ? (
             <div className="transition-all duration-500">
-              <p className="font-heading text-xl text-[#FDFBF7]">Release / Отпускание</p>
+              <p className="font-heading text-xl text-[#FDFBF7]">{SECTION_LABELS.release[language]}</p>
               <p className="mt-1 text-xs text-[#8D8B9F]">{sectionPrompt('release', moonPhase, language)}</p>
               <textarea
                 value={entry.release}
@@ -450,15 +457,15 @@ export default function JournalPage() {
                 </button>
                 {expanded ? (
                   <div className="animate-fadeInUp border-t border-white/10 px-4 py-4 text-sm text-[#C0BDD6]">
-                    <p className="text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">Intention / Намерение</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">{SECTION_LABELS.intention[language]}</p>
                     <p className="mt-1 whitespace-pre-wrap">{item.entries.intention || '—'}</p>
-                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">Reflection / Размышление</p>
+                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">{SECTION_LABELS.reflection[language]}</p>
                     <p className="mt-1 whitespace-pre-wrap">{item.entries.reflection || '—'}</p>
-                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">Gratitude / Благодарность</p>
+                    <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">{SECTION_LABELS.gratitude[language]}</p>
                     <p className="mt-1 whitespace-pre-wrap">{item.entries.gratitude || '—'}</p>
                     {item.entries.release ? (
                       <>
-                        <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">Release / Отпускание</p>
+                        <p className="mt-4 text-xs uppercase tracking-[0.18em] text-[#8D8B9F]">{SECTION_LABELS.release[language]}</p>
                         <p className="mt-1 whitespace-pre-wrap">{item.entries.release}</p>
                       </>
                     ) : null}

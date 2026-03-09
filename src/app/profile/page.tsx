@@ -309,9 +309,9 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center">
-        <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
-        <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
-        <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+        <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
+        <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
+        <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
         <p className="font-heading text-3xl text-[#FDFBF7]">Lumina</p>
       </div>
     );
@@ -320,9 +320,9 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="lumina-screen">
-        <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
-        <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
-        <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+        <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
+        <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
+        <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
         <div className="mx-auto w-full max-w-md px-4 pb-28 pt-12 sm:px-6">
         <div className="text-center">
           <p className="lumina-label">{language === 'ru' ? 'Профиль Lumina' : 'Lumina profile'}</p>
@@ -384,9 +384,9 @@ export default function ProfilePage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
-      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
-      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
+      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
+      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
       <div className="mx-auto max-w-lg px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">

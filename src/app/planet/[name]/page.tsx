@@ -54,9 +54,9 @@ export default function PlanetPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
-      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
-      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
+      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
+      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
       <div className="mx-auto min-h-screen max-w-3xl px-4 pb-10 pt-14 sm:px-6 sm:pt-6">
       <header className="mb-6 flex items-center justify-between">
         <button onClick={() => router.push('/chart')} className="min-h-11 rounded-full px-4 text-sm text-cream hover:text-warmWhite">

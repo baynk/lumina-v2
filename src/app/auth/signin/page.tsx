@@ -11,9 +11,9 @@ function SignInContent() {
 
   return (
     <div className="lumina-screen flex min-h-screen items-center justify-center px-4">
-      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
-      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
-      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
+      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
+      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
+      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
       <div className="relative z-10 w-full max-w-sm text-center animate-fadeInUp">
         <p className="font-heading text-5xl text-lumina-soft mb-2">Lumina</p>
         <p className="text-sm text-cream/50 mb-8">Sign in to access your celestial profile</p>

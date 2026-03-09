@@ -110,8 +110,10 @@ function ctaClasses(disabled = false) {
 }
 
 function cardClasses(active = false) {
-  return `glass-card w-full text-left transition-all duration-300 ${
-    active ? 'border-white/[0.12] bg-white/[0.03]' : ''
+  return `w-full text-left transition-all duration-300 rounded-[28px] backdrop-blur-[20px] ${
+    active
+      ? 'bg-[rgba(200,164,164,0.18)] border-2 border-[rgba(200,164,164,0.6)] shadow-[0_0_24px_rgba(200,164,164,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]'
+      : 'bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.1)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_30px_rgba(90,67,138,0.08)]'
   }`;
 }
 
@@ -619,19 +621,8 @@ export default function OnboardingPage() {
                       type="button"
                       onClick={() => setGender(option.value)}
                       className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 py-4 text-base transition-all duration-300 ${
-                        genderAttention && !gender ? 'ring-2 ring-[#C8A4A4]/60 ring-offset-2 ring-offset-[#0B0814]' : ''
-                      }`}
-                      style={{
-                        borderColor: active
-                          ? 'rgba(200,164,164,0.64)'
-                          : genderAttention && !gender
-                            ? 'rgba(200,164,164,0.52)'
-                            : 'rgba(253,251,247,0.18)',
-                        borderWidth: '2px',
-                        backgroundColor: active ? 'rgba(200,164,164,0.14)' : undefined,
-                        boxShadow: active || (genderAttention && !gender) ? '0 0 18px rgba(200,164,164,0.16)' : 'none',
-                        color: active ? '#FDFBF7' : '#8D8B9F',
-                      }}
+                        active ? 'text-[#FDFBF7]' : 'text-[#8D8B9F]'
+                      } ${genderAttention && !gender ? 'ring-2 ring-[#C8A4A4]/60 ring-offset-2 ring-offset-[#0B0814]' : ''}`}
                     >
                       <span>{option.label}</span>
                       <span
@@ -694,12 +685,7 @@ export default function OnboardingPage() {
                           return next;
                         })
                       }
-                      className={`${cardClasses(active)} flex items-start gap-4 rounded-[28px] p-4`}
-                      style={{
-                        borderColor: active ? 'rgba(200,164,164,0.6)' : 'rgba(253,251,247,0.04)',
-                        backgroundColor: active ? 'rgba(200,164,164,0.18)' : undefined,
-                        boxShadow: active ? '0 0 20px rgba(200,164,164,0.15)' : 'none',
-                      }}
+                      className={`${cardClasses(active)} flex items-start gap-4 p-4`}
                     >
                       <div className="mt-0.5 flex shrink-0 items-center">
                         <goal.icon className={active ? 'text-[#FDFBF7]' : 'text-[#8D8B9F]'} size={18} strokeWidth={1.5} />
@@ -737,13 +723,7 @@ export default function OnboardingPage() {
                         setSelectedEnergy(option.key);
                         startTransition(() => setStep(5));
                       }}
-                      className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 text-left text-base`}
-                      style={{
-                        borderColor: active ? 'rgba(200,164,164,0.6)' : 'rgba(253,251,247,0.04)',
-                        backgroundColor: active ? 'rgba(200,164,164,0.18)' : undefined,
-                        boxShadow: active ? '0 0 20px rgba(200,164,164,0.15)' : 'none',
-                        color: active ? '#FDFBF7' : '#8D8B9F',
-                      }}
+                      className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 text-left text-base ${active ? 'text-[#FDFBF7]' : 'text-[#8D8B9F]'}`}
                     >
                       <option.icon
                         className={active ? 'text-[#FDFBF7]' : 'text-[#8D8B9F]'}

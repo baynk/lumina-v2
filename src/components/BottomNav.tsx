@@ -50,7 +50,7 @@ export default function BottomNav() {
       aria-label={language === 'ru' ? 'Нижняя навигация' : 'Bottom navigation'}
     >
       <div className="bottom-nav-fade pointer-events-none absolute inset-x-0 bottom-0 h-[calc(90px+env(safe-area-inset-bottom,0px))]" aria-hidden="true" />
-      <ul className="pointer-events-auto mx-auto grid h-[90px] w-full max-w-md grid-cols-4 px-6 pb-5 pt-5">
+      <ul className="pointer-events-auto mx-auto grid w-full max-w-md grid-cols-4 px-6 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] pt-5" style={{ minHeight: 'calc(90px + env(safe-area-inset-bottom, 0px))' }}>
         {items.map((item) => {
           const active = isActive(item.href);
           const Icon = item.icon;

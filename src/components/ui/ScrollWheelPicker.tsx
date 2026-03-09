@@ -14,7 +14,7 @@ const ITEM_HEIGHT = 52;
 const VISIBLE_ITEMS = 5;
 const SIDE_PADDING = ((VISIBLE_ITEMS - 1) / 2) * ITEM_HEIGHT;
 const CIRCULAR_REPEAT_COUNT = 5;
-const SETTLE_TIMEOUT_MS = 140;
+const SETTLE_TIMEOUT_MS = 200;
 
 function clampIndex(index: number, length: number) {
   return Math.max(0, Math.min(index, length - 1));
@@ -31,6 +31,7 @@ export default function ScrollWheelPicker({
   const frameRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
   const initialisedRef = useRef(false);
+  const userScrollingRef = useRef(false);
 
   const boundedIndex = useMemo(() => clampIndex(selectedIndex, items.length), [items.length, selectedIndex]);
   const isCircular = circular && items.length > 1;
@@ -84,6 +85,7 @@ export default function ScrollWheelPicker({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    if (userScrollingRef.current) return;
 
     const targetIndex = isCircular
       ? findNearestVirtualIndex(Math.round(container.scrollTop / ITEM_HEIGHT), boundedIndex)
@@ -104,12 +106,17 @@ export default function ScrollWheelPicker({
   const settleToNearest = () => {
     const container = containerRef.current;
     if (!container) return;
+    if (userScrollingRef.current) return;
+    timeoutRef.current = null;
 
-    const rawIndex = recenterIfNeeded(container);
-    const nextIndex = getNormalizedIndex(Math.round(rawIndex));
-    const targetIndex = isCircular ? middleSetStart + nextIndex : nextIndex;
-    container.scrollTo({ top: targetIndex * ITEM_HEIGHT, behavior: 'smooth' });
-    if (nextIndex !== boundedIndex) onChange(nextIndex);
+    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+    frameRef.current = requestAnimationFrame(() => {
+      const rawIndex = recenterIfNeeded(container);
+      const nextIndex = getNormalizedIndex(Math.round(rawIndex));
+      const targetIndex = isCircular ? middleSetStart + nextIndex : nextIndex;
+      container.scrollTo({ top: targetIndex * ITEM_HEIGHT, behavior: 'smooth' });
+      if (nextIndex !== boundedIndex) onChange(nextIndex);
+    });
   };
 
   const handleScroll = () => {
@@ -118,9 +125,12 @@ export default function ScrollWheelPicker({
 
     if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     frameRef.current = requestAnimationFrame(() => {
-      const rawIndex = recenterIfNeeded(container);
-      const nextIndex = getNormalizedIndex(Math.round(rawIndex));
-      if (nextIndex !== boundedIndex) onChange(nextIndex);
+      const rawIndex = Math.round(container.scrollTop / ITEM_HEIGHT);
+      const nextIndex = getNormalizedIndex(rawIndex);
+      if (nextIndex !== boundedIndex) {
+        navigator.vibrate?.(10);
+        onChange(nextIndex);
+      }
     });
 
     if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
@@ -145,10 +155,29 @@ export default function ScrollWheelPicker({
           height: ITEM_HEIGHT * VISIBLE_ITEMS,
           paddingTop: SIDE_PADDING,
           paddingBottom: SIDE_PADDING,
-          scrollBehavior: 'smooth',
           scrollSnapType: 'y mandatory',
           touchAction: 'pan-y',
           WebkitOverflowScrolling: 'touch',
+        }}
+        onTouchStart={() => {
+          userScrollingRef.current = true;
+          if (timeoutRef.current !== null) {
+            window.clearTimeout(timeoutRef.current);
+          }
+        }}
+        onTouchEnd={() => {
+          userScrollingRef.current = false;
+          if (timeoutRef.current !== null) {
+            window.clearTimeout(timeoutRef.current);
+          }
+          timeoutRef.current = window.setTimeout(settleToNearest, SETTLE_TIMEOUT_MS);
+        }}
+        onTouchCancel={() => {
+          userScrollingRef.current = false;
+          if (timeoutRef.current !== null) {
+            window.clearTimeout(timeoutRef.current);
+          }
+          timeoutRef.current = window.setTimeout(settleToNearest, SETTLE_TIMEOUT_MS);
         }}
         onScroll={handleScroll}
       >

@@ -501,7 +501,7 @@ textarea.lumina-input {
 }
 
 .bottom-nav-fade {
-  background: linear-gradient(to top, rgba(11, 8, 20, 1) 50%, rgba(11, 8, 20, 0));
+  background: linear-gradient(to top, rgba(11, 8, 20, 0.92) 30%, rgba(11, 8, 20, 0));
 }
 
 .bottom-nav-shell {

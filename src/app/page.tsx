@@ -439,7 +439,7 @@ export default function LandingPage() {
             <div className="mt-10 flex flex-col items-center">
               <div className="moon">
                 <div
-                  className="absolute rounded-full bg-[linear-gradient(180deg,rgba(11,8,20,0.96),rgba(20,17,33,0.92))] transition-all duration-300"
+                  className="absolute bg-[linear-gradient(180deg,rgba(11,8,20,0.96),rgba(20,17,33,0.92))] transition-all duration-300"
                   style={phaseShadowStyle}
                   aria-hidden="true"
                 />

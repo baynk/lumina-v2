@@ -572,6 +572,7 @@ export default function OnboardingPage() {
                           window.clearTimeout(genderAdvanceTimeoutRef.current);
                         }
                         genderAdvanceTimeoutRef.current = window.setTimeout(() => {
+                          genderAdvanceTimeoutRef.current = null;
                           startTransition(() => setStep(3));
                         }, 600);
                       }}

@@ -1,16 +1,27 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { ChevronRight, Sparkles, UserRound } from 'lucide-react';
+import {
+  CalendarDays,
+  ChevronRight,
+  HeartHandshake,
+  NotebookPen,
+  Sparkles,
+  Stars,
+  UserRound,
+} from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { calculateDailyCelestialData, calculateNatalChart } from '@/lib/astronomyCalculator';
 import { clearProfile, loadProfile, saveProfile, type UserProfileLocal } from '@/lib/profile';
-import { translateMoonPhase, translateSignGenitive } from '@/lib/translations';
-import type { BirthData, MoonRitualResponse } from '@/lib/types';
+import { translateMoonPhase, translatePlanet, translateSign } from '@/lib/translations';
+import type { BirthData, MoonRitualResponse, TransitAlert, TransitReport } from '@/lib/types';
 import LandingContent from '@/components/LandingContent';
 import BirthDataForm, { type BirthDataFormResult } from '@/components/BirthDataForm';
+import BottomNav from '@/components/BottomNav';
+import MoonPhaseVisual from '@/components/MoonPhaseVisual';
 
 const STORY_SHOWN_PREFIX = 'lumina_story_shown_';
 const REFERRAL_CODE_STORAGE_KEY = 'lumina_referral_code';
@@ -40,21 +51,67 @@ function greetingForHour(language: 'en' | 'ru', hour: number): string {
   return 'Good evening';
 }
 
-function badgeText(language: 'en' | 'ru', sign: string): string {
-  if (language === 'ru') {
-    return `✦ СОЛНЦЕ В ${translateSignGenitive(sign).toUpperCase()}`;
-  }
-
-  return `✦ SUN IN ${sign.toUpperCase()}`;
-}
-
 function subtitleText(language: 'en' | 'ru'): string {
-  return language === 'ru' ? 'Звезды выстроились для тебя.' : 'The stars are aligned for you.';
+  return language === 'ru' ? 'Небо сегодня говорит тихо, но очень точно.' : 'The sky is speaking softly, but clearly today.';
 }
 
 function phaseMetaText(language: 'en' | 'ru', illumination: number): string {
   return language === 'ru' ? `${illumination}% освещённости` : `${illumination}% illuminated`;
 }
+
+function todayDate(language: 'en' | 'ru'): string {
+  const locale = language === 'ru' ? 'ru-RU' : 'en-US';
+  return new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date());
+}
+
+function trimEnergyLine(text: string, fallback: string): string {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  if (!normalized) return fallback;
+  const firstSentence = normalized.split(/(?<=[.!?])\s+/)[0]?.trim() || normalized;
+  return firstSentence.length > 110 ? `${firstSentence.slice(0, 107).trim()}...` : firstSentence;
+}
+
+function formatForecast(text: string): string {
+  const trimmed = text.trim().replace(/[✦\s]+$/, '');
+  return trimmed ? `${trimmed} ✦` : '';
+}
+
+function transitBorder(tone: TransitAlert['tone']): string {
+  if (tone === 'opportunity') return 'border-l-[#8FD6D1]';
+  if (tone === 'challenge') return 'border-l-[var(--text-accent)]';
+  return 'border-l-[#C0BDD6]';
+}
+
+function transitToneLabel(language: 'en' | 'ru', tone: TransitAlert['tone']): string {
+  if (language === 'ru') {
+    if (tone === 'opportunity') return 'Возможность';
+    if (tone === 'challenge') return 'Вызов';
+    return 'Осознание';
+  }
+
+  if (tone === 'opportunity') return 'Opportunity';
+  if (tone === 'challenge') return 'Challenge';
+  return 'Awareness';
+}
+
+const QUICK_LINKS = {
+  en: [
+    { href: '/journal', label: 'Moon Journal', icon: NotebookPen, note: 'Rituals and reflections' },
+    { href: '/consultation', label: 'Consultation', icon: Stars, note: 'Personal reading' },
+    { href: '/calendar', label: 'Calendar', icon: CalendarDays, note: 'Celestial timing' },
+    { href: '/synastry', label: 'Synastry', icon: HeartHandshake, note: 'Relationship chemistry' },
+  ],
+  ru: [
+    { href: '/journal', label: 'Лунный дневник', icon: NotebookPen, note: 'Ритуалы и заметки' },
+    { href: '/consultation', label: 'Консультация', icon: Stars, note: 'Личный разбор' },
+    { href: '/calendar', label: 'Календарь', icon: CalendarDays, note: 'Ритм неба' },
+    { href: '/synastry', label: 'Синастрия', icon: HeartHandshake, note: 'Химия отношений' },
+  ],
+} as const;
 
 export default function LandingPage() {
   const router = useRouter();
@@ -75,10 +132,13 @@ export default function LandingPage() {
 
   const [moonPhase, setMoonPhase] = useState('New Moon');
   const [moonIllumination, setMoonIllumination] = useState(0);
+  const [moonSign, setMoonSign] = useState('Aries');
   const [dailyInsight, setDailyInsight] = useState('');
   const [dailyInsightLoading, setDailyInsightLoading] = useState(false);
   const [moonRitual, setMoonRitual] = useState<MoonRitualResponse | null>(null);
   const [moonRitualLoading, setMoonRitualLoading] = useState(false);
+  const [transitReport, setTransitReport] = useState<TransitReport | null>(null);
+  const [transitLoading, setTransitLoading] = useState(false);
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('start')) {
@@ -189,6 +249,7 @@ export default function LandingPage() {
         setExistingProfile(null);
         setDailyInsight('');
         setMoonRitual(null);
+        setTransitReport(null);
       }
     };
 
@@ -206,9 +267,11 @@ export default function LandingPage() {
       const dailyToday = calculateDailyCelestialData();
       setMoonPhase(dailyToday.moon.phase);
       setMoonIllumination(dailyToday.moon.illumination);
+      setMoonSign(dailyToday.moon.sign);
     } catch {
       setMoonPhase('New Moon');
       setMoonIllumination(0);
+      setMoonSign('Aries');
     }
   }, []);
 
@@ -297,6 +360,41 @@ export default function LandingPage() {
     };
   }, [existingProfile, language, moonPhase, natalChart, showForm]);
 
+  useEffect(() => {
+    if (!existingProfile || showForm) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      setTransitLoading(true);
+      try {
+        const response = await fetch('/api/transits', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ birthData: existingProfile.birthData, language }),
+        });
+
+        if (!response.ok) {
+          if (!cancelled) setTransitReport(null);
+          return;
+        }
+
+        const payload = (await response.json()) as TransitReport;
+        if (!cancelled) setTransitReport(payload);
+      } catch {
+        if (!cancelled) setTransitReport(null);
+      } finally {
+        if (!cancelled) setTransitLoading(false);
+      }
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [existingProfile, language, showForm]);
+
   const handleFormComplete = useCallback(async (data: BirthDataFormResult) => {
     saveProfile({
       birthData: data.birthData,
@@ -348,17 +446,21 @@ export default function LandingPage() {
 
   const homeCopy = useMemo(() => {
     const ritualFallbackSummary = language === 'ru'
-      ? 'Мягко настрой своё внимание на то, что просит тишины, заботы и осознанного движения.'
-      : 'Set your attention on what wants quiet, care, and one intentional next move.';
+      ? 'Мягко настрой внимание на том, что просит нежности, границ и честного присутствия.'
+      : 'Set your attention on what wants tenderness, boundaries, and honest presence.';
 
     return {
-      insightTitle: language === 'ru' ? 'Послание на сегодня' : 'A message for today',
-      ritualOverline: language === 'ru' ? 'Лунный ритуал' : 'Moon Ritual',
-      ritualButton: language === 'ru' ? 'Открыть ритуал' : 'Open ritual',
       profileFallbackName: language === 'ru' ? 'друг' : 'friend',
       startFresh: language === 'ru' ? 'Не ты? Начать заново' : 'Not you? Start fresh',
       moonMeta: phaseMetaText(language, moonIllumination),
       ritualFallbackSummary,
+      ritualButton: language === 'ru' ? 'Открыть ритуал' : 'Open ritual',
+      energyLabel: language === 'ru' ? 'Энергия дня' : "Energy of the day",
+      forecastLabel: language === 'ru' ? 'Прогноз на сегодня' : 'Daily forecast',
+      quickLabel: language === 'ru' ? 'Быстрый доступ' : 'Quick access',
+      transitLabel: language === 'ru' ? 'ТРАНЗИТЫ ДНЯ' : 'TRANSITS TODAY',
+      transitEmpty: language === 'ru' ? 'Сегодня небо спокойно: важных предупреждений нет.' : 'The sky is quiet today. No major alerts need your attention.',
+      heroLabel: language === 'ru' ? 'Сегодня' : 'Today',
     };
   }, [language, moonIllumination]);
 
@@ -368,20 +470,21 @@ export default function LandingPage() {
     return `${greetingForHour(language, now.getHours())}, ${name}`;
   }, [existingProfile?.name, homeCopy.profileFallbackName, language, session?.user?.name]);
 
-  const phaseShadowStyle = useMemo(() => {
-    const illumination = Math.max(0, Math.min(100, moonIllumination));
-    const width = `${100 - illumination}%`;
-    const waxing = moonPhase.toLowerCase().includes('waxing');
-    const full = moonPhase.toLowerCase().includes('full');
+  const transitHighlights = useMemo(() => {
+    return (transitReport?.activeTransits || []).slice(0, 3);
+  }, [transitReport]);
 
-    if (full) {
-      return { opacity: 0 };
-    }
+  const energyLine = useMemo(() => {
+    const fallback = language === 'ru'
+      ? 'День просит мягкой концентрации и доверия к внутреннему ритму.'
+      : 'The day asks for soft focus and trust in your inner rhythm.';
 
-    return waxing
-      ? { top: 0, left: 0, bottom: 0, width }
-      : { top: 0, right: 0, bottom: 0, width };
-  }, [moonIllumination, moonPhase]);
+    return trimEnergyLine(dailyInsight || moonRitual?.summary || '', fallback);
+  }, [dailyInsight, language, moonRitual?.summary]);
+
+  const forecastText = useMemo(() => {
+    return formatForecast(dailyInsight || t.homeDailyFallback);
+  }, [dailyInsight, t.homeDailyFallback]);
 
   useEffect(() => {
     if (checkingProfile || existingProfile) return;
@@ -398,117 +501,205 @@ export default function LandingPage() {
 
   if (existingProfile && !showForm) {
     const ritualSummary = moonRitual?.summary || homeCopy.ritualFallbackSummary;
-    const ritualTitle = moonRitual?.title || homeCopy.ritualOverline;
+    const quickLinks = QUICK_LINKS[language];
 
     return (
-      <div className="px-0 pb-24 sm:px-6 sm:pb-28">
-        <section className="relative mx-auto min-h-screen w-full max-w-md overflow-hidden bg-bg-base sm:mt-6 sm:min-h-[calc(100dvh-3rem)] sm:rounded-[36px] sm:border sm:border-bg-frame">
-          <div className="aura aura-violet left-[42%] top-16 h-[390px] w-[390px] -translate-x-[56%]" aria-hidden="true" />
-          <div className="aura aura-indigo left-[66%] top-[24rem] h-[360px] w-[360px] -translate-x-[16%] [animation-delay:-5s]" aria-hidden="true" />
-          <div className="aura aura-blue left-[28%] bottom-12 h-[400px] w-[400px] -translate-x-[22%] [animation-delay:-2s]" aria-hidden="true" />
+      <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+        <div className="celestial-gradient" aria-hidden="true" />
+        <div className="star-field" aria-hidden="true" />
 
-          <div className="relative z-10 flex min-h-screen flex-col px-6 pb-[100px] pt-10 sm:min-h-[calc(100dvh-3rem)]">
-            <header className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => router.push('/')}
-                className="font-heading text-[26px] font-medium tracking-[0.5px] text-text-primary"
-                aria-label="Lumina"
-              >
-                lumina<span className="align-top text-lg text-[var(--wordmark-sparkle)]">✦</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => router.push('/profile')}
-                className="profile-btn"
-                aria-label={language === 'ru' ? 'Открыть профиль' : 'Open profile'}
-              >
-                <UserRound size={18} strokeWidth={1.5} />
-              </button>
-            </header>
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6">
+          <header className="flex items-center justify-between pb-6 pt-4">
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="font-heading text-[26px] font-medium tracking-[0.5px] text-text-primary"
+              aria-label="Lumina"
+            >
+              lumina<span className="align-top text-lg text-[var(--wordmark-sparkle)]">✦</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push('/profile')}
+              className="profile-btn"
+              aria-label={language === 'ru' ? 'Открыть профиль' : 'Open profile'}
+            >
+              <UserRound size={18} strokeWidth={1.5} />
+            </button>
+          </header>
 
-            <div className="mt-8 text-center">
-              <h1 className="font-heading text-[32px] font-medium leading-[1.1] text-text-primary">
-                {greeting}
-              </h1>
-              <p className="mt-2 font-heading text-[18px] italic text-text-secondary">
-                {subtitleText(language)}
-              </p>
-            </div>
+          <section className="animate-stagger-1">
+            <p className="lumina-label">{homeCopy.heroLabel}</p>
+            <h1 className="mt-3 font-heading text-[34px] leading-[1.02] text-text-primary">
+              {greeting}
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+              {subtitleText(language)}
+            </p>
+          </section>
 
-            <div className="mt-10 flex flex-col items-center">
-              <div className="moon">
-                <div
-                  className="absolute bg-[linear-gradient(180deg,rgba(11,8,20,0.96),rgba(20,17,33,0.92))] transition-all duration-300"
-                  style={phaseShadowStyle}
-                  aria-hidden="true"
-                />
-              </div>
-              <p className="mt-6 text-sm font-light text-text-secondary">
-                {translateMoonPhase(moonPhase, language)}
-              </p>
-              <p className="mt-1 text-[13px] font-light text-text-muted">
-                {homeCopy.moonMeta}
-              </p>
-              {natalChart ? <div className="badge mt-5">{badgeText(language, natalChart.zodiacSign)}</div> : null}
-            </div>
-
-            <div className="mt-8 space-y-4">
-              <article className="glass-card p-[26px]">
-                <p className="lumina-section-title">{t.homeDailyInsight}</p>
-                <h2 className="font-heading text-[28px] font-normal text-text-primary">
-                  {homeCopy.insightTitle}
-                </h2>
-                {dailyInsightLoading ? (
-                  <div className="space-y-2 pt-1">
-                    <div className="skeleton h-4 w-full" />
-                    <div className="skeleton h-4 w-11/12" />
-                    <div className="skeleton h-4 w-10/12" />
-                  </div>
-                ) : (
-                  <p className="whitespace-pre-line font-body text-[15px] font-light leading-[1.6] text-text-secondary">
-                    {dailyInsight || t.homeDailyFallback}
-                  </p>
-                )}
-              </article>
-
-              <div className="py-1 text-center font-body text-sm tracking-[0.45em] text-text-secondary/40">
-                ✦ ✦ ✦
-              </div>
-
-              <article className="glass-card p-[26px]">
-                <p className="lumina-section-title">
-                  {moonRitualLoading ? translateMoonPhase(moonPhase, language) : homeCopy.ritualOverline}
+          <section className="glass-card lumina-orb-shell mt-6 p-6 animate-stagger-2">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="badge">{todayDate(language)}</p>
+                <p className="mt-4 font-heading text-[18px] italic text-text-secondary">
+                  {translateMoonPhase(moonPhase, language)}
                 </p>
-                <h2 className="font-heading text-[28px] font-normal text-text-primary">
-                  {ritualTitle}
-                </h2>
-                <p className="font-body text-[15px] font-light leading-[1.6] text-text-secondary">
-                  {ritualSummary}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => router.push('/journal')}
-                  className="lumina-btn-primary mt-2 flex w-full items-center justify-center gap-2 px-4 py-4 text-[14px] tracking-[0.14em]"
-                >
-                  <span>{homeCopy.ritualButton}</span>
-                  <ChevronRight size={16} strokeWidth={1.7} />
-                </button>
-              </article>
+              </div>
+              {natalChart ? (
+                <div className="hidden rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-[var(--text-badge)] sm:block">
+                  {language === 'ru'
+                    ? `Солнце в ${translateSign(natalChart.zodiacSign, language)}`
+                    : `Sun in ${translateSign(natalChart.zodiacSign, language)}`}
+                </div>
+              ) : null}
             </div>
 
-            <div className="mt-auto pt-6">
+            <div className="mt-6 flex flex-col items-center text-center">
+              <div className="animate-float">
+                <MoonPhaseVisual illumination={moonIllumination} phase={moonPhase} />
+              </div>
+              <h2 className="mt-4 font-heading text-[36px] leading-none text-text-primary">
+                {translateSign(moonSign, language)}
+              </h2>
+              <p className="mt-3 text-sm text-text-secondary">
+                {translateMoonPhase(moonPhase, language)} · {homeCopy.moonMeta}
+              </p>
+              <div className="mt-5 w-full rounded-[24px] border border-white/10 bg-white/[0.04] px-4 py-4 text-left">
+                <p className="lumina-label">{homeCopy.energyLabel}</p>
+                <p className="mt-2 text-[15px] leading-[1.65] text-text-primary">
+                  {energyLine}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-8 animate-stagger-3">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="lumina-label">{homeCopy.transitLabel}</p>
+              <Link href="/transits" className="text-[11px] uppercase tracking-[0.18em] text-text-secondary transition hover:text-text-primary">
+                {language === 'ru' ? 'Все' : 'All'}
+              </Link>
+            </div>
+
+            <div className="space-y-3">
+              {transitLoading ? (
+                <>
+                  <div className="glass-card p-4"><div className="skeleton h-20 w-full" /></div>
+                  <div className="glass-card p-4"><div className="skeleton h-20 w-full" /></div>
+                </>
+              ) : transitHighlights.length ? (
+                transitHighlights.map((item) => (
+                  <Link
+                    key={item.id}
+                    href="/transits"
+                    className={`glass-card block border-l-[3px] ${transitBorder(item.tone)} p-4 transition`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-medium text-text-primary">
+                          {translatePlanet(item.transitPlanet, language)} {language === 'ru' ? 'к' : 'to'} {translatePlanet(item.natalPlanet, language)}
+                        </p>
+                        <p className="mt-1 text-sm leading-relaxed text-text-secondary">
+                          {item.aiInterpretation || item.description}
+                        </p>
+                      </div>
+                      <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--text-badge)]">
+                        {transitToneLabel(language, item.tone)}
+                      </span>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="glass-card p-4">
+                  <p className="text-sm leading-relaxed text-text-secondary">{homeCopy.transitEmpty}</p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="glass-card mt-8 p-6 animate-stagger-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="lumina-label">{homeCopy.forecastLabel}</p>
+                <h2 className="mt-3 font-heading text-[28px] leading-[1.06] text-text-primary">
+                  {language === 'ru' ? 'Для твоего сердца' : 'For your heart'}
+                </h2>
+              </div>
               <button
                 type="button"
-                onClick={handleStartFresh}
-                className="mx-auto flex items-center gap-2 font-body text-[11px] uppercase tracking-[0.22em] text-text-muted transition-colors duration-300 hover:text-text-secondary"
+                onClick={() => router.push('/journal')}
+                className="profile-btn h-11 w-11 shrink-0"
+                aria-label={t.homeMoonJournalCta}
               >
-                <Sparkles size={14} strokeWidth={1.5} />
-                <span>{homeCopy.startFresh}</span>
+                <NotebookPen size={17} strokeWidth={1.7} />
               </button>
             </div>
+
+            {dailyInsightLoading ? (
+              <div className="mt-5 space-y-2">
+                <div className="skeleton h-4 w-full" />
+                <div className="skeleton h-4 w-11/12" />
+                <div className="skeleton h-4 w-9/12" />
+              </div>
+            ) : (
+              <p className="mt-5 whitespace-pre-line text-[15px] leading-[1.8] text-text-secondary">
+                {forecastText}
+              </p>
+            )}
+
+            <div className="mt-5 flex items-center justify-between rounded-[22px] border border-white/10 bg-white/[0.04] px-4 py-3">
+              <div>
+                <p className="lumina-label">{moonRitualLoading ? t.moonPhase : t.moonRitualTitle}</p>
+                <p className="mt-1 text-sm text-text-secondary">{ritualSummary}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => router.push('/journal')}
+                className="lumina-btn-primary inline-flex items-center gap-2 px-4 py-3 text-[11px] tracking-[0.18em]"
+              >
+                <span>{homeCopy.ritualButton}</span>
+                <ChevronRight size={15} strokeWidth={1.7} />
+              </button>
+            </div>
+          </section>
+
+          <section className="mt-8 animate-stagger-5">
+            <p className="lumina-label mb-3">{homeCopy.quickLabel}</p>
+            <div className="grid grid-cols-2 gap-3">
+              {quickLinks.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <Link key={item.href} href={item.href} className="glass-card block p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-heading text-[24px] leading-none text-text-primary">{item.label}</p>
+                        <p className="mt-2 text-sm text-text-secondary">{item.note}</p>
+                      </div>
+                      <span className="rounded-full border border-white/10 bg-white/[0.04] p-2 text-text-primary">
+                        <Icon size={18} strokeWidth={1.7} />
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+
+          <div className="mt-8 pb-2 text-center">
+            <button
+              type="button"
+              onClick={handleStartFresh}
+              className="mx-auto flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-text-muted transition hover:text-text-secondary"
+            >
+              <Sparkles size={14} strokeWidth={1.5} />
+              <span>{homeCopy.startFresh}</span>
+            </button>
           </div>
-        </section>
+        </div>
+
+        <BottomNav />
       </div>
     );
   }

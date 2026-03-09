@@ -631,18 +631,10 @@ export default function OnboardingPage() {
                         boxShadow: active ? '0 0 20px rgba(200,164,164,0.15)' : 'none',
                       }}
                     >
-                      <div className="mt-0.5 flex shrink-0 items-start gap-3">
+                      <div className="mt-0.5 flex shrink-0 items-center">
                         <goal.icon className={active ? 'text-[#FDFBF7]' : 'text-[#8D8B9F]'} size={18} strokeWidth={1.5} />
-                        <span
-                          className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border transition ${
-                            active ? 'border-[#C8A4A4] bg-[#C8A4A4] text-[#FDFBF7]' : 'border-white/[0.12] bg-transparent text-transparent'
-                          }`}
-                          aria-hidden="true"
-                        >
-                          <Check size={12} strokeWidth={2.4} />
-                        </span>
                       </div>
-                      <span className="block">
+                      <span className="block flex-1">
                         <span className="block text-sm text-[#FDFBF7]">{goal.title}</span>
                         <span className="mt-1 block text-sm leading-5 text-[#8D8B9F]">{goal.description}</span>
                       </span>
@@ -650,7 +642,7 @@ export default function OnboardingPage() {
                   );
                 })}
               </div>
-              <div className="mt-auto pt-8">
+              <div className="sticky bottom-0 z-20 -mx-4 bg-gradient-to-t from-[#0B0814] via-[#0B0814]/95 to-transparent px-4 pb-6 pt-8">
                 <button type="button" onClick={nextStep} className={ctaClasses()}>
                   {t.onboardingContinue}
                 </button>

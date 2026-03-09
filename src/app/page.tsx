@@ -388,7 +388,7 @@ export default function LandingPage() {
     router.replace('/onboarding');
   }, [checkingProfile, existingProfile, router]);
 
-  if (checkingProfile) {
+  if (checkingProfile || !existingProfile) {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center">
         <p className="font-heading text-3xl text-text-primary">lumina✦</p>

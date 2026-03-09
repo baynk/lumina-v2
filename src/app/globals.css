@@ -225,7 +225,7 @@ textarea {
 .lumina-btn-primary:disabled,
 .lumina-button:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
+  opacity: 0.4;
 }
 
 .lumina-btn-google {
@@ -695,6 +695,10 @@ textarea.lumina-input {
 
 .lumina-screen-content--wide {
   max-width: 1120px;
+}
+
+.lumina-shell-main > .lumina-screen {
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {

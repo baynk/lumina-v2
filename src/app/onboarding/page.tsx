@@ -169,6 +169,8 @@ export default function OnboardingPage() {
   const [searchingPlaces, setSearchingPlaces] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [genderError, setGenderError] = useState('');
+  const [genderAttention, setGenderAttention] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState<number[]>([]);
   const [factIndex, setFactIndex] = useState(0);
   const [factVisible, setFactVisible] = useState(true);
@@ -335,14 +337,24 @@ export default function OnboardingPage() {
 
   const handleBack = () => {
     setErrorMessage('');
+    setGenderError('');
+    setGenderAttention(false);
     setPlaceResults([]);
     startTransition(() => setStep((current) => Math.max(1, current - 1)));
   };
 
   const nextStep = () => {
     setErrorMessage('');
+    setGenderError('');
+    setGenderAttention(false);
     startTransition(() => setStep((current) => Math.min(TOTAL_STEPS, current + 1)));
   };
+
+  useEffect(() => {
+    if (!gender) return;
+    setGenderError('');
+    setGenderAttention(false);
+  }, [gender]);
 
   const handleSelectPlace = async (result: PlaceResult) => {
     const latitude = Number.parseFloat(result.lat);
@@ -606,19 +618,25 @@ export default function OnboardingPage() {
                       key={option.value}
                       type="button"
                       onClick={() => setGender(option.value)}
-                      className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 py-4 text-base transition-all duration-300`}
+                      className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 py-4 text-base transition-all duration-300 ${
+                        genderAttention && !gender ? 'ring-2 ring-[#C8A4A4]/60 ring-offset-2 ring-offset-[#0B0814]' : ''
+                      }`}
                       style={{
-                        borderColor: active ? 'rgba(200,164,164,0.5)' : 'rgba(253,251,247,0.12)',
-                        borderWidth: active ? '1.5px' : '1px',
+                        borderColor: active
+                          ? 'rgba(200,164,164,0.64)'
+                          : genderAttention && !gender
+                            ? 'rgba(200,164,164,0.52)'
+                            : 'rgba(253,251,247,0.18)',
+                        borderWidth: '2px',
                         backgroundColor: active ? 'rgba(200,164,164,0.14)' : undefined,
-                        boxShadow: active ? '0 0 18px rgba(200,164,164,0.16)' : 'none',
+                        boxShadow: active || (genderAttention && !gender) ? '0 0 18px rgba(200,164,164,0.16)' : 'none',
                         color: active ? '#FDFBF7' : '#8D8B9F',
                       }}
                     >
                       <span>{option.label}</span>
                       <span
-                        className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full border-[1.5px] transition ${
-                          active ? 'border-[#C8A4A4] bg-[#C8A4A4]/20 text-[#FDFBF7]' : 'border-white/50 bg-white/[0.04] text-transparent'
+                        className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full border-[2px] transition ${
+                          active ? 'border-[#C8A4A4] bg-[#C8A4A4]/20 text-[#FDFBF7]' : 'border-white/70 bg-white/[0.04] text-transparent'
                         }`}
                         aria-hidden="true"
                       >
@@ -628,11 +646,22 @@ export default function OnboardingPage() {
                   );
                 })}
               </div>
+              {genderError ? (
+                <p className="mt-4 text-sm text-[#C8A4A4]">{genderError}</p>
+              ) : null}
               <div className="sticky bottom-0 z-20 -mx-4 mt-auto bg-gradient-to-t from-[#0B0814] via-[#0B0814]/95 to-transparent px-4 pb-6 pt-8">
                 <button
                   type="button"
-                  onClick={nextStep}
-                  disabled={!gender}
+                  onClick={() => {
+                    if (gender) {
+                      nextStep();
+                      return;
+                    }
+                    setGenderError(language === 'ru' ? 'Пожалуйста, выберите вариант' : 'Please select an option');
+                    setGenderAttention(true);
+                    window.setTimeout(() => setGenderAttention(false), 900);
+                  }}
+                  aria-disabled={!gender}
                   className={ctaClasses(!gender)}
                 >
                   {t.onboardingContinue}

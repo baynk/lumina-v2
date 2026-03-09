@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { CalendarDays, CircleDot, HeartHandshake, Home } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { hasProfile } from '@/lib/profile';
 
 type NavItem = {
   href: string;
@@ -16,24 +14,6 @@ type NavItem = {
 export default function BottomNav() {
   const pathname = usePathname();
   const { language, t } = useLanguage();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const refresh = () => setVisible(hasProfile());
-    refresh();
-
-    window.addEventListener('storage', refresh);
-    window.addEventListener('focus', refresh);
-    window.addEventListener('lumina-profile-changed', refresh);
-
-    return () => {
-      window.removeEventListener('storage', refresh);
-      window.removeEventListener('focus', refresh);
-      window.removeEventListener('lumina-profile-changed', refresh);
-    };
-  }, [pathname]);
-
-  if (!visible) return null;
 
   const items: NavItem[] = [
     { href: '/', label: t.bottomNavToday, icon: Home },

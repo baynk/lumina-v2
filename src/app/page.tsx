@@ -18,7 +18,6 @@ import { calculateDailyCelestialData, calculateNatalChart } from '@/lib/astronom
 import { clearProfile, loadProfile, saveProfile, type UserProfileLocal } from '@/lib/profile';
 import { translateMoonPhase, translatePlanet, translateSign } from '@/lib/translations';
 import type { BirthData, MoonRitualResponse, TransitAlert, TransitReport } from '@/lib/types';
-import LandingContent from '@/components/LandingContent';
 import BirthDataForm, { type BirthDataFormResult } from '@/components/BirthDataForm';
 import MoonPhaseVisual from '@/components/MoonPhaseVisual';
 
@@ -114,12 +113,6 @@ export default function LandingPage() {
 
   const [existingProfile, setExistingProfile] = useState<UserProfileLocal | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [showLanding, setShowLanding] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return !new URLSearchParams(window.location.search).get('start');
-    }
-    return true;
-  });
   const [checkingProfile, setCheckingProfile] = useState(true);
 
   const [moonPhase, setMoonPhase] = useState('New Moon');
@@ -131,12 +124,6 @@ export default function LandingPage() {
   const [moonRitualLoading, setMoonRitualLoading] = useState(false);
   const [transitReport, setTransitReport] = useState<TransitReport | null>(null);
   const [transitLoading, setTransitLoading] = useState(false);
-
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('start')) {
-      setShowLanding(false);
-    }
-  }, []);
 
   useEffect(() => {
     const refCode = new URLSearchParams(window.location.search).get('ref');
@@ -698,15 +685,6 @@ export default function LandingPage() {
         </div>
 
       </div>
-    );
-  }
-
-  if (showLanding && !existingProfile && !session?.user) {
-    return (
-      <LandingContent
-        onCtaClick={() => setShowLanding(false)}
-        onConsultationClick={() => router.push('/consultation')}
-      />
     );
   }
 

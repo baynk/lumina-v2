@@ -9,7 +9,6 @@ import MoonPhaseVisual from '@/components/MoonPhaseVisual';
 import ExplainModal from '@/components/ExplainModal';
 import BlurGate from '@/components/BlurGate';
 import BirthDataForm, { type BirthDataFormResult } from '@/components/BirthDataForm';
-import BottomNav from '@/components/BottomNav';
 import { useLanguage } from '@/context/LanguageContext';
 import { calculateDailyCelestialData, calculateNatalChart } from '@/lib/astronomyCalculator';
 import {
@@ -732,8 +731,6 @@ export default function ChartPage() {
         house={explainState?.house}
         language={language}
       />
-
-      <BottomNav />
     </div>
   );
 }

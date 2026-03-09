@@ -352,8 +352,10 @@ export default function JournalPage() {
           </div>
           <p className="mt-2 inline-flex items-center gap-2 font-heading text-2xl text-[#FDFBF7]"><Moon className="text-[#C8A4A4]" size={22} strokeWidth={1.5} />{translateMoonPhase(moonPhase, language)}</p>
           <p className="mt-1 text-xs text-[#8D8B9F]">{t.illumination}: {moonIllumination}%</p>
-          <div className="mt-3 h-2 w-full max-w-xs overflow-hidden rounded-full bg-white/10">
-            <div className="h-full rounded-full bg-lumina-accent transition-all duration-700" style={{ width: `${moonIllumination}%` }} aria-hidden="true" />
+          <div className="mt-3 w-full px-4">
+            <div className="mx-auto h-2 w-full max-w-xs overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full bg-lumina-accent transition-all duration-700" style={{ width: `${moonIllumination}%` }} aria-hidden="true" />
+            </div>
           </div>
         </div>
       </section>

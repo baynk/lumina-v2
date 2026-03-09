@@ -24,6 +24,11 @@ const COPY = {
     empty: 'No notable events in this period.',
     unsupportedYear: 'Event data is currently precomputed for 2026 only.',
     retrogradeProgress: 'Retrograde progress',
+    legendTitle: 'Dot legend',
+    legendRetrograde: 'Retrogrades',
+    legendMoon: 'New and full moons',
+    legendSeason: 'Equinoxes and solstices',
+    legendEclipse: 'Eclipses',
   },
   ru: {
     title: 'Небесный календарь',
@@ -33,6 +38,11 @@ const COPY = {
     empty: 'В этот период значимых событий нет.',
     unsupportedYear: 'Данные событий сейчас предрасчитаны только для 2026 года.',
     retrogradeProgress: 'Прогресс ретрограда',
+    legendTitle: 'Легенда точек',
+    legendRetrograde: 'Ретрограды',
+    legendMoon: 'Новолуния и полнолуния',
+    legendSeason: 'Равноденствия и солнцестояния',
+    legendEclipse: 'Затмения',
   },
 } as const;
 
@@ -64,11 +74,12 @@ export default function CalendarPage() {
   const yearEvents = useMemo(() => getCelestialEventsForYear(currentMonth.getFullYear()), [currentMonth]);
   const monthEvents = useMemo(() => getEventsForMonth(currentMonth), [currentMonth]);
   const dayEvents = useMemo(() => getEventsForDate(selectedDate), [selectedDate]);
+  const upcomingEvents = useMemo(() => getUpcomingCelestialEvents(new Date(), 7), []);
 
   const listEvents = useMemo(() => {
     if (dayEvents.length) return dayEvents;
-    return getUpcomingCelestialEvents(selectedDate, 7);
-  }, [dayEvents, selectedDate]);
+    return upcomingEvents;
+  }, [dayEvents, upcomingEvents]);
 
   const listLabel = dayEvents.length ? copy.selectedDay : copy.upcoming;
 
@@ -99,6 +110,23 @@ export default function CalendarPage() {
         events={monthEvents}
         language={language}
       />
+
+      <section className="glass-card mt-4 p-4 sm:p-5">
+        <p className="lumina-section-title">{copy.legendTitle}</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {[
+            { color: '#fb7185', label: copy.legendRetrograde },
+            { color: '#a78bfa', label: copy.legendMoon },
+            { color: '#67e8f9', label: copy.legendSeason },
+            { color: '#facc15', label: copy.legendEclipse },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-3 rounded-full border border-white/8 bg-white/[0.03] px-3 py-2">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} aria-hidden="true" />
+              <span className="text-sm text-[#C0BDD6]">{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {!yearEvents.length ? (
         <p className="mt-4 text-sm text-[#C8A4A4]">{copy.unsupportedYear}</p>

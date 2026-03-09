@@ -12,16 +12,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isHome = pathname === '/';
 
   return (
-    <>
+    <div className="relative z-10 flex min-h-dvh flex-col">
       {!isOnboarding && !isHome ? (
-        <nav className="fixed right-3 top-3 z-50 flex items-center gap-2 sm:right-6 sm:top-4 sm:gap-3">
-          <LanguageToggle />
-          <UserMenu />
+        <nav className="relative z-40 border-b border-white/5 bg-[#0B0814]/72 backdrop-blur-xl">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-end gap-2 px-4 py-3 pt-safe sm:px-6">
+            <LanguageToggle />
+            <UserMenu />
+          </div>
         </nav>
       ) : null}
-      <main className={`relative z-10 min-h-dvh ${isOnboarding ? '' : isHome ? 'bottom-nav-content-offset' : 'bottom-nav-content-offset pt-14 sm:pb-0 sm:pt-16'}`}>{children}</main>
+      <main className={`lumina-shell-main relative z-10 flex-1 ${isOnboarding ? '' : 'bottom-nav-content-offset'}`}>{children}</main>
       {!isOnboarding ? <BottomNav /> : null}
       {!isOnboarding && !isHome ? <Footer /> : null}
-    </>
+    </div>
   );
 }

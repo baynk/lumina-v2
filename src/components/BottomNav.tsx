@@ -46,11 +46,11 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="bottom-nav-shell pointer-events-none fixed inset-x-0 bottom-0 z-40"
+      className="bottom-nav-fade fixed inset-x-0 bottom-0 z-40"
       aria-label={language === 'ru' ? 'Нижняя навигация' : 'Bottom navigation'}
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="bottom-nav-fade pointer-events-none absolute inset-x-0 bottom-0 h-[calc(90px+env(safe-area-inset-bottom,0px))]" aria-hidden="true" />
-      <ul className="pointer-events-auto mx-auto grid w-full max-w-md grid-cols-4 border-t border-white/[0.06] px-6 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] pt-4" style={{ minHeight: 'calc(90px + env(safe-area-inset-bottom, 0px))' }}>
+      <ul className="mx-auto grid w-full max-w-md grid-cols-4 px-6 pb-3 pt-3" style={{ minHeight: '72px' }}>
         {items.map((item) => {
           const active = isActive(item.href);
           const Icon = item.icon;
@@ -60,10 +60,10 @@ export default function BottomNav() {
               <Link
                 href={item.href}
                 className="flex min-h-[64px] flex-col items-center justify-center gap-2 text-center font-body transition-colors duration-300"
-                style={{ color: active ? '#FDFBF7' : '#9B99B0' }}
+                style={{ color: active ? '#FDFBF7' : '#C0BDD6' }}
               >
-                <Icon size={20} strokeWidth={1.5} absoluteStrokeWidth />
-                <span className="text-[11px] leading-none">{item.label}</span>
+                <Icon size={22} strokeWidth={1.5} absoluteStrokeWidth />
+                <span className="text-[11px] font-medium leading-none">{item.label}</span>
               </Link>
             </li>
           );

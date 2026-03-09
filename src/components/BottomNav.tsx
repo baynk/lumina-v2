@@ -46,10 +46,10 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40"
+      className="bottom-nav-shell pointer-events-none fixed inset-x-0 bottom-0 z-40"
       aria-label={language === 'ru' ? 'Нижняя навигация' : 'Bottom navigation'}
     >
-      <div className="bottom-nav-fade pointer-events-none absolute inset-x-0 bottom-0 h-[90px]" aria-hidden="true" />
+      <div className="bottom-nav-fade pointer-events-none absolute inset-x-0 bottom-0 h-[calc(90px+env(safe-area-inset-bottom,0px))]" aria-hidden="true" />
       <ul className="pointer-events-auto mx-auto grid h-[90px] w-full max-w-md grid-cols-4 px-6 pb-5 pt-5">
         {items.map((item) => {
           const active = isActive(item.href);

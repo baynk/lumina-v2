@@ -71,6 +71,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
   themeColor: '#0B0814',
 };
 
@@ -79,6 +80,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isProduction = process.env.NODE_ENV === 'production';
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -121,8 +123,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-bg-base text-text-primary font-body antialiased">
         <ServiceWorkerRegistrar />
-        <Analytics />
-        <SpeedInsights />
+        {isProduction ? <Analytics /> : null}
+        {isProduction ? <SpeedInsights /> : null}
         <AppProviders>
           <div className="star-field" aria-hidden="true" />
           <div className="celestial-gradient" aria-hidden="true" />

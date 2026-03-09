@@ -403,9 +403,9 @@ export default function LandingPage() {
     return (
       <div className="px-0 pb-24 sm:px-6 sm:pb-28">
         <section className="relative mx-auto min-h-screen w-full max-w-md overflow-hidden bg-bg-base sm:mt-6 sm:min-h-[calc(100dvh-3rem)] sm:rounded-[36px] sm:border sm:border-bg-frame">
-          <div className="aura aura-violet -right-24 -top-16 h-[300px] w-[300px]" aria-hidden="true" />
-          <div className="aura aura-indigo -left-24 bottom-[22%] h-[280px] w-[280px] [animation-delay:-5s]" aria-hidden="true" />
-          <div className="aura aura-blue -right-14 top-[42%] h-[250px] w-[250px] [animation-delay:-2s]" aria-hidden="true" />
+          <div className="aura aura-violet left-[-8%] top-[8%] h-[390px] w-[390px]" aria-hidden="true" />
+          <div className="aura aura-indigo right-[-8%] top-[36%] h-[380px] w-[380px] [animation-delay:-5s]" aria-hidden="true" />
+          <div className="aura aura-blue left-[18%] bottom-[-4%] h-[350px] w-[350px] [animation-delay:-2s]" aria-hidden="true" />
 
           <div className="relative z-10 flex min-h-screen flex-col px-6 pb-[100px] pt-10 sm:min-h-[calc(100dvh-3rem)]">
             <header className="flex items-center justify-between">

@@ -6,17 +6,17 @@
   --bg-void: #050408;
   --bg-base: #0b0814;
   --bg-frame: #14111d;
-  --bg-card-start: rgba(28, 24, 43, 0.8);
-  --bg-card-end: rgba(20, 17, 33, 0.8);
+  --bg-card-start: rgba(255, 255, 255, 0.05);
+  --bg-card-end: rgba(255, 255, 255, 0.05);
   --text-primary: #fdfbf7;
   --text-secondary: #8d8b9f;
   --text-accent: #c8a4a4;
   --text-muted: #5c5970;
   --text-badge: #c0bdd6;
   --wordmark-sparkle: #bca8bc;
-  --aura-violet: #5a438a;
-  --aura-indigo: #2e1b54;
-  --aura-blue: #18244d;
+  --aura-violet: #7b5eb8;
+  --aura-indigo: #4a2e80;
+  --aura-blue: #2e4080;
   --lumina-bg: var(--bg-base);
   --lumina-bg-alt: var(--bg-frame);
   --lumina-accent: var(--text-accent);
@@ -54,6 +54,10 @@ select,
 button,
 textarea {
   font: inherit;
+}
+
+textarea {
+  resize: none;
 }
 
 .star-field {
@@ -109,20 +113,20 @@ textarea {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--bg-card-start), var(--bg-card-end));
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    inset 0 1px 0 rgba(253, 251, 247, 0.05),
-    0 24px 60px rgba(4, 3, 10, 0.26);
+    inset 0 1px 0 rgba(253, 251, 247, 0.1),
+    0 24px 60px rgba(4, 3, 10, 0.22);
   border-radius: 28px;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .glass-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .lumina-label {
@@ -137,8 +141,8 @@ textarea {
   width: 100%;
   min-height: 48px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(20, 17, 33, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--lumina-text);
   padding: 0.75rem 0.95rem;
   outline: none;
@@ -148,7 +152,7 @@ textarea {
 .lumina-input:focus {
   border-color: rgba(253, 251, 247, 0.14);
   box-shadow: 0 0 0 3px rgba(90, 67, 138, 0.18), 0 0 24px rgba(90, 67, 138, 0.12);
-  background: rgba(20, 17, 33, 0.9);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .lumina-input::placeholder {
@@ -162,16 +166,20 @@ textarea {
   border: 1px solid rgba(253, 251, 247, 0.08);
   font-weight: 500;
   letter-spacing: 0.01em;
-  color: var(--bg-base);
+  color: #0b0814;
   background: rgba(253, 251, 247, 0.9);
-  box-shadow: 0 18px 40px rgba(7, 6, 12, 0.24);
+  box-shadow:
+    0 0 20px rgba(253, 251, 247, 0.1),
+    0 18px 40px rgba(7, 6, 12, 0.24);
   transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .lumina-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  background: rgba(253, 251, 247, 0.82);
-  box-shadow: 0 20px 44px rgba(7, 6, 12, 0.28);
+  background: rgba(253, 251, 247, 0.94);
+  box-shadow:
+    0 0 24px rgba(253, 251, 247, 0.12),
+    0 20px 44px rgba(7, 6, 12, 0.28);
 }
 
 .lumina-button:disabled {
@@ -183,20 +191,24 @@ textarea {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--bg-card-start), var(--bg-card-end));
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    inset 0 1px 0 rgba(253, 251, 247, 0.05),
-    0 24px 60px rgba(4, 3, 10, 0.26);
+    inset 0 1px 0 rgba(253, 251, 247, 0.1),
+    0 24px 60px rgba(4, 3, 10, 0.22);
   border-radius: 28px;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .lumina-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+textarea.lumina-input {
+  resize: none;
 }
 
 .lumina-section-title {
@@ -285,11 +297,15 @@ textarea {
 .aura {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(90px);
-  opacity: 0.48;
+  filter: blur(100px);
+  opacity: 0.6;
   pointer-events: none;
   z-index: 0;
   animation: breathe 10s infinite alternate ease-in-out;
+}
+
+.aura-strong {
+  opacity: 0.65;
 }
 
 .badge {
@@ -500,7 +516,7 @@ textarea {
   position: absolute;
   border-radius: 9999px;
   filter: blur(90px);
-  opacity: 0.18;
+  opacity: 0.24;
   pointer-events: none;
   z-index: 0;
 }

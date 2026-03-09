@@ -309,8 +309,8 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center">
-        <div className="aura aura-violet left-[-22%] top-[8%] h-[260px] w-[260px]" />
-        <div className="aura aura-blue right-[-18%] bottom-[-10%] h-[280px] w-[280px]" />
+        <div className="aura aura-violet left-[-8%] top-[6%] h-[380px] w-[380px]" />
+        <div className="aura aura-strong aura-blue right-[-6%] bottom-[-2%] h-[360px] w-[360px]" />
         <p className="font-heading text-3xl text-[#FDFBF7]">Lumina</p>
       </div>
     );
@@ -319,9 +319,9 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="lumina-screen">
-        <div className="aura aura-violet left-[-24%] top-[8%] h-[270px] w-[270px]" />
-        <div className="aura aura-blue right-[-18%] top-[30%] h-[250px] w-[250px]" />
-        <div className="aura aura-indigo bottom-[-10%] left-[16%] h-[240px] w-[240px]" />
+        <div className="aura aura-violet left-[-8%] top-[4%] h-[390px] w-[390px]" />
+        <div className="aura aura-strong aura-blue right-[-8%] top-[26%] h-[360px] w-[360px]" />
+        <div className="aura aura-indigo bottom-[-4%] left-[20%] h-[350px] w-[350px]" />
         <div className="mx-auto w-full max-w-md px-4 pb-28 pt-12 sm:px-6">
         <div className="text-center">
           <p className="lumina-label">{language === 'ru' ? 'Профиль Lumina' : 'Lumina profile'}</p>
@@ -383,9 +383,9 @@ export default function ProfilePage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
-      <div className="aura aura-blue right-[-18%] top-[20%] h-[260px] w-[260px]" />
-      <div className="aura aura-indigo bottom-[-12%] left-[18%] h-[250px] w-[250px]" />
+      <div className="aura aura-violet left-[-8%] top-[4%] h-[400px] w-[400px]" />
+      <div className="aura aura-strong aura-blue right-[-8%] top-[24%] h-[370px] w-[370px]" />
+      <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
       <div className="mx-auto max-w-lg px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
@@ -470,7 +470,7 @@ export default function ProfilePage() {
                     ref={compatCardRef}
                     className="glass-card relative overflow-hidden rounded-[28px] p-5"
                   >
-                    <div className="aura aura-violet left-[-18%] top-[-18%] h-[160px] w-[160px]" />
+                    <div className="aura aura-strong aura-violet left-[-10%] top-[-12%] h-[220px] w-[220px]" />
                     <div className="relative z-10 flex items-center justify-between">
                       <div className="text-center flex-1">
                         <p className="text-3xl">{ZODIAC_SYMBOLS[bigThree.sun]}</p>

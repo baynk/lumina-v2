@@ -757,9 +757,9 @@ export default function SynastryPage() {
 
     return (
       <div className="lumina-screen">
-        <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
-        <div className="aura aura-blue right-[-22%] top-[24%] h-[290px] w-[290px]" />
-        <div className="aura aura-indigo bottom-[-12%] left-[18%] h-[260px] w-[260px]" />
+        <div className="aura aura-violet left-[-8%] top-[4%] h-[400px] w-[400px]" />
+        <div className="aura aura-strong aura-blue right-[-8%] top-[24%] h-[380px] w-[380px]" />
+        <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
         <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 animate-fadeInUp">
         {/* Results Header */}
         <div className="mb-8 text-center">
@@ -843,7 +843,7 @@ export default function SynastryPage() {
           <p className="lumina-label mb-4">{t.synastryKeyAspects}</p>
           <div className="space-y-3">
             {result.synastry.crossAspects.slice(0, 8).map((aspect, idx) => (
-              <div key={`${aspect.planetA}-${aspect.planetB}-${idx}`} className="rounded-[22px] border border-white/[0.06] bg-white/[0.02] p-4">
+              <div key={`${aspect.planetA}-${aspect.planetB}-${idx}`} className="glass-card p-4">
                 <div className="mb-2 flex items-center gap-2">
                   <span className={`inline-block h-2 w-2 rounded-full ${
                     ['trine', 'sextile'].includes(aspect.type.toLowerCase()) ? 'bg-emerald-400' :
@@ -957,9 +957,9 @@ export default function SynastryPage() {
   // ─── FORM VIEW ───
   return (
     <div className="lumina-screen">
-      <div className="aura aura-violet left-[-24%] top-[6%] h-[280px] w-[280px]" />
-      <div className="aura aura-blue right-[-22%] top-[24%] h-[290px] w-[290px]" />
-      <div className="aura aura-indigo bottom-[-12%] left-[18%] h-[260px] w-[260px]" />
+      <div className="aura aura-violet left-[-8%] top-[4%] h-[400px] w-[400px]" />
+      <div className="aura aura-strong aura-blue right-[-8%] top-[24%] h-[380px] w-[380px]" />
+      <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
       <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
       {/* Hero */}
       <div className="mb-10 text-center animate-fadeInUp">
@@ -999,7 +999,7 @@ export default function SynastryPage() {
                   key={partner.id}
                   type="button"
                   onClick={() => fillPersonBFromPartner(partner)}
-                  className="rounded-[22px] border border-white/10 bg-white/[0.03] px-4 py-2.5 text-left transition hover:border-white/[0.16] hover:bg-white/[0.06]"
+                  className="glass-card rounded-[28px] px-4 py-3 text-left transition hover:border-white/[0.16] hover:bg-white/[0.08]"
                 >
                   <p className="text-sm font-medium text-[#FDFBF7]">{partner.partner_name}</p>
                 </button>

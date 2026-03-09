@@ -493,9 +493,9 @@ export default function OnboardingPage() {
 
   return (
     <div className="lumina-screen lumina-orb-shell" data-lang={language}>
-      <div className="aura aura-violet left-[-26%] top-[8%] h-[260px] w-[260px]" />
-      <div className="aura aura-blue right-[-28%] top-[34%] h-[280px] w-[280px]" />
-      <div className="aura aura-indigo bottom-[-12%] left-[14%] h-[250px] w-[250px]" />
+      <div className="aura aura-violet left-[-8%] top-[4%] h-[380px] w-[380px]" />
+      <div className="aura aura-strong aura-blue right-[-10%] top-[28%] h-[360px] w-[360px]" />
+      <div className="aura aura-indigo bottom-[-4%] left-[20%] h-[350px] w-[350px]" />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-0">
         <OnboardingHeader

@@ -135,9 +135,9 @@ export default function ConsultationPage() {
   if (submitted) {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center px-4">
-        <div className="aura aura-violet left-[-8%] top-[8%] h-[400px] w-[400px]" />
-        <div className="aura aura-strong aura-blue right-[-8%] top-[28%] h-[380px] w-[380px]" />
-        <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
+        <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+        <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+        <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
         <div className="max-w-md text-center animate-fadeInUp">
           <div className="mb-6 flex justify-center text-[#C8A4A4] animate-float"><Sparkles size={40} strokeWidth={1.5} /></div>
           <h1 className="mb-4 font-heading text-3xl text-[#FDFBF7]">
@@ -164,9 +164,9 @@ export default function ConsultationPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura aura-violet left-[-8%] top-[4%] h-[400px] w-[400px]" />
-      <div className="aura aura-strong aura-blue right-[-8%] top-[24%] h-[380px] w-[380px]" />
-      <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
       <div className="mx-auto max-w-2xl px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">

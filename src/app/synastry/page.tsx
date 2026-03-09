@@ -89,7 +89,7 @@ const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com
 /* ─── Benefit Card ─── */
 function BenefitCard({ icon: Icon, text }: { icon: LucideIcon; text: string }) {
   return (
-    <div className="glass-card flex items-start gap-3 rounded-[24px] p-4">
+    <div className="glass-card flex items-start gap-3 rounded-[28px] p-4">
       <Icon className="mt-0.5 shrink-0 text-[#8D8B9F]" size={18} strokeWidth={1.5} />
       <p className="text-sm leading-relaxed text-[#8D8B9F]">{text}</p>
     </div>
@@ -757,9 +757,9 @@ export default function SynastryPage() {
 
     return (
       <div className="lumina-screen">
-        <div className="aura aura-violet left-[-8%] top-[4%] h-[400px] w-[400px]" />
-        <div className="aura aura-strong aura-blue right-[-8%] top-[24%] h-[380px] w-[380px]" />
-        <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
+        <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+        <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+        <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
         <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 animate-fadeInUp">
         {/* Results Header */}
         <div className="mb-8 text-center">
@@ -957,9 +957,9 @@ export default function SynastryPage() {
   // ─── FORM VIEW ───
   return (
     <div className="lumina-screen">
-      <div className="aura aura-violet left-[-8%] top-[4%] h-[400px] w-[400px]" />
-      <div className="aura aura-strong aura-blue right-[-8%] top-[24%] h-[380px] w-[380px]" />
-      <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
       <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
       {/* Hero */}
       <div className="mb-10 text-center animate-fadeInUp">

@@ -148,9 +148,9 @@ export default function TransitsPage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura aura-violet left-[-8%] top-[4%] h-[400px] w-[400px]" />
-      <div className="aura aura-strong aura-blue right-[-8%] top-[24%] h-[380px] w-[380px]" />
-      <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
       <div className="mx-auto max-w-5xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
         <button type="button" onClick={() => router.push('/')} className="min-h-11 rounded-full px-3 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">

@@ -309,8 +309,9 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="lumina-screen flex min-h-screen items-center justify-center">
-        <div className="aura aura-violet left-[-8%] top-[6%] h-[380px] w-[380px]" />
-        <div className="aura aura-strong aura-blue right-[-6%] bottom-[-2%] h-[360px] w-[360px]" />
+        <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+        <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+        <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
         <p className="font-heading text-3xl text-[#FDFBF7]">Lumina</p>
       </div>
     );
@@ -319,9 +320,9 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="lumina-screen">
-        <div className="aura aura-violet left-[-8%] top-[4%] h-[390px] w-[390px]" />
-        <div className="aura aura-strong aura-blue right-[-8%] top-[26%] h-[360px] w-[360px]" />
-        <div className="aura aura-indigo bottom-[-4%] left-[20%] h-[350px] w-[350px]" />
+        <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+        <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+        <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
         <div className="mx-auto w-full max-w-md px-4 pb-28 pt-12 sm:px-6">
         <div className="text-center">
           <p className="lumina-label">{language === 'ru' ? 'Профиль Lumina' : 'Lumina profile'}</p>
@@ -353,7 +354,7 @@ export default function ProfilePage() {
               ru: 'Анализ совместимости с любым человеком',
             },
           ].map((item) => (
-            <div key={item.en} className="glass-card flex items-start gap-3 rounded-[22px] p-3.5">
+            <div key={item.en} className="glass-card flex items-start gap-3 rounded-[28px] p-3.5">
               <item.icon className="mt-0.5 text-[#8D8B9F]" size={18} strokeWidth={1.5} />
               <p className="text-sm text-[#8D8B9F]">{language === 'ru' ? item.ru : item.en}</p>
             </div>
@@ -383,9 +384,9 @@ export default function ProfilePage() {
 
   return (
     <div className="lumina-screen">
-      <div className="aura aura-violet left-[-8%] top-[4%] h-[400px] w-[400px]" />
-      <div className="aura aura-strong aura-blue right-[-8%] top-[24%] h-[370px] w-[370px]" />
-      <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
       <div className="mx-auto max-w-lg px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">

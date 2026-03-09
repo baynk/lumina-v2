@@ -99,9 +99,9 @@ export default function StoryOfYouPage() {
 
   return (
     <div className="lumina-screen flex min-h-screen items-center">
-      <div className="aura aura-violet left-[-8%] top-[6%] h-[400px] w-[400px]" />
-      <div className="aura aura-strong aura-blue right-[-8%] top-[26%] h-[370px] w-[370px]" />
-      <div className="aura aura-indigo bottom-[-4%] left-[22%] h-[360px] w-[360px]" />
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
       <div className="mx-auto flex min-h-screen max-w-3xl items-center px-4 pb-12 pt-6 sm:px-6">
       <section className="glass-card w-full p-6 sm:p-8">
         {loading ? (

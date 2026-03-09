@@ -493,9 +493,9 @@ export default function OnboardingPage() {
 
   return (
     <div className="lumina-screen lumina-orb-shell" data-lang={language}>
-      <div className="aura aura-violet left-[-8%] top-[4%] h-[380px] w-[380px]" />
-      <div className="aura aura-strong aura-blue right-[-10%] top-[28%] h-[360px] w-[360px]" />
-      <div className="aura aura-indigo bottom-[-4%] left-[20%] h-[350px] w-[350px]" />
+      <div className="aura -right-24 -top-16 h-[300px] w-[300px] bg-[#5A438A]" />
+      <div className="aura -left-24 bottom-[22%] h-[280px] w-[280px] bg-[#2E1B54]" />
+      <div className="aura -right-14 top-[42%] h-[250px] w-[250px] bg-[#18244D]" />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-0">
         <OnboardingHeader
@@ -517,7 +517,7 @@ export default function OnboardingPage() {
               <p className="mt-4 max-w-[300px] text-sm leading-6 text-[#8D8B9F]">{t.onboardingWelcomeSubtitle}</p>
               <div className="mt-8 grid w-full grid-cols-2 gap-3">
                 {featureCards.map((card) => (
-                  <div key={card.label} className="glass-card rounded-[24px] p-4 text-left">
+                  <div key={card.label} className="glass-card rounded-[28px] p-4 text-left">
                     <card.icon className="text-[#8D8B9F]" size={20} strokeWidth={1.5} />
                     <p className="mt-4 text-sm leading-5 text-[#FDFBF7]">{card.label}</p>
                   </div>
@@ -585,7 +585,7 @@ export default function OnboardingPage() {
                           return next;
                         })
                       }
-                      className={`${cardClasses(active)} flex items-start gap-4 rounded-[24px] p-4`}
+                      className={`${cardClasses(active)} flex items-start gap-4 rounded-[28px] p-4`}
                       style={{
                         borderColor: active ? 'rgba(200,164,164,0.32)' : 'rgba(253,251,247,0.04)',
                         backgroundColor: active ? 'rgba(200,164,164,0.08)' : undefined,
@@ -672,7 +672,7 @@ export default function OnboardingPage() {
                 <ScrollWheelPicker items={DAYS} selectedIndex={dayIndex} onChange={setDayIndex} ariaLabel={t.day} />
                 <ScrollWheelPicker items={YEARS.map(String)} selectedIndex={yearIndex} onChange={setYearIndex} ariaLabel={t.year} />
               </div>
-              <div className="glass-card mt-8 rounded-[24px] p-4">
+              <div className="glass-card mt-8 rounded-[28px] p-4">
                 <p className="lumina-label">{t.onboardingWhy}</p>
                 <p className="mt-3 text-sm leading-6 text-[#8D8B9F]">{t.onboardingBirthDateWhyAnswer}</p>
               </div>
@@ -768,7 +768,7 @@ export default function OnboardingPage() {
               {searchingPlaces ? <p className="mt-3 text-sm text-[#8D8B9F]">{language === 'ru' ? 'Ищем место, где началась ваша история...' : 'Searching for the place where your story began...'}</p> : null}
 
               {placeResults.length ? (
-                <div className="glass-card mt-3 overflow-hidden rounded-[24px]">
+                <div className="glass-card mt-3 overflow-hidden rounded-[28px]">
                   {placeResults.map((result) => (
                     <button
                       key={result.place_id}
@@ -783,7 +783,7 @@ export default function OnboardingPage() {
               ) : null}
 
               {selectedPlace ? (
-                <div className="glass-card mt-4 rounded-[24px] p-4">
+                <div className="glass-card mt-4 rounded-[28px] p-4">
                   <p className="lumina-label">{language === 'ru' ? 'Выбрано' : 'Selected'}</p>
                   <p className="mt-2 text-sm leading-6 text-[#FDFBF7]">{selectedPlace.name}</p>
                 </div>
@@ -831,7 +831,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <div className="glass-card mt-6 rounded-[24px] px-5 py-4">
+              <div className="glass-card mt-6 rounded-[28px] px-5 py-4">
                 <p
                   className={`text-sm leading-6 text-[#B7AEB4] transition-opacity duration-300 ${
                     factVisible ? 'opacity-100' : 'opacity-0'
@@ -857,7 +857,7 @@ export default function OnboardingPage() {
                   return (
                     <div
                       key={card.label}
-                      className={`glass-card rounded-[24px] p-5 transition-all duration-500 ${
+                      className={`glass-card rounded-[28px] p-5 transition-all duration-500 ${
                         bigThreeVisible[index] ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                       }`}
                     >

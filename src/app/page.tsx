@@ -20,7 +20,6 @@ import { translateMoonPhase, translatePlanet, translateSign } from '@/lib/transl
 import type { BirthData, MoonRitualResponse, TransitAlert, TransitReport } from '@/lib/types';
 import LandingContent from '@/components/LandingContent';
 import BirthDataForm, { type BirthDataFormResult } from '@/components/BirthDataForm';
-import BottomNav from '@/components/BottomNav';
 import MoonPhaseVisual from '@/components/MoonPhaseVisual';
 
 const STORY_SHOWN_PREFIX = 'lumina_story_shown_';
@@ -66,13 +65,6 @@ function todayDate(language: 'en' | 'ru'): string {
     day: 'numeric',
     month: 'long',
   }).format(new Date());
-}
-
-function trimEnergyLine(text: string, fallback: string): string {
-  const normalized = text.replace(/\s+/g, ' ').trim();
-  if (!normalized) return fallback;
-  const firstSentence = normalized.split(/(?<=[.!?])\s+/)[0]?.trim() || normalized;
-  return firstSentence.length > 110 ? `${firstSentence.slice(0, 107).trim()}...` : firstSentence;
 }
 
 function formatForecast(text: string): string {
@@ -474,12 +466,14 @@ export default function LandingPage() {
     return (transitReport?.activeTransits || []).slice(0, 3);
   }, [transitReport]);
 
-  const energyLine = useMemo(() => {
+  const energyText = useMemo(() => {
     const fallback = language === 'ru'
       ? 'День просит мягкой концентрации и доверия к внутреннему ритму.'
       : 'The day asks for soft focus and trust in your inner rhythm.';
 
-    return trimEnergyLine(dailyInsight || moonRitual?.summary || '', fallback);
+    const source = dailyInsight || moonRitual?.summary || '';
+    const normalized = source.replace(/\s+/g, ' ').trim();
+    return normalized || fallback;
   }, [dailyInsight, language, moonRitual?.summary]);
 
   const forecastText = useMemo(() => {
@@ -508,7 +502,7 @@ export default function LandingPage() {
         <div className="celestial-gradient" aria-hidden="true" />
         <div className="star-field" aria-hidden="true" />
 
-        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6">
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6">
           <header className="flex items-center justify-between pb-6 pt-4">
             <button
               type="button"
@@ -567,8 +561,8 @@ export default function LandingPage() {
               </p>
               <div className="mt-5 w-full rounded-[24px] border border-white/10 bg-white/[0.04] px-4 py-4 text-left">
                 <p className="lumina-label">{homeCopy.energyLabel}</p>
-                <p className="mt-2 text-[15px] leading-[1.65] text-text-primary">
-                  {energyLine}
+                <p className="mt-2 whitespace-pre-line text-[15px] leading-[1.75] text-text-primary">
+                  {energyText}
                 </p>
               </div>
             </div>
@@ -648,15 +642,15 @@ export default function LandingPage() {
               </p>
             )}
 
-            <div className="mt-5 flex items-center justify-between rounded-[22px] border border-white/10 bg-white/[0.04] px-4 py-3">
-              <div>
+            <div className="mt-5 flex flex-col gap-4 rounded-[22px] border border-white/10 bg-white/[0.04] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="lumina-label">{moonRitualLoading ? t.moonPhase : t.moonRitualTitle}</p>
                 <p className="mt-1 text-sm text-text-secondary">{ritualSummary}</p>
               </div>
               <button
                 type="button"
                 onClick={() => router.push('/journal')}
-                className="lumina-btn-primary inline-flex items-center gap-2 px-4 py-3 text-[11px] tracking-[0.18em]"
+                className="lumina-btn-primary inline-flex min-h-12 items-center justify-center gap-2 self-start whitespace-nowrap px-5 text-[11px] tracking-[0.18em] sm:self-auto"
               >
                 <span>{homeCopy.ritualButton}</span>
                 <ChevronRight size={15} strokeWidth={1.7} />
@@ -666,21 +660,25 @@ export default function LandingPage() {
 
           <section className="mt-8 animate-stagger-5">
             <p className="lumina-label mb-3">{homeCopy.quickLabel}</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid auto-rows-fr grid-cols-2 gap-3">
               {quickLinks.map((item) => {
                 const Icon = item.icon;
 
                 return (
-                  <Link key={item.href} href={item.href} className="glass-card block p-4">
+                  <Link key={item.href} href={item.href} className="glass-card flex h-full min-h-[164px] flex-col justify-between p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="font-heading text-[24px] leading-none text-text-primary">{item.label}</p>
-                        <p className="mt-2 text-sm text-text-secondary">{item.note}</p>
+                        <p className="font-heading text-[20px] leading-[1.05] text-text-primary">{item.label}</p>
+                        <p className="mt-2 text-sm leading-relaxed text-text-secondary">{item.note}</p>
                       </div>
                       <span className="rounded-full border border-white/10 bg-white/[0.04] p-2 text-text-primary">
                         <Icon size={18} strokeWidth={1.7} />
                       </span>
                     </div>
+                    <span className="mt-5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-[var(--text-badge)]">
+                      {language === 'ru' ? 'Открыть' : 'Open'}
+                      <ChevronRight size={14} strokeWidth={1.7} />
+                    </span>
                   </Link>
                 );
               })}
@@ -699,7 +697,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <BottomNav />
       </div>
     );
   }

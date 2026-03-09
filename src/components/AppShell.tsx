@@ -19,7 +19,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <UserMenu />
         </nav>
       ) : null}
-      <main className={`relative z-10 min-h-screen ${isOnboarding ? '' : isHome ? 'bottom-nav-content-offset' : 'bottom-nav-content-offset pt-14 sm:pb-0 sm:pt-16'}`}>{children}</main>
+      <main className={`relative z-10 min-h-dvh ${isOnboarding ? '' : isHome ? 'bottom-nav-content-offset' : 'bottom-nav-content-offset pt-14 sm:pb-0 sm:pt-16'}`}>{children}</main>
       {!isOnboarding ? <BottomNav /> : null}
       {!isOnboarding && !isHome ? <Footer /> : null}
     </>

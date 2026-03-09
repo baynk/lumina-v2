@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -27,6 +28,17 @@ type SelectedPlace = {
   latitude: number;
   longitude: number;
   timezone: string;
+};
+
+type ZodiacPreviewConfig = {
+  en: string;
+  ru: string;
+  glow: string;
+};
+
+const ZODIAC_PREVIEW_SIGNS: Record<'leo' | 'aquarius', ZodiacPreviewConfig> = {
+  leo: { en: 'Leo', ru: 'Лев', glow: 'rgba(200,164,164,0.24)' },
+  aquarius: { en: 'Aquarius', ru: 'Водолей', glow: 'rgba(192,189,214,0.22)' },
 };
 
 const SIGN_DESCRIPTIONS: Record<string, { en: string; ru: string }> = {
@@ -101,6 +113,39 @@ function cardClasses(active = false) {
   return `glass-card w-full text-left transition-all duration-300 ${
     active ? 'border-white/[0.12] bg-white/[0.03]' : ''
   }`;
+}
+
+function ZodiacPreviewCircle({
+  signKey,
+  language,
+  className = '',
+}: {
+  signKey: keyof typeof ZODIAC_PREVIEW_SIGNS;
+  language: 'en' | 'ru';
+  className?: string;
+}) {
+  const sign = ZODIAC_PREVIEW_SIGNS[signKey];
+  const label = language === 'ru' ? sign.ru : sign.en;
+  const accentStyle = { boxShadow: `0 0 0 1px rgba(253,251,247,0.05), 0 18px 44px ${sign.glow}` } satisfies CSSProperties;
+
+  return (
+    <div
+      className={`relative flex h-28 w-28 flex-col justify-between rounded-full border border-white/[0.10] bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.02)),rgba(20,17,33,0.82)] p-4 backdrop-blur-xl ${className}`}
+      style={accentStyle}
+    >
+      <div className="flex gap-1.5">
+        <span className="h-1.5 w-1.5 rounded-full bg-[var(--text-accent)]/80" />
+        <span className="mt-2 h-1 w-1 rounded-full bg-white/55" />
+        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--text-badge)]/70" />
+      </div>
+      <div>
+        <p className="text-[10px] uppercase tracking-[0.26em] text-[var(--text-badge)]">
+          {language === 'ru' ? 'Знак' : 'Sign'}
+        </p>
+        <p className="mt-1 font-heading text-[20px] leading-none text-[#FDFBF7]">{label}</p>
+      </div>
+    </div>
+  );
 }
 
 export default function OnboardingPage() {
@@ -474,13 +519,16 @@ export default function OnboardingPage() {
       subtitle: t.onboardingFeatureCompatSubtitle,
       cta: t.onboardingFeatureCompatCta,
       preview: (
-        <div className="flex items-center justify-center gap-5 text-[#FDFBF7]">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
-              ♌
-          </div>
-          <Heart className="text-[#C8A4A4]" size={28} strokeWidth={1.5} />
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
-            ♒
+        <div className="relative flex h-[190px] w-[190px] items-center justify-center">
+          <div className="absolute inset-[18px] rounded-[34px] border border-white/[0.06] bg-white/[0.02]" />
+          <div className="absolute left-[22px] top-[34px] h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(200,164,164,0.20),transparent_68%)] blur-xl" />
+          <div className="absolute right-[22px] bottom-[34px] h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(123,91,191,0.18),transparent_68%)] blur-xl" />
+          <ZodiacPreviewCircle signKey="leo" language={language} className="-mr-3 z-10" />
+          <ZodiacPreviewCircle signKey="aquarius" language={language} className="-ml-3 mt-10" />
+          <div className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/[0.10] bg-[rgba(20,17,33,0.92)] backdrop-blur-md">
+            <div className="h-5 w-5 rounded-full border border-[var(--text-accent)]/70">
+              <div className="h-full w-full scale-[0.45] rounded-full bg-[var(--text-accent)]/75" />
+            </div>
           </div>
         </div>
       ),
@@ -902,6 +950,11 @@ export default function OnboardingPage() {
                 <h2 className="mt-3 font-heading text-[36px] leading-none text-[#FDFBF7]">
                   {t.onboardingBigThreeTitle}
                 </h2>
+                <p className="mx-auto mt-4 max-w-[320px] text-sm leading-6 text-[#8D8B9F]">
+                  {language === 'ru'
+                    ? 'Солнце, Луна и Асцендент показывают, кто вы, как вы чувствуете и каким вас видят другие.'
+                    : 'Your Sun, Moon, and Rising sign shape who you are, how you feel, and how others see you.'}
+                </p>
               </div>
               <div className="mt-8 space-y-4">
                 {bigThreeCards.map((card, index) => {
@@ -924,7 +977,7 @@ export default function OnboardingPage() {
               </div>
               <div className="mt-8">
                 <button type="button" onClick={() => router.push('/')} className={ctaClasses()}>
-                  {t.onboardingBigThreeCta}
+                  {language === 'ru' ? 'ОТКРОЙ СВОЮ КАРТУ ✦' : 'EXPLORE YOUR CHART ✦'}
                 </button>
               </div>
             </section>

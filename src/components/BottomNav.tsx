@@ -50,7 +50,7 @@ export default function BottomNav() {
       aria-label={language === 'ru' ? 'Нижняя навигация' : 'Bottom navigation'}
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <ul className="mx-auto grid w-full max-w-md grid-cols-4 px-6 pb-3 pt-3" style={{ minHeight: '72px' }}>
+      <ul className="mx-auto grid w-full max-w-[430px] grid-cols-4 px-6 pb-3 pt-3" style={{ minHeight: '72px' }}>
         {items.map((item) => {
           const active = isActive(item.href);
           const Icon = item.icon;

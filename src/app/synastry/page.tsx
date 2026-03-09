@@ -264,17 +264,28 @@ export default function SynastryPage() {
   const [savedPartners, setSavedPartners] = useState<SavedPartner[]>([]);
   const [connectionsLoading, setConnectionsLoading] = useState(false);
   const [connectionsError, setConnectionsError] = useState('');
+  const [connectionCode, setConnectionCode] = useState('');
+  const [connectionCodeLoading, setConnectionCodeLoading] = useState(false);
   const [connectCodeInput, setConnectCodeInput] = useState('');
   const [showConnectCode, setShowConnectCode] = useState(false);
   const [connectCodeLoading, setConnectCodeLoading] = useState(false);
   const [savePartnerLoading, setSavePartnerLoading] = useState(false);
   const [partnerSaved, setPartnerSaved] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [inviteStatus, setInviteStatus] = useState('');
 
   useEffect(() => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
     setPersonA((prev) => ({ ...prev, timezone }));
     setPersonB((prev) => ({ ...prev, timezone }));
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const inviteCode = params.get('code')?.trim().toUpperCase();
+    if (!inviteCode) return;
+    setConnectCodeInput(inviteCode);
+    setShowConnectCode(true);
   }, []);
 
   useEffect(() => {
@@ -337,6 +348,12 @@ export default function SynastryPage() {
     return () => clearTimeout(timeout);
   }, [toastMessage]);
 
+  useEffect(() => {
+    if (!inviteStatus) return;
+    const timeout = setTimeout(() => setInviteStatus(''), 2500);
+    return () => clearTimeout(timeout);
+  }, [inviteStatus]);
+
   const autoFilledRef = useRef(false);
 
   const loadConnections = useCallback(async () => {
@@ -396,6 +413,37 @@ export default function SynastryPage() {
       setConnectionsError('');
     }
   }, [loadConnections, sessionStatus]);
+
+  useEffect(() => {
+    async function loadConnectionCode() {
+      if (sessionStatus !== 'authenticated') {
+        setConnectionCode('');
+        return;
+      }
+
+      setConnectionCodeLoading(true);
+      try {
+        const response = await fetch('/api/connections', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'get-code' }),
+        });
+        const payload = (await response.json()) as { code?: string; error?: string };
+        if (!response.ok) throw new Error(payload.error || 'failed');
+        setConnectionCode(payload.code || '');
+      } catch {
+        setConnectionsError(
+          language === 'ru'
+            ? 'Не удалось загрузить код подключения'
+            : 'Unable to load connection code'
+        );
+      } finally {
+        setConnectionCodeLoading(false);
+      }
+    }
+
+    loadConnectionCode();
+  }, [language, sessionStatus]);
 
   const searchLocation = useCallback(async (query: string, target: 'A' | 'B') => {
     const update = target === 'A' ? setPersonA : setPersonB;
@@ -525,6 +573,49 @@ export default function SynastryPage() {
     } finally {
       setConnectCodeLoading(false);
     }
+  };
+
+  const inviteLink = connectionCode ? `${siteUrl}/synastry?code=${encodeURIComponent(connectionCode)}` : '';
+
+  const handleCopyInviteCode = async () => {
+    if (!connectionCode) return;
+    try {
+      await navigator.clipboard.writeText(connectionCode);
+      setInviteStatus(language === 'ru' ? 'Код скопирован' : 'Code copied');
+    } catch {
+      setConnectionsError(language === 'ru' ? 'Не удалось скопировать код' : 'Unable to copy code');
+    }
+  };
+
+  const handleShareInvite = async () => {
+    if (!inviteLink || !connectionCode) return;
+
+    const message = language === 'ru'
+      ? `Присоединяйся ко мне в Lumina. Открой синастрию по ссылке или используй код ${connectionCode}.`
+      : `Join me on Lumina. Open synastry from this link or use code ${connectionCode}.`;
+
+    try {
+      await navigator.clipboard.writeText(`${message}\n${inviteLink}`);
+    } catch {
+      // Clipboard fallback is non-blocking; continue with native share or toast.
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Lumina Synastry',
+          text: message,
+          url: inviteLink,
+        });
+      } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+          setInviteStatus(language === 'ru' ? 'Ссылка скопирована' : 'Invite link copied');
+          return;
+        }
+      }
+    }
+
+    setInviteStatus(language === 'ru' ? 'Ссылка скопирована' : 'Invite link copied');
   };
 
   const handleSavePartner = async () => {
@@ -756,11 +847,11 @@ export default function SynastryPage() {
     const moonB = result.synastry.personBChart.planets.find((p) => p.planet === 'Moon');
 
     return (
-      <div className="lumina-screen">
+      <div className="lumina-screen overflow-hidden">
         <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
         <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
         <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-        <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 animate-fadeInUp">
+      <div className="mx-auto max-w-4xl px-4 pb-20 pt-safe sm:px-6 animate-fadeInUp">
         {/* Results Header */}
         <div className="mb-8 text-center">
           <p className="lumina-label mb-2">
@@ -776,7 +867,7 @@ export default function SynastryPage() {
 
         {/* Big Three Comparison */}
         <section className="glass-card mb-6 overflow-hidden">
-          <div className="grid grid-cols-2 divide-x divide-white/[0.06]">
+          <div className="grid grid-cols-1 divide-y divide-white/[0.06] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             {[
               { name: nameA, sun: sunA, moon: moonA, rising: result.synastry.personAChart.risingSign },
               { name: nameB, sun: sunB, moon: moonB, rising: result.synastry.personBChart.risingSign },
@@ -956,11 +1047,11 @@ export default function SynastryPage() {
 
   // ─── FORM VIEW ───
   return (
-    <div className="lumina-screen">
+    <div className="lumina-screen overflow-hidden">
       <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
       <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
       <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-      <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
+      <div className="mx-auto max-w-4xl px-4 pb-20 pt-safe sm:px-6">
       {/* Hero */}
       <div className="mb-10 text-center animate-fadeInUp">
         <button
@@ -1009,7 +1100,7 @@ export default function SynastryPage() {
         )}
 
         {/* Two forms side-by-side on desktop */}
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:items-start">
           <PersonCard
             title={t.synastryPersonA}
             subtitle={language === 'ru' ? 'Автозаполнение из профиля' : 'Auto-filled from your profile'}
@@ -1032,45 +1123,85 @@ export default function SynastryPage() {
           />
         </div>
 
-        {/* Connect with code — compact, below forms */}
+        {/* Invite and connect */}
         {session?.user && (
-          <div className="mt-3 text-center">
-            {!showConnectCode && (
-              <button
-                type="button"
-                onClick={() => setShowConnectCode(true)}
-                className="text-xs text-[#C0BDD6] transition hover:text-[#FDFBF7]"
-              >
-                {language === 'ru' ? 'Подключить по коду партнёра' : 'Connect with partner code'}
-              </button>
-            )}
-            {showConnectCode && (
-              <div className="mx-auto flex max-w-xs gap-2 mt-1">
-                <input
-                  className="lumina-input text-center"
-                  value={connectCodeInput}
-                  onChange={(e) => setConnectCodeInput(e.target.value.toUpperCase())}
-                  placeholder="LUNA-XXXX"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={handleConnectWithCode}
-                  disabled={connectCodeLoading || !connectCodeInput.trim()}
-                  className="lumina-button min-w-20 px-4 disabled:opacity-60"
-                >
-                  {connectCodeLoading ? '...' : 'OK'}
-                </button>
+          <section className="glass-card mt-4 rounded-[28px] p-4 sm:p-5">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.03] p-4">
+                <p className="lumina-label mb-2">{language === 'ru' ? 'Ваш код приглашения' : 'Your invite code'}</p>
+                <p className="font-heading text-[28px] tracking-[0.18em] text-[#FDFBF7]">
+                  {connectionCodeLoading ? '••••••' : connectionCode || 'LUMINA'}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-[#8D8B9F]">
+                  {language === 'ru'
+                    ? 'Отправьте код или ссылку партнёру, чтобы он быстро подключился к вашей совместимости.'
+                    : 'Send your code or invite link so your partner can join your compatibility space quickly.'}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopyInviteCode}
+                    disabled={!connectionCode || connectionCodeLoading}
+                    className="rounded-full border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition hover:bg-white/[0.08] disabled:opacity-50"
+                  >
+                    {language === 'ru' ? 'Копировать код' : 'Copy code'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleShareInvite}
+                    disabled={!inviteLink || connectionCodeLoading}
+                    className="rounded-full border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition hover:bg-white/[0.08] disabled:opacity-50"
+                  >
+                    {language === 'ru' ? 'Поделиться ссылкой' : 'Share invite link'}
+                  </button>
+                </div>
+                {inviteLink ? (
+                  <p className="mt-3 break-all text-[11px] leading-5 text-[#8D8B9F]">{inviteLink}</p>
+                ) : null}
+                {inviteStatus ? <p className="mt-3 text-xs text-[#C0BDD6]">{inviteStatus}</p> : null}
               </div>
-            )}
-            {connectionsError && <p className="mt-2 text-xs text-[#C8A4A4]">{connectionsError}</p>}
-          </div>
+
+              <div className="rounded-[24px] border border-white/[0.08] bg-white/[0.03] p-4 text-center lg:text-left">
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <p className="lumina-label mb-2">{language === 'ru' ? 'Подключить партнёра' : 'Connect your partner'}</p>
+                    <p className="text-sm leading-relaxed text-[#8D8B9F]">
+                      {language === 'ru'
+                        ? 'Вставьте код партнёра, если он уже отправил приглашение.'
+                        : 'Paste your partner’s code if they already sent you an invite.'}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                      className="lumina-input text-center sm:text-left"
+                      value={connectCodeInput}
+                      onChange={(e) => setConnectCodeInput(e.target.value.toUpperCase())}
+                      placeholder="LUNA-XXXX"
+                      autoFocus={showConnectCode}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleConnectWithCode}
+                      disabled={connectCodeLoading || !connectCodeInput.trim()}
+                      className="lumina-button min-w-[136px] px-4 disabled:opacity-60"
+                    >
+                      {connectCodeLoading ? '...' : language === 'ru' ? 'Подключить' : 'Connect'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {connectionsLoading ? (
+              <p className="mt-3 text-xs text-[#8D8B9F]">{language === 'ru' ? 'Загружаем связи...' : 'Loading connections...'}</p>
+            ) : null}
+            {connectionsError && <p className="mt-3 text-xs text-[#C8A4A4]">{connectionsError}</p>}
+          </section>
         )}
 
         <button
           type="submit"
           disabled={!canSubmit || loading}
-          className="lumina-button mt-6 w-full px-8 py-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 lg:mx-auto lg:max-w-md"
+          className="lumina-button mx-auto mt-6 flex w-full items-center justify-center px-8 py-4 text-sm disabled:cursor-not-allowed disabled:opacity-40 lg:max-w-md"
         >
           {loading ? t.synastryLoading : t.synastryRun}
         </button>

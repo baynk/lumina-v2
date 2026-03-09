@@ -3,7 +3,7 @@
 import { startTransition, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Calendar, Compass, Heart, Moon, Orbit, Search, Sparkles, Sun, Waves } from 'lucide-react';
+import { Calendar, Check, Compass, Heart, Moon, Orbit, Search, Sparkles, Sun, Waves } from 'lucide-react';
 import OnboardingHeader from '@/components/onboarding/OnboardingHeader';
 import ScrollWheelPicker from '@/components/ui/ScrollWheelPicker';
 import { useLanguage } from '@/context/LanguageContext';
@@ -415,14 +415,20 @@ export default function OnboardingPage() {
       subtitle: t.onboardingFeatureForecastSubtitle,
       cta: t.onboardingFeatureForecastCta,
       preview: (
-          <div className="glass-card w-full max-w-[200px] p-5 text-left text-[#FDFBF7] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+        <div className="glass-card w-full max-w-[200px] p-5 text-left text-[#FDFBF7] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
           <Moon className="text-[#C8A4A4]" size={28} strokeWidth={1.5} />
-          <p className="mt-4 font-heading text-[28px] leading-none">Луна в Рыбах</p>
+          <p className="mt-4 font-heading text-[28px] leading-none">
+            {language === 'ru' ? 'Луна в Рыбах' : 'Moon in Pisces'}
+          </p>
           <p className="mt-4 text-xs leading-5 text-[#8D8B9F]">
-            Вечер зовет выбирать мягко и слышать то, что шепчет сердце.
+            {language === 'ru'
+              ? 'Вечер зовет выбирать мягко и слышать то, что шепчет сердце.'
+              : 'The evening asks for softer choices and attention to what the heart is quietly saying.'}
           </p>
           <p className="mt-2 text-xs leading-5 text-[#8D8B9F]">
-            Интуиция ясна, когда ты не торопишься назвать ее вслух.
+            {language === 'ru'
+              ? 'Интуиция ясна, когда ты не торопишься назвать ее вслух.'
+              : 'Intuition gets clearer when you do not rush to explain it out loud.'}
           </p>
         </div>
       ),
@@ -459,10 +465,10 @@ export default function OnboardingPage() {
       subtitle: t.onboardingFeatureCompatSubtitle,
       cta: t.onboardingFeatureCompatCta,
       preview: (
-          <div className="flex items-center justify-center gap-5 text-[#FDFBF7]">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
+        <div className="flex items-center justify-center gap-5 text-[#FDFBF7]">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
               ♌
-            </div>
+          </div>
           <Heart className="text-[#C8A4A4]" size={28} strokeWidth={1.5} />
           <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/[0.08] bg-[#141121] text-4xl">
             ♒
@@ -587,11 +593,22 @@ export default function OnboardingPage() {
                       }
                       className={`${cardClasses(active)} flex items-start gap-4 rounded-[28px] p-4`}
                       style={{
-                        borderColor: active ? 'rgba(200,164,164,0.32)' : 'rgba(253,251,247,0.04)',
-                        backgroundColor: active ? 'rgba(200,164,164,0.08)' : undefined,
+                        borderColor: active ? 'rgba(200,164,164,0.6)' : 'rgba(253,251,247,0.04)',
+                        backgroundColor: active ? 'rgba(200,164,164,0.18)' : undefined,
+                        boxShadow: active ? '0 0 20px rgba(200,164,164,0.15)' : 'none',
                       }}
                     >
-                      <goal.icon className="mt-0.5 shrink-0 text-[#C8A4A4]" size={18} strokeWidth={1.5} />
+                      <div className="mt-0.5 flex shrink-0 items-start gap-3">
+                        <goal.icon className={active ? 'text-[#FDFBF7]' : 'text-[#8D8B9F]'} size={18} strokeWidth={1.5} />
+                        <span
+                          className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border transition ${
+                            active ? 'border-[#C8A4A4] bg-[#C8A4A4] text-[#FDFBF7]' : 'border-white/[0.12] bg-transparent text-transparent'
+                          }`}
+                          aria-hidden="true"
+                        >
+                          <Check size={12} strokeWidth={2.4} />
+                        </span>
+                      </div>
                       <span className="block">
                         <span className="block text-sm text-[#FDFBF7]">{goal.title}</span>
                         <span className="mt-1 block text-sm leading-5 text-[#8D8B9F]">{goal.description}</span>
@@ -627,17 +644,26 @@ export default function OnboardingPage() {
                       }}
                       className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 text-left text-base`}
                       style={{
-                        borderColor: active ? 'rgba(200,164,164,0.32)' : 'rgba(253,251,247,0.04)',
-                        backgroundColor: active ? 'rgba(200,164,164,0.08)' : undefined,
+                        borderColor: active ? 'rgba(200,164,164,0.6)' : 'rgba(253,251,247,0.04)',
+                        backgroundColor: active ? 'rgba(200,164,164,0.18)' : undefined,
+                        boxShadow: active ? '0 0 20px rgba(200,164,164,0.15)' : 'none',
                         color: active ? '#FDFBF7' : '#8D8B9F',
                       }}
                     >
                       <option.icon
-                        className={active ? 'text-[#C8A4A4]' : 'text-[#8D8B9F]'}
+                        className={active ? 'text-[#FDFBF7]' : 'text-[#8D8B9F]'}
                         size={18}
                         strokeWidth={1.5}
                       />
                       <span>{option.label}</span>
+                      <span
+                        className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full border transition ${
+                          active ? 'border-[#C8A4A4] bg-[#C8A4A4] text-[#FDFBF7]' : 'border-white/[0.12] bg-transparent text-transparent'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <Check size={12} strokeWidth={2.4} />
+                      </span>
                     </button>
                   );
                 })}
@@ -668,7 +694,7 @@ export default function OnboardingPage() {
                 <h2 className="mt-3 font-heading text-[38px] leading-none text-[#FDFBF7]">{birthDateTitle}</h2>
               </div>
               <div className="mt-10 grid grid-cols-3 gap-3">
-                <ScrollWheelPicker items={monthNames} selectedIndex={monthIndex} onChange={setMonthIndex} ariaLabel={t.month} />
+                <ScrollWheelPicker items={monthNames} selectedIndex={monthIndex} onChange={setMonthIndex} ariaLabel={t.month} circular />
                 <ScrollWheelPicker items={DAYS} selectedIndex={dayIndex} onChange={setDayIndex} ariaLabel={t.day} />
                 <ScrollWheelPicker items={YEARS.map(String)} selectedIndex={yearIndex} onChange={setYearIndex} ariaLabel={t.year} />
               </div>
@@ -710,8 +736,8 @@ export default function OnboardingPage() {
                   timeAccuracy === 'unknown' ? 'opacity-40' : 'opacity-100'
                 }`}
               >
-                <ScrollWheelPicker items={HOURS} selectedIndex={hourIndex} onChange={setHourIndex} ariaLabel={t.hour} />
-                <ScrollWheelPicker items={MINUTES} selectedIndex={minuteIndex} onChange={setMinuteIndex} ariaLabel={t.minute} />
+                <ScrollWheelPicker items={HOURS} selectedIndex={hourIndex} onChange={setHourIndex} ariaLabel={t.hour} circular />
+                <ScrollWheelPicker items={MINUTES} selectedIndex={minuteIndex} onChange={setMinuteIndex} ariaLabel={t.minute} circular />
               </div>
               <div className="mt-8 grid grid-cols-3 gap-2">
                 {([

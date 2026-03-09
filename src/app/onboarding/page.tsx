@@ -1,6 +1,6 @@
 'use client';
 
-import { startTransition, useEffect, useMemo, useState } from 'react';
+import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Calendar, Check, Compass, Heart, Moon, Orbit, Search, Sparkles, Sun, Waves } from 'lucide-react';
@@ -129,6 +129,7 @@ export default function OnboardingPage() {
   const [factVisible, setFactVisible] = useState(true);
   const [bigThreeSigns, setBigThreeSigns] = useState<{ sun: string; moon: string; rising: string } | null>(null);
   const [bigThreeVisible, setBigThreeVisible] = useState([false, false, false]);
+  const genderAdvanceTimeoutRef = useRef<number | null>(null);
 
   const monthNames = language === 'ru' ? MONTHS_RU : MONTHS_EN;
   const analyzingItems = useMemo(
@@ -151,6 +152,14 @@ export default function OnboardingPage() {
       router.replace('/');
     }
   }, [router]);
+
+  useEffect(() => {
+    return () => {
+      if (genderAdvanceTimeoutRef.current !== null) {
+        window.clearTimeout(genderAdvanceTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const year = YEARS[yearIndex] ?? 2000;
@@ -550,19 +559,42 @@ export default function OnboardingPage() {
                   { value: 'she', label: t.onboardingGenderShe },
                   { value: 'he', label: t.onboardingGenderHe },
                   { value: 'neutral', label: t.onboardingGenderNeutral },
-                ] as const).map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => {
-                      setGender(option.value);
-                      startTransition(() => setStep(3));
-                    }}
-                    className={`${cardClasses()} min-h-14 rounded-full px-5 py-4 text-base text-[#8D8B9F] hover:text-[#FDFBF7]`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+                ] as const).map((option) => {
+                  const active = gender === option.value;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setGender(option.value);
+                        if (genderAdvanceTimeoutRef.current !== null) {
+                          window.clearTimeout(genderAdvanceTimeoutRef.current);
+                        }
+                        genderAdvanceTimeoutRef.current = window.setTimeout(() => {
+                          startTransition(() => setStep(3));
+                        }, 600);
+                      }}
+                      className={`${cardClasses(active)} flex min-h-14 items-center gap-3 rounded-full px-5 py-4 text-base transition-all duration-300`}
+                      style={{
+                        borderColor: active ? 'rgba(200,164,164,0.5)' : 'rgba(253,251,247,0.04)',
+                        backgroundColor: active ? 'rgba(200,164,164,0.14)' : undefined,
+                        boxShadow: active ? '0 0 18px rgba(200,164,164,0.16)' : 'none',
+                        color: active ? '#FDFBF7' : '#8D8B9F',
+                      }}
+                    >
+                      <span>{option.label}</span>
+                      <span
+                        className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full border transition ${
+                          active ? 'border-[#C8A4A4] bg-[#C8A4A4]/20 text-[#FDFBF7]' : 'border-white/[0.12] text-transparent'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <Check size={12} strokeWidth={2.4} />
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           ) : null}
@@ -787,7 +819,8 @@ export default function OnboardingPage() {
                     setSelectedPlace(null);
                   }}
                   placeholder={t.onboardingPlacePlaceholder}
-                  className="lumina-input h-14 rounded-[24px] pl-12 pr-4"
+                  className="lumina-input h-14 rounded-[24px] pr-4"
+                  style={{ paddingLeft: '3rem' }}
                 />
               </div>
 

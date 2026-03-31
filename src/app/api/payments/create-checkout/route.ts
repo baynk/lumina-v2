@@ -5,12 +5,13 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getOrCreateUser, initDB } from '@/lib/db';
 import { getStripe } from '@/lib/stripe';
 
-type CheckoutType = 'subscription' | 'consultation_written' | 'consultation_video' | 'consultation_deep';
+type ConsultationCheckoutType = 'consultation_written' | 'consultation_video_40' | 'consultation_video_60';
+type CheckoutType = 'subscription' | ConsultationCheckoutType;
 
-const CONSULTATION_PRICES: Record<Exclude<CheckoutType, 'subscription'>, number> = {
-  consultation_written: 2500,
-  consultation_video: 3500,
-  consultation_deep: 5500,
+const CONSULTATION_SUCCESS_PATHS: Record<ConsultationCheckoutType, string> = {
+  consultation_written: '/consultation?type=written&paid=1&session_id={CHECKOUT_SESSION_ID}',
+  consultation_video_40: '/consultation?type=video-40&paid=1&session_id={CHECKOUT_SESSION_ID}',
+  consultation_video_60: '/consultation?type=video-60&paid=1&session_id={CHECKOUT_SESSION_ID}',
 };
 
 let dbInitialized = false;
@@ -42,6 +43,28 @@ async function ensureDB() {
 
 function baseUrl() {
   return process.env.NEXT_PUBLIC_APP_URL || 'https://luminastrology.com';
+}
+
+function getConsultationPriceId(type: ConsultationCheckoutType) {
+  const priceIdMap: Record<ConsultationCheckoutType, string | undefined> = {
+    consultation_written:
+      process.env.STRIPE_PRICE_CONSULTATION_WRITTEN || process.env.STRIPE_PRICE_CONSULTATION,
+    consultation_video_40: process.env.STRIPE_PRICE_CONSULTATION_VIDEO_40,
+    consultation_video_60: process.env.STRIPE_PRICE_CONSULTATION_VIDEO_60,
+  };
+
+  const envNameMap: Record<ConsultationCheckoutType, string> = {
+    consultation_written: 'STRIPE_PRICE_CONSULTATION_WRITTEN',
+    consultation_video_40: 'STRIPE_PRICE_CONSULTATION_VIDEO_40',
+    consultation_video_60: 'STRIPE_PRICE_CONSULTATION_VIDEO_60',
+  };
+
+  const priceId = priceIdMap[type];
+  if (!priceId) {
+    throw new Error(`Missing Stripe price configuration: ${envNameMap[type]}`);
+  }
+
+  return priceId;
 }
 
 async function getOrCreateStripeCustomer(userId: string, email: string) {
@@ -84,7 +107,7 @@ export async function POST(request: Request) {
     const body = (await request.json()) as { type?: CheckoutType };
     const type = body?.type;
 
-    if (!type || !(type in { subscription: true, consultation_written: true, consultation_video: true, consultation_deep: true })) {
+    if (!type || !(type in { subscription: true, consultation_written: true, consultation_video_40: true, consultation_video_60: true })) {
       return NextResponse.json({ error: 'Invalid payment type' }, { status: 400 });
     }
 
@@ -111,27 +134,13 @@ export async function POST(request: Request) {
         },
       });
     } else {
+      const consultationPriceId = getConsultationPriceId(type);
+
       checkoutSession = await getStripe().checkout.sessions.create({
         mode: 'payment',
         customer: customerId,
-        line_items: [
-          {
-            price_data: {
-              currency: 'eur',
-              unit_amount: CONSULTATION_PRICES[type],
-              product_data: {
-                name:
-                  type === 'consultation_written'
-                    ? 'Written Consultation'
-                    : type === 'consultation_video'
-                      ? 'Video Consultation 40 min'
-                      : 'Deep Dive Consultation 60 min',
-              },
-            },
-            quantity: 1,
-          },
-        ],
-        success_url: `${siteBaseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+        line_items: [{ price: consultationPriceId, quantity: 1 }],
+        success_url: `${siteBaseUrl}${CONSULTATION_SUCCESS_PATHS[type]}`,
         cancel_url: `${siteBaseUrl}/consultation`,
         metadata: {
           user_id: userId,
@@ -143,6 +152,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {
     console.error('POST /api/payments/create-checkout error:', error);
-    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to create checkout session';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

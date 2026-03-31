@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, MessageCircle, Moon, Sparkles } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useLanguage } from '@/context/LanguageContext';
 import { loadProfile } from '@/lib/profile';
 
@@ -38,15 +39,18 @@ function isValidBirthTime(value: string) {
   return TIME_RE.test(trimmed);
 }
 
-function cardCtaLabel(language: 'en' | 'ru') {
-  return language === 'ru' ? 'Выбрать' : 'Select';
+function isConsultationType(value: string | null): value is Exclude<ConsultationType, null> {
+  return value === 'written' || value === 'video-40' || value === 'video-60';
 }
 
-export default function ConsultationPage() {
+function ConsultationPageContent() {
   const router = useRouter();
-  const { language, t } = useLanguage();
+  const searchParams = useSearchParams();
+  const { data: session, status: sessionStatus } = useSession();
+  const { language } = useLanguage();
 
   const [selectedType, setSelectedType] = useState<ConsultationType>(null);
+  const [checkoutLoadingType, setCheckoutLoadingType] = useState<ConsultationType>(null);
 
   // Written reading form state
   const [name, setName] = useState('');
@@ -61,6 +65,49 @@ export default function ConsultationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const autoCheckoutKeyRef = useRef<string | null>(null);
+
+  const typeParam = searchParams.get('type');
+  const paidParam = searchParams.get('paid');
+  const paid = paidParam === '1';
+  const queryType = isConsultationType(typeParam) ? typeParam : null;
+
+  const createCheckout = async (type: Exclude<ConsultationType, null>) => {
+    setSubmitError('');
+    setSelectedType(type);
+    setCheckoutLoadingType(type);
+
+    const checkoutType =
+      type === 'written'
+        ? 'consultation_written'
+        : type === 'video-40'
+          ? 'consultation_video_40'
+          : 'consultation_video_60';
+
+    try {
+      const response = await fetch('/api/payments/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: checkoutType }),
+      });
+
+      const data = (await response.json()) as { error?: string; url?: string };
+      if (!response.ok || !data.url) {
+        throw new Error(data.error || (language === 'ru' ? 'Не удалось создать ссылку на оплату' : 'Failed to create checkout session'));
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      setCheckoutLoadingType(null);
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : language === 'ru'
+            ? 'Не удалось создать ссылку на оплату'
+            : 'Failed to create checkout session'
+      );
+    }
+  };
 
   // Pre-fill from profile
   useEffect(() => {
@@ -76,6 +123,20 @@ export default function ConsultationPage() {
     }
   }, []);
 
+  useEffect(() => {
+    setSelectedType(queryType);
+  }, [queryType]);
+
+  useEffect(() => {
+    if (!queryType || paid || sessionStatus !== 'authenticated') return;
+
+    const autoCheckoutKey = `${queryType}:${paidParam ?? '0'}`;
+    if (autoCheckoutKeyRef.current === autoCheckoutKey) return;
+
+    autoCheckoutKeyRef.current = autoCheckoutKey;
+    void createCheckout(queryType);
+  }, [paid, paidParam, queryType, sessionStatus]);
+
   const toggleTopic = (topic: Topic) => {
     setTopics((prev) =>
       prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
@@ -88,6 +149,23 @@ export default function ConsultationPage() {
       ru: { love: 'Любовь и отношения', career: 'Карьера и предназначение', money: 'Деньги и изобилие', growth: 'Личностный рост', other: 'Другое' },
     };
     return (labels[language] || labels.en)[topic];
+  };
+
+  const handleTierSelection = async (type: Exclude<ConsultationType, null>) => {
+    if (sessionStatus === 'loading') return;
+
+    if (!session?.user?.email) {
+      const callbackUrl = `/consultation?type=${type}`;
+      router.push(`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      return;
+    }
+
+    if (paid) {
+      setSelectedType(type);
+      return;
+    }
+
+    await createCheckout(type);
   };
 
   const handleSubmitWritten = async () => {
@@ -134,6 +212,23 @@ export default function ConsultationPage() {
   };
 
   const isWrittenValid = name.trim() && question.trim() && contactEmail.trim();
+  const showSelector = !selectedType;
+  const showPaymentRedirectState = !!selectedType && !paid;
+  const showVideoForm = paid && (selectedType === 'video-40' || selectedType === 'video-60');
+  const showWrittenForm = paid && selectedType === 'written';
+  const handleBack = () => {
+    if (queryType) {
+      router.push('/consultation');
+      return;
+    }
+
+    if (selectedType) {
+      setSelectedType(null);
+      return;
+    }
+
+    router.back();
+  };
 
   // Confirmation screen (written)
   if (submitted) {
@@ -174,7 +269,7 @@ export default function ConsultationPage() {
       <div className="mx-auto max-w-2xl px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
-        <button onClick={() => selectedType ? setSelectedType(null) : router.back()} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
+        <button onClick={handleBack} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
           <span className="inline-flex items-center gap-2"><ArrowLeft size={16} strokeWidth={1.5} />{language === 'ru' ? 'Назад' : 'Back'}</span>
         </button>
         <p className="font-heading text-xl text-[#FDFBF7]">Lumina</p>
@@ -194,11 +289,13 @@ export default function ConsultationPage() {
       </section>
 
       {/* Type selector — show when no type chosen */}
-      {!selectedType && (
+      {showSelector && (
         <div className="grid gap-4 sm:grid-cols-3 animate-fadeInUp">
           {/* Written Reading */}
           <button
-            onClick={() => setSelectedType('written')}
+            type="button"
+            onClick={() => void handleTierSelection('written')}
+            disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
             className="glass-card group p-6 text-left transition hover:border-white/[0.16]"
           >
             <MessageCircle className="mb-3 text-[#8D8B9F]" size={28} strokeWidth={1.5} />
@@ -214,13 +311,19 @@ export default function ConsultationPage() {
               <span className="font-heading text-2xl text-[#FDFBF7]">€25</span>
             </div>
             <span className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20">
-              {cardCtaLabel(language)}
+              {checkoutLoadingType === 'written'
+                ? '...'
+                : language === 'ru'
+                  ? 'К оплате · €25'
+                  : 'Continue to Payment · €25'}
             </span>
           </button>
 
           {/* Video 40 min */}
           <button
-            onClick={() => setSelectedType('video-40')}
+            type="button"
+            onClick={() => void handleTierSelection('video-40')}
+            disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
             className="glass-card group relative overflow-hidden p-6 text-left transition hover:border-white/[0.16]"
           >
             <div className="absolute top-3 right-3">
@@ -242,13 +345,19 @@ export default function ConsultationPage() {
               <span className="text-xs text-[#8D8B9F]">/ 40 min</span>
             </div>
             <span className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20">
-              {cardCtaLabel(language)}
+              {checkoutLoadingType === 'video-40'
+                ? '...'
+                : language === 'ru'
+                  ? 'Оплатить и продолжить · €35'
+                  : 'Pay & Continue · €35'}
             </span>
           </button>
 
           {/* Video 60 min */}
           <button
-            onClick={() => setSelectedType('video-60')}
+            type="button"
+            onClick={() => void handleTierSelection('video-60')}
+            disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
             className="glass-card group p-6 text-left transition hover:border-white/[0.16]"
           >
             <Sparkles className="mb-3 text-[#C8A4A4]" size={28} strokeWidth={1.5} />
@@ -265,14 +374,40 @@ export default function ConsultationPage() {
               <span className="text-xs text-[#8D8B9F]">/ 60 min</span>
             </div>
             <span className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20">
-              {cardCtaLabel(language)}
+              {checkoutLoadingType === 'video-60'
+                ? '...'
+                : language === 'ru'
+                  ? 'Оплатить и продолжить · €55'
+                  : 'Pay & Continue · €55'}
             </span>
           </button>
         </div>
       )}
 
+      {showPaymentRedirectState && (
+        <div className="animate-fadeInUp">
+          <div className="glass-card p-6 sm:p-8 text-center">
+            <div className="mb-4 flex justify-center">
+              {selectedType === 'written'
+                ? <MessageCircle className="text-[#8D8B9F]" size={30} strokeWidth={1.5} />
+                : selectedType === 'video-40'
+                  ? <Moon className="text-[#8D8B9F]" size={30} strokeWidth={1.5} />
+                  : <Sparkles className="text-[#C8A4A4]" size={30} strokeWidth={1.5} />}
+            </div>
+            <h2 className="font-heading text-xl text-lumina-soft mb-2">
+              {language === 'ru' ? 'Переход к оплате' : 'Redirecting to payment'}
+            </h2>
+            <p className="mx-auto max-w-sm text-sm text-cream/60">
+              {language === 'ru'
+                ? 'Мы готовим безопасную страницу Stripe Checkout для выбранной консультации.'
+                : 'Preparing a secure Stripe Checkout page for your selected consultation.'}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Video booking — redirect to Calendly */}
-      {(selectedType === 'video-40' || selectedType === 'video-60') && (
+      {showVideoForm && (
         <div className="animate-fadeInUp">
           <div className="glass-card p-6 sm:p-8 text-center mb-6">
             <div className="mb-4 flex justify-center">
@@ -299,9 +434,6 @@ export default function ConsultationPage() {
               <span>{language === 'ru' ? 'Выбрать время' : 'Choose a Time'}</span>
               <ArrowRight size={16} strokeWidth={1.5} />
             </a>
-            <p className="text-xs text-cream/40 mt-4">
-              {selectedType === 'video-40' ? '€35' : '€55'} · {language === 'ru' ? 'Оплата при бронировании' : 'Payment at booking'}
-            </p>
           </div>
 
           {/* Full intake form for the astrologer */}
@@ -432,7 +564,7 @@ export default function ConsultationPage() {
                   setSubmitError('');
                   setSubmitting(true);
                   try {
-                    await fetch('/api/consultation', {
+                    const response = await fetch('/api/consultation', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -449,11 +581,20 @@ export default function ConsultationPage() {
                         preferredFormat: selectedType === 'video-40' ? 'video-40min' : 'video-60min',
                       }),
                     });
-                    // Open Calendly after submission
+                    if (!response.ok) {
+                      throw new Error(language === 'ru' ? 'Не удалось отправить форму' : 'Failed to submit form');
+                    }
+
                     window.open(CALENDLY_LINKS[selectedType!], '_blank');
                     setSubmitted(true);
-                  } catch {
-                    // Handle silently
+                  } catch (error) {
+                    setSubmitError(
+                      error instanceof Error
+                        ? error.message
+                        : language === 'ru'
+                          ? 'Не удалось отправить форму'
+                          : 'Failed to submit form'
+                    );
                   } finally {
                     setSubmitting(false);
                   }
@@ -482,7 +623,7 @@ export default function ConsultationPage() {
       )}
 
       {/* Written reading form */}
-      {selectedType === 'written' && (
+      {showWrittenForm && (
         <div className="space-y-5 animate-fadeInUp">
           <div className="glass-card p-5 text-center">
             <div className="mb-2 flex justify-center"><MessageCircle className="text-[#8D8B9F]" size={28} strokeWidth={1.5} /></div>
@@ -587,15 +728,26 @@ export default function ConsultationPage() {
           >
             {submitting
               ? '...'
-              : (language === 'ru' ? 'Отправить запрос · €25' : 'Submit Request · €25')}
+              : (language === 'ru' ? 'Отправить детали' : 'Submit Details')}
           </button>
           {submitError && <p className="text-center text-xs text-[#C8A4A4]">{submitError}</p>}
-          <p className="text-center text-[10px] text-[#8D8B9F]">
-            {language === 'ru' ? 'Оплата после подтверждения запроса' : 'Payment link will be sent after request confirmation'}
-          </p>
         </div>
       )}
     </div>
     </div>
+  );
+}
+
+export default function ConsultationPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="lumina-screen flex min-h-screen items-center justify-center">
+          <p className="font-heading text-3xl text-lumina-soft">Lumina</p>
+        </div>
+      }
+    >
+      <ConsultationPageContent />
+    </Suspense>
   );
 }

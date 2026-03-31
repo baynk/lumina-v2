@@ -394,14 +394,32 @@ function ConsultationPageContent() {
                   ? <Moon className="text-[#8D8B9F]" size={30} strokeWidth={1.5} />
                   : <Sparkles className="text-[#C8A4A4]" size={30} strokeWidth={1.5} />}
             </div>
-            <h2 className="font-heading text-xl text-lumina-soft mb-2">
-              {language === 'ru' ? 'Переход к оплате' : 'Redirecting to payment'}
-            </h2>
-            <p className="mx-auto max-w-sm text-sm text-cream/60">
-              {language === 'ru'
-                ? 'Мы готовим безопасную страницу Stripe Checkout для выбранной консультации.'
-                : 'Preparing a secure Stripe Checkout page for your selected consultation.'}
-            </p>
+            {submitError ? (
+              <>
+                <h2 className="font-heading text-xl text-[#C8A4A4] mb-2">
+                  {language === 'ru' ? 'Ошибка оплаты' : 'Payment error'}
+                </h2>
+                <p className="mx-auto max-w-sm text-sm text-[#C8A4A4]/80 mb-4">{submitError}</p>
+                <button
+                  type="button"
+                  onClick={() => { setSubmitError(''); void createCheckout(selectedType!); }}
+                  className="lumina-button px-8"
+                >
+                  {language === 'ru' ? 'Попробовать снова' : 'Try again'}
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="font-heading text-xl text-lumina-soft mb-2">
+                  {language === 'ru' ? 'Переход к оплате' : 'Redirecting to payment'}
+                </h2>
+                <p className="mx-auto max-w-sm text-sm text-cream/60">
+                  {language === 'ru'
+                    ? 'Мы готовим безопасную страницу Stripe Checkout для выбранной консультации.'
+                    : 'Preparing a secure Stripe Checkout page for your selected consultation.'}
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}

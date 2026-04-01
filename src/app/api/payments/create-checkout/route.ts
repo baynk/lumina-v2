@@ -76,7 +76,16 @@ async function getOrCreateStripeCustomer(userId: string, email: string) {
   `;
 
   const existingCustomerId = existing.rows[0]?.stripe_customer_id;
-  if (existingCustomerId) return existingCustomerId;
+
+  // Validate existing customer still exists in Stripe (handles test→live mode switch)
+  if (existingCustomerId) {
+    try {
+      await getStripe().customers.retrieve(existingCustomerId);
+      return existingCustomerId;
+    } catch {
+      // Customer doesn't exist in current mode — create a new one below
+    }
+  }
 
   const customer = await getStripe().customers.create({
     email,

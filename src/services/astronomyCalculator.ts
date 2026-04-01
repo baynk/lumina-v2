@@ -50,7 +50,7 @@ function longitudeToZodiac(longitude: number): { sign: string; degrees: number }
   const normalizedLon = ((longitude % 360) + 360) % 360;
 
   // Each sign is 30 degrees
-  const signIndex = Math.floor(normalizedLon / 30);
+  const signIndex = Math.floor(normalizedLon / 30) % 12;
   const degrees = normalizedLon % 30;
 
   return {

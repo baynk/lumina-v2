@@ -127,13 +127,13 @@ type RetrogradeRange = {
 };
 
 const RETROGRADE_RANGES_2026: RetrogradeRange[] = [
-  { body: 'Mercury', start: utcDate(2026, 2, 27), end: utcDate(2026, 3, 22) },
-  { body: 'Mercury', start: utcDate(2026, 7, 1), end: utcDate(2026, 7, 25) },
-  { body: 'Mercury', start: utcDate(2026, 10, 25), end: utcDate(2026, 11, 15) },
-  { body: 'Venus', start: utcDate(2026, 10, 3), end: utcDate(2026, 11, 14) },
+  { body: 'Mercury', start: utcDate(2026, 2, 25), end: utcDate(2026, 3, 20) },
+  { body: 'Mercury', start: utcDate(2026, 6, 29), end: utcDate(2026, 7, 23) },
+  { body: 'Mercury', start: utcDate(2026, 10, 24), end: utcDate(2026, 11, 13) },
+  { body: 'Venus', start: utcDate(2026, 10, 3), end: utcDate(2026, 11, 13) },
   { body: 'Saturn', start: utcDate(2026, 7, 26), end: utcDate(2026, 12, 10) },
-  { body: 'Jupiter', start: utcDate(2026, 11, 11), end: utcDate(2027, 3, 11) },
-  { body: 'Jupiter', start: utcDate(2025, 10, 9), end: utcDate(2026, 2, 4) },
+  { body: 'Jupiter', start: utcDate(2026, 12, 12), end: utcDate(2027, 4, 12) },
+  { body: 'Jupiter', start: utcDate(2025, 11, 11), end: utcDate(2026, 3, 10) },
 ];
 
 function retrogradeEvents(): CelestialEvent[] {

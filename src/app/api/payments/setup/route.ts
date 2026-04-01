@@ -1,5 +1,18 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import { sql } from '@vercel/postgres';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+
+const ADMIN_EMAILS = ['ryan@ryanwright.io', 'luminastrology@gmail.com', 'rudasirina773@gmail.com'];
+const ADMIN_DOMAINS = ['ryanwright.io'];
+
+async function isAdmin() {
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email;
+  if (!email) return false;
+  const domain = email.split('@')[1];
+  return ADMIN_EMAILS.includes(email) || ADMIN_DOMAINS.includes(domain);
+}
 
 async function setupPaymentsSchema() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`;
@@ -23,6 +36,9 @@ async function setupPaymentsSchema() {
 
 export async function POST() {
   try {
+    if (!(await isAdmin())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     await setupPaymentsSchema();
     return NextResponse.json({ ok: true });
   } catch (error) {

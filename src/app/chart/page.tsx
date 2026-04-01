@@ -557,7 +557,7 @@ export default function ChartPage() {
           </div>
         </section>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
+        <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
           <section className="glass-card p-6 animate-stagger-2">
             <div className="flex items-center justify-between gap-4">
               <div>

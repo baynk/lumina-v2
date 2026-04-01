@@ -13,7 +13,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
-      {!isOnboarding && !isHome ? (
+      {!isOnboarding ? (
         <nav className="relative z-40 border-b border-white/5 bg-[#0B0814]/72 backdrop-blur-xl">
           <div className="mx-auto flex w-full max-w-6xl items-center justify-end gap-2 px-4 py-3 pt-safe sm:px-6">
             <LanguageToggle />
@@ -23,7 +23,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       ) : null}
       <main className={`lumina-shell-main relative z-10 flex-1 lg:ml-[72px] ${isOnboarding ? '' : 'bottom-nav-content-offset'}`}>{children}</main>
       {!isOnboarding ? <BottomNav /> : null}
-      {!isOnboarding && !isHome ? <Footer /> : null}
+      {!isOnboarding ? <Footer /> : null}
     </div>
   );
 }

@@ -147,11 +147,10 @@ export default function TransitsPage() {
   }, [report]);
 
   return (
-    <div className="lumina-screen">
-      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-      <div className="mx-auto max-w-5xl px-4 pb-28 pt-2 sm:px-6">
+    <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+      <div className="celestial-gradient" aria-hidden="true" />
+      <div className="star-field" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-5xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5 flex items-center justify-between">
         <button type="button" onClick={() => router.push('/')} className="lumina-back-btn text-sm">
           <span className="inline-flex items-center gap-2"><ArrowLeft strokeWidth={1.8} />{t.back}</span>

@@ -10,10 +10,9 @@ function SignInContent() {
   const error = searchParams.get('error');
 
   return (
-    <div className="lumina-screen flex min-h-screen items-center justify-center px-4">
-      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
+    <div className="relative flex min-h-screen items-center justify-center px-4 bg-[var(--bg-void)]">
+      <div className="celestial-gradient" aria-hidden="true" />
+      <div className="star-field" aria-hidden="true" />
       <div className="relative z-10 w-full max-w-sm text-center animate-fadeInUp">
         <p className="font-heading text-5xl text-lumina-soft mb-2">Lumina</p>
         <p className="text-sm text-cream/50 mb-8">Sign in to access your celestial profile</p>

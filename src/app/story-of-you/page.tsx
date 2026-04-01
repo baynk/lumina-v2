@@ -98,11 +98,10 @@ export default function StoryOfYouPage() {
   };
 
   return (
-    <div className="lumina-screen flex min-h-screen items-center">
-      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-      <div className="mx-auto flex min-h-screen max-w-3xl items-center px-4 pb-12 pt-6 sm:px-6">
+    <div className="relative min-h-screen flex items-center overflow-x-hidden bg-[var(--bg-void)]">
+      <div className="celestial-gradient" aria-hidden="true" />
+      <div className="star-field" aria-hidden="true" />
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-3xl items-center px-4 pb-12 pt-6 sm:px-6">
       <section className="glass-card w-full p-6 sm:p-8">
         {loading ? (
           <div className="space-y-3">

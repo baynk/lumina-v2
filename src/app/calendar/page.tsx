@@ -84,11 +84,10 @@ export default function CalendarPage() {
   const listLabel = dayEvents.length ? copy.selectedDay : copy.upcoming;
 
   return (
-    <div className="lumina-screen">
-      <div className="aura aura-violet left-[44%] top-16 h-[390px] w-[390px] -translate-x-[58%]" />
-      <div className="aura aura-indigo left-[62%] top-[26rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-[30%] bottom-10 h-[400px] w-[400px] -translate-x-[24%] [animation-delay:-2s]" />
-      <div className="mx-auto max-w-4xl px-4 pb-28 pt-2 sm:px-6">
+    <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+      <div className="celestial-gradient" aria-hidden="true" />
+      <div className="star-field" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-4xl px-4 pb-28 pt-2 sm:px-6">
       <header className="mb-5">
         <div className="flex items-center justify-start">
           <button type="button" onClick={() => router.push('/')} className="lumina-back-btn text-sm">

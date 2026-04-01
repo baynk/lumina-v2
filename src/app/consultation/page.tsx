@@ -233,11 +233,10 @@ function ConsultationPageContent() {
   // Confirmation screen (written)
   if (submitted) {
     return (
-      <div className="lumina-screen flex min-h-screen items-center justify-center px-4">
-        <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-        <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-        <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-        <div className="max-w-md text-center animate-fadeInUp">
+      <div className="relative flex min-h-screen items-center justify-center px-4 bg-[var(--bg-void)]">
+        <div className="celestial-gradient" aria-hidden="true" />
+        <div className="star-field" aria-hidden="true" />
+        <div className="relative z-10 max-w-md text-center animate-fadeInUp">
           <div className="mb-6 flex justify-center text-[#C8A4A4] animate-float"><Sparkles size={40} strokeWidth={1.5} /></div>
           <h1 className="mb-4 font-heading text-3xl text-[#FDFBF7]">
             {language === 'ru' ? 'Спасибо!' : 'Thank you!'}

@@ -847,11 +847,10 @@ export default function SynastryPage() {
     const moonB = result.synastry.personBChart.planets.find((p) => p.planet === 'Moon');
 
     return (
-      <div className="lumina-screen overflow-hidden">
-        <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-        <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-        <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-      <div className="mx-auto max-w-4xl px-4 pb-20 pt-safe sm:px-6 animate-fadeInUp">
+      <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+        <div className="celestial-gradient" aria-hidden="true" />
+        <div className="star-field" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-4xl px-4 pb-20 pt-safe sm:px-6 animate-fadeInUp">
         {/* Results Header */}
         <div className="mb-8 text-center">
           <p className="lumina-label mb-2">
@@ -1047,11 +1046,10 @@ export default function SynastryPage() {
 
   // ─── FORM VIEW ───
   return (
-    <div className="lumina-screen overflow-hidden">
-      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-      <div className="mx-auto max-w-4xl px-4 pb-20 pt-safe sm:px-6">
+    <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+      <div className="celestial-gradient" aria-hidden="true" />
+      <div className="star-field" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-4xl px-4 pb-20 pt-safe sm:px-6">
       {/* Hero */}
       <div className="mb-10 text-center animate-fadeInUp">
         <button

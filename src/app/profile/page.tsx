@@ -308,22 +308,19 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="lumina-screen flex min-h-screen items-center justify-center">
-        <div className="aura aura-violet left-[42%] top-14 h-[390px] w-[390px] -translate-x-[54%]" />
-        <div className="aura aura-indigo left-[70%] top-[23rem] h-[360px] w-[360px] -translate-x-[18%] [animation-delay:-5s]" />
-        <div className="aura aura-blue left-[28%] bottom-10 h-[400px] w-[400px] -translate-x-[20%] [animation-delay:-2s]" />
-        <p className="font-heading text-3xl text-[#FDFBF7]">Lumina</p>
+      <div className="relative flex min-h-screen items-center justify-center bg-[var(--bg-void)]">
+        <div className="celestial-gradient" aria-hidden="true" />
+        <p className="relative z-10 font-heading text-3xl text-[#FDFBF7]">Lumina</p>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="lumina-screen">
-        <div className="aura aura-violet left-[42%] top-14 h-[390px] w-[390px] -translate-x-[54%]" />
-        <div className="aura aura-indigo left-[70%] top-[23rem] h-[360px] w-[360px] -translate-x-[18%] [animation-delay:-5s]" />
-        <div className="aura aura-blue left-[28%] bottom-10 h-[400px] w-[400px] -translate-x-[20%] [animation-delay:-2s]" />
-        <div className="mx-auto w-full max-w-md px-4 pb-28 pt-12 sm:px-6">
+      <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+        <div className="celestial-gradient" aria-hidden="true" />
+        <div className="star-field" aria-hidden="true" />
+        <div className="relative z-10 mx-auto w-full max-w-md px-4 pb-28 pt-12 sm:px-6">
         <div className="text-center">
           <p className="lumina-label">{language === 'ru' ? 'Профиль Lumina' : 'Lumina profile'}</p>
           <h1 className="mt-4 font-heading text-2xl text-[#FDFBF7]">
@@ -383,11 +380,10 @@ export default function ProfilePage() {
   const birthTime = `${String(profile.birthData.hour).padStart(2, '0')}:${String(profile.birthData.minute).padStart(2, '0')}`;
 
   return (
-    <div className="lumina-screen">
-      <div className="aura aura-violet left-[42%] top-14 h-[390px] w-[390px] -translate-x-[54%]" />
-      <div className="aura aura-indigo left-[70%] top-[23rem] h-[360px] w-[360px] -translate-x-[18%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-[28%] bottom-10 h-[400px] w-[400px] -translate-x-[20%] [animation-delay:-2s]" />
-      <div className="mx-auto max-w-lg px-4 pb-10 pt-0 sm:px-6">
+    <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+      <div className="celestial-gradient" aria-hidden="true" />
+      <div className="star-field" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-lg px-4 pb-10 pt-0 sm:px-6">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
         <button onClick={() => router.push('/chart')} className="lumina-back-btn text-sm">

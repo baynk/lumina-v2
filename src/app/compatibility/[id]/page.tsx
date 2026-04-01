@@ -92,10 +92,8 @@ export default function PublicCompatibilityPage() {
 
   if (loading) {
     return (
-      <div className="lumina-screen flex min-h-screen items-center justify-center">
-        <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-        <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-        <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
+      <div className="relative flex min-h-screen items-center justify-center bg-[var(--bg-void)]">
+        <div className="celestial-gradient" aria-hidden="true" />
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-lumina-accent border-t-transparent" />
       </div>
     );
@@ -103,11 +101,9 @@ export default function PublicCompatibilityPage() {
 
   if (error || !data) {
     return (
-      <div className="lumina-screen flex min-h-screen flex-col items-center justify-center gap-4 px-4">
-        <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-        <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-        <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-        <p className="text-lg text-cream/60">{error || 'Not found'}</p>
+      <div className="relative flex min-h-screen flex-col items-center justify-center gap-4 px-4 bg-[var(--bg-void)]">
+        <div className="celestial-gradient" aria-hidden="true" />
+        <p className="relative z-10 text-lg text-cream/60">{error || 'Not found'}</p>
         <Link href="/" className="lumina-button">Discover Your Compatibility</Link>
       </div>
     );
@@ -143,11 +139,10 @@ export default function PublicCompatibilityPage() {
   const risingB = result.synastry.personBChart.risingSign;
 
   return (
-    <div className="lumina-screen">
-      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+    <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+      <div className="celestial-gradient" aria-hidden="true" />
+      <div className="star-field" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-2xl px-4 py-10 sm:px-6">
         {/* Header */}
         <div className="mb-10 text-center">
           <Link href="/" className="inline-block mb-6">

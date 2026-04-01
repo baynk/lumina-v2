@@ -490,7 +490,7 @@ export default function LandingPage() {
         <div className="star-field" aria-hidden="true" />
 
         <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6 lg:max-w-5xl lg:pb-10">
-          <header className="flex items-center justify-between pb-6 pt-4">
+          <header className="pb-6 pt-4">
             <button
               type="button"
               onClick={() => router.push('/')}
@@ -498,14 +498,6 @@ export default function LandingPage() {
               aria-label="Lumina"
             >
               lumina<span className="align-top text-lg text-[var(--wordmark-sparkle)]">✦</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push('/profile')}
-              className="profile-btn"
-              aria-label={language === 'ru' ? 'Открыть профиль' : 'Open profile'}
-            >
-              <UserRound size={18} strokeWidth={1.5} />
             </button>
           </header>
 

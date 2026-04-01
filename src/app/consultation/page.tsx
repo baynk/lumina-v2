@@ -309,13 +309,13 @@ function ConsultationPageContent() {
               type="button"
               onClick={() => void handleTierSelection('written')}
               disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
-              className="lumina-button w-full text-sm"
+              className="lumina-button w-full whitespace-nowrap !text-[13px] !tracking-[0.12em]"
             >
               {checkoutLoadingType === 'written'
                 ? '...'
                 : language === 'ru'
-                  ? 'К оплате · €25'
-                  : 'Continue · €25'}
+                  ? 'Выбрать · €25'
+                  : 'Choose · €25'}
             </button>
           </div>
 
@@ -343,13 +343,13 @@ function ConsultationPageContent() {
               type="button"
               onClick={() => void handleTierSelection('video-40')}
               disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
-              className="lumina-button w-full text-sm"
+              className="lumina-button w-full whitespace-nowrap !text-[13px] !tracking-[0.12em]"
             >
               {checkoutLoadingType === 'video-40'
                 ? '...'
                 : language === 'ru'
-                  ? 'Оплатить · €35'
-                  : 'Pay & Continue · €35'}
+                  ? 'Выбрать · €35'
+                  : 'Choose · €35'}
             </button>
           </div>
 
@@ -372,13 +372,13 @@ function ConsultationPageContent() {
               type="button"
               onClick={() => void handleTierSelection('video-60')}
               disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
-              className="lumina-button w-full text-sm"
+              className="lumina-button w-full whitespace-nowrap !text-[13px] !tracking-[0.12em]"
             >
               {checkoutLoadingType === 'video-60'
                 ? '...'
                 : language === 'ru'
-                  ? 'Оплатить · €55'
-                  : 'Pay & Continue · €55'}
+                  ? 'Выбрать · €55'
+                  : 'Choose · €55'}
             </button>
           </div>
         </div>

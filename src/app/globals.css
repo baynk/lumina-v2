@@ -687,13 +687,31 @@ textarea.lumina-input {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 390px;
+  max-width: 430px;
   margin: 0 auto;
   padding: 40px 24px 100px;
 }
 
+@media (min-width: 768px) {
+  .lumina-screen-content {
+    max-width: 720px;
+    padding: 40px 32px 80px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lumina-screen-content {
+    max-width: 1080px;
+    padding: 40px 40px 60px;
+  }
+}
+
 .lumina-screen-content--wide {
   max-width: 1120px;
+}
+
+.lumina-screen-content--narrow {
+  max-width: 640px;
 }
 
 .lumina-shell-main > .lumina-screen {
@@ -703,6 +721,13 @@ textarea.lumina-input {
 @media (min-width: 768px) {
   .bottom-nav-fade {
     padding-inline: 24px;
+  }
+}
+
+/* Desktop: sidebar nav replaces bottom nav */
+@media (min-width: 1024px) {
+  .bottom-nav-content-offset {
+    padding-bottom: 2rem;
   }
 }
 

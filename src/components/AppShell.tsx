@@ -21,7 +21,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
       ) : null}
-      <main className={`lumina-shell-main relative z-10 flex-1 ${isOnboarding ? '' : 'bottom-nav-content-offset'}`}>{children}</main>
+      <main className={`lumina-shell-main relative z-10 flex-1 lg:ml-[72px] ${isOnboarding ? '' : 'bottom-nav-content-offset'}`}>{children}</main>
       {!isOnboarding ? <BottomNav /> : null}
       {!isOnboarding && !isHome ? <Footer /> : null}
     </div>

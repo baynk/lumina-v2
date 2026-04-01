@@ -80,7 +80,7 @@ function WheelPlaceholder({
   const innerRadius = 86;
 
   return (
-    <div className="relative mx-auto w-full max-w-[320px]">
+    <div className="relative mx-auto w-full max-w-[320px] lg:max-w-[420px]">
       <svg viewBox={`0 0 ${size} ${size}`} className="h-auto w-full">
         <defs>
           <radialGradient id="wheelGlow" cx="50%" cy="50%" r="60%">
@@ -551,7 +551,7 @@ export default function ChartPage() {
                   <div className="skeleton h-4 w-11/12" />
                 </div>
               ) : (
-                <p className="mt-3 text-sm leading-relaxed text-text-secondary">{horoscope}</p>
+                <p className="mt-3 max-w-prose text-sm leading-relaxed text-text-secondary line-clamp-6">{horoscope}</p>
               )}
             </div>
           </div>
@@ -598,10 +598,10 @@ export default function ChartPage() {
           </section>
 
           <div className="space-y-6">
-            <section className="glass-card p-6 animate-stagger-3">
+            <section className="glass-card overflow-hidden p-6 animate-stagger-3">
               <p className="lumina-label">{t.moonPhase}</p>
               <div className="mt-4 flex items-center gap-5">
-                <div className="animate-float">
+                <div className="shrink-0 animate-float">
                   <MoonPhaseVisual illumination={dailyData.moon.illumination} phase={dailyData.moon.phase} />
                 </div>
                 <div>
@@ -643,13 +643,13 @@ export default function ChartPage() {
             </span>
           </div>
 
-          <div className="flex snap-x gap-3 overflow-x-auto pb-1">
+          <div className="flex snap-x gap-3 overflow-x-auto pb-1 lg:grid lg:grid-cols-3 lg:overflow-visible">
             {bigThree.map((item) => (
               <button
                 key={item.key}
                 type="button"
                 onClick={() => openPlanetExplanation(item.planet, item.sign, item.planet === 'Ascendant' ? 1 : natalChart.planets.find((planet) => planet.planet === item.planet)?.house)}
-                className="glass-card min-w-[260px] snap-start p-5 text-left"
+                className="glass-card min-w-[260px] snap-start p-5 text-left lg:min-w-0"
               >
                 <p className="lumina-label">{item.label}</p>
                 <div className="mt-4 flex items-center gap-3">
@@ -680,7 +680,7 @@ export default function ChartPage() {
             </Link>
           </div>
 
-          <div className="mt-6 space-y-3">
+          <div className="mt-6 grid gap-3 lg:grid-cols-2">
             {natalChart.planets.map((planet) => (
               <button
                 key={planet.planet}

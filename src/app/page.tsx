@@ -489,7 +489,7 @@ export default function LandingPage() {
         <div className="celestial-gradient" aria-hidden="true" />
         <div className="star-field" aria-hidden="true" />
 
-        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6">
+        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6 lg:max-w-5xl lg:pb-10">
           <header className="flex items-center justify-between pb-6 pt-4">
             <button
               type="button"
@@ -519,7 +519,8 @@ export default function LandingPage() {
             </p>
           </section>
 
-          <section className="glass-card lumina-orb-shell mt-6 p-6 animate-stagger-2">
+          <div className="mt-6 lg:grid lg:grid-cols-[1.2fr_0.8fr] lg:gap-6">
+          <section className="glass-card lumina-orb-shell p-6 animate-stagger-2">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="badge">{todayDate(language)}</p>
@@ -548,14 +549,15 @@ export default function LandingPage() {
               </p>
               <div className="mt-5 w-full rounded-[24px] border border-white/10 bg-white/[0.04] px-4 py-4 text-left">
                 <p className="lumina-label">{homeCopy.energyLabel}</p>
-                <p className="mt-2 whitespace-pre-line text-[15px] leading-[1.75] text-text-primary">
+                <p className="mt-2 max-w-prose whitespace-pre-line text-[15px] leading-[1.75] text-text-primary">
                   {energyText}
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="mt-8 animate-stagger-3">
+          <div className="mt-8 space-y-8 lg:mt-0">
+          <section className="animate-stagger-3">
             <div className="mb-3 flex items-center justify-between">
               <p className="lumina-label">{homeCopy.transitLabel}</p>
               <Link href="/transits" className="text-[11px] uppercase tracking-[0.18em] text-text-secondary transition hover:text-text-primary">
@@ -599,7 +601,7 @@ export default function LandingPage() {
             </div>
           </section>
 
-          <section className="glass-card mt-8 p-6 animate-stagger-4">
+          <section className="glass-card mt-8 p-6 animate-stagger-4 lg:mt-0">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="lumina-label">{homeCopy.forecastLabel}</p>
@@ -624,7 +626,7 @@ export default function LandingPage() {
                 <div className="skeleton h-4 w-9/12" />
               </div>
             ) : (
-              <p className="mt-5 whitespace-pre-line text-[15px] leading-[1.8] text-text-secondary">
+              <p className="mt-5 max-w-prose whitespace-pre-line text-[15px] leading-[1.8] text-text-secondary">
                 {forecastText}
               </p>
             )}
@@ -644,10 +646,12 @@ export default function LandingPage() {
               </button>
             </div>
           </section>
+          </div>
+          </div>
 
           <section className="mt-8 animate-stagger-5">
             <p className="lumina-label mb-3">{homeCopy.quickLabel}</p>
-            <div className="grid auto-rows-fr grid-cols-2 gap-3">
+            <div className="grid auto-rows-fr grid-cols-2 gap-3 lg:grid-cols-4">
               {quickLinks.map((item) => {
                 const Icon = item.icon;
 

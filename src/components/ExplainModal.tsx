@@ -88,7 +88,7 @@ export default function ExplainModal({
       aria-label={title}
     >
       <div
-        className="relative w-full max-w-lg max-h-[85vh] rounded-t-2xl sm:rounded-2xl border border-lumina-accent/30 bg-[#0d1229]/95 backdrop-blur-xl p-5 sm:p-7 overflow-hidden flex flex-col animate-slideUp sm:animate-fadeInUp"
+        className="relative w-full max-w-lg max-h-[85vh] rounded-t-[28px] sm:rounded-[28px] border border-white/10 bg-[rgba(20,17,29,0.95)] backdrop-blur-xl p-5 sm:p-7 overflow-hidden flex flex-col animate-slideUp sm:animate-fadeInUp shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_30px_rgba(90,67,138,0.08),0_24px_60px_rgba(4,3,10,0.22)]"
         onClick={(event) => event.stopPropagation()}
       >
         {/* Sticky header */}

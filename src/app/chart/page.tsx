@@ -104,7 +104,7 @@ function WheelPlaceholder({
           return (
             <g
               key={house.house}
-              className="cursor-pointer"
+              className="cursor-pointer outline-none focus:outline-none"
               onMouseEnter={() => onHouseFocus(house.house)}
               onFocus={() => onHouseFocus(house.house)}
               onClick={() => onHouseClick(house.house, house.sign)}

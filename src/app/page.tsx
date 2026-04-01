@@ -662,7 +662,7 @@ export default function LandingPage() {
                         <p className="font-heading text-[20px] leading-[1.05] text-text-primary">{item.label}</p>
                         <p className="mt-2 text-sm leading-relaxed text-text-secondary">{item.note}</p>
                       </div>
-                      <span className="rounded-full border border-white/10 bg-white/[0.04] p-2 text-text-primary">
+                      <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] p-2 text-text-primary">
                         <Icon size={18} strokeWidth={1.7} />
                       </span>
                     </div>

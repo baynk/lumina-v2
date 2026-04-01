@@ -515,7 +515,7 @@ export default function ChartPage() {
       <div className="celestial-gradient" aria-hidden="true" />
       <div className="star-field" aria-hidden="true" />
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6 lg:pb-10">
         <header className="flex items-center justify-between pb-6 pt-4">
           <button type="button" onClick={() => router.push('/')} className="lumina-back-btn text-sm">
             <span className="inline-flex items-center gap-2">

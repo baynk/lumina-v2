@@ -688,26 +688,26 @@ export default function ChartPage() {
                 onClick={() => openPlanetExplanation(planet.planet, planet.sign, planet.house)}
                 className="flex w-full items-center justify-between gap-4 rounded-[24px] border border-white/10 bg-white/[0.04] px-4 py-4 text-left transition hover:border-white/[0.18] hover:bg-white/[0.05]"
               >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-text-primary">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-text-primary">
                     <PlanetSvg planet={planet.planet} size={18} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-text-primary">{translatePlanet(planet.planet, language)}</p>
-                    <p className="mt-1 text-sm text-text-secondary">
+                    <p className="mt-1 text-sm text-text-secondary line-clamp-1">
                       {getPlanetWhyItMatters(planet.planet, language)}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex shrink-0 items-center gap-2">
                   <div className="text-right">
-                    <p className="font-heading text-2xl text-text-primary">{translateSign(planet.sign, language)}</p>
-                    <p className="mt-1 text-xs uppercase tracking-[0.18em] text-text-secondary">
-                      {planet.degrees}° · {language === 'ru' ? `Дом ${planet.house}` : `House ${planet.house}`}
+                    <p className="font-heading text-xl text-text-primary sm:text-2xl">{translateSign(planet.sign, language)}</p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-text-secondary sm:text-xs sm:tracking-[0.18em]">
+                      {planet.degrees}° · {language === 'ru' ? `Дом ${planet.house}` : `H${planet.house}`}
                     </p>
                   </div>
-                  <ZodiacSvg sign={planet.sign} size={30} />
+                  <ZodiacSvg sign={planet.sign} size={26} />
                 </div>
               </button>
             ))}

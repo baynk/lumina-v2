@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { isRateLimited } from '@/lib/rateLimit';
-import { isRateLimited } from '@/lib/rateLimit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { calculateNatalChart } from '@/services/astronomyCalculator';
 import type { BirthData, OnboardingStoryResponse } from '@/types';

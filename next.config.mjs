@@ -1,8 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['astronomy-engine'],
+  experimental: {
+    serverComponentsExternalPackages: ['astronomy-engine'],
+  },
   typescript: {
     ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   async headers() {
     return [

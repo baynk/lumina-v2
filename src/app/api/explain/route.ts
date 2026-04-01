@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isRateLimited } from '@/lib/rateLimit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 type RequestBody = {
@@ -14,6 +15,10 @@ const fallbackText = {
 };
 
 export async function POST(request: Request) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+  if (isRateLimited(`explain:${ip}`)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     const body = (await request.json()) as RequestBody;
     const apiKey = process.env.GEMINI_API_KEY;

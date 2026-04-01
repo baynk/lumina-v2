@@ -13,30 +13,50 @@ function isAdminEmail(email: string | null | undefined) {
 }
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-
   const { pathname, search } = request.nextUrl;
 
-  if (!token) {
-    const signInUrl = new URL('/auth/signin', request.url);
-    signInUrl.searchParams.set('callbackUrl', `${pathname}${search}`);
-    return NextResponse.redirect(signInUrl);
+  // Admin routes: require auth + admin check
+  if (pathname.startsWith('/admin')) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token) {
+      const signInUrl = new URL('/auth/signin', request.url);
+      signInUrl.searchParams.set('callbackUrl', `${pathname}${search}`);
+      return NextResponse.redirect(signInUrl);
+    }
+
+    if (!isAdminEmail(token.email)) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    const response = NextResponse.next();
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    addSecurityHeaders(response);
+    return response;
   }
 
-  if (pathname.startsWith('/admin') && !isAdminEmail(token.email)) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
+  // All other matched routes: add security headers
   const response = NextResponse.next();
-  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  response.headers.set('Pragma', 'no-cache');
-  response.headers.set('Expires', '0');
+  addSecurityHeaders(response);
   return response;
 }
 
+function addSecurityHeaders(response: NextResponse) {
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+}
+
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: [
+    '/admin/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|icons|manifest).*)',
+  ],
 };

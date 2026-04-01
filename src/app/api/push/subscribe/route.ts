@@ -35,8 +35,7 @@ export async function POST(req: Request) {
     `;
 
     const session = await getServerSession(authOptions);
-    const sessionUserId = session?.user ? ((session.user as Record<string, unknown>).id as string | undefined) : undefined;
-    const userId = body.userId || sessionUserId || null;
+    const userId = session?.user ? ((session.user as Record<string, unknown>).id as string | undefined) || null : null;
 
     await sql`
       INSERT INTO push_subscriptions (user_id, endpoint, keys_p256dh, keys_auth)

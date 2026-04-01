@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { DailyCelestialData, NatalChartData } from '@/lib/types';
+import { isRateLimited } from '@/lib/rateLimit';
 
 // Force dynamic rendering — never cache this route
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,10 @@ const fallbackText = {
 };
 
 export async function POST(request: Request) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+  if (isRateLimited(`horoscope:${ip}`)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     const body = (await request.json()) as RequestBody;

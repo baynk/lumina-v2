@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isRateLimited } from '@/lib/rateLimit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { MoonRitualResponse } from '@/types';
 
@@ -34,6 +35,10 @@ function cleanJson(text: string): string {
 }
 
 export async function POST(request: Request) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+  if (isRateLimited(`moon-ritual:${ip}`)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     const body = (await request.json()) as RequestBody;
     if (!body?.moonPhase || !body?.sunSign || (body.language !== 'en' && body.language !== 'ru')) {

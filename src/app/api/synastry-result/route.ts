@@ -7,7 +7,10 @@ export async function POST(req: NextRequest) {
   await initDB();
 
   const session = await getServerSession(authOptions);
-  const userId = session?.user?.id || null;
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+  const userId = (session.user as Record<string, unknown>).id as string;
 
   const body = await req.json();
   const { personAName, personBName, personASun, personBSun, overallScore, result } = body;

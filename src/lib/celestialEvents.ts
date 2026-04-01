@@ -28,7 +28,7 @@ function utcDateOnly(input: Date): Date {
 }
 
 function eventDateKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
 }
 
 function sortEvents(events: CelestialEvent[]): CelestialEvent[] {

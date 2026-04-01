@@ -262,11 +262,10 @@ function ConsultationPageContent() {
   }
 
   return (
-    <div className="lumina-screen">
-      <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
-      <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
-      <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-      <div className="relative z-[1] mx-auto max-w-3xl px-4 pb-24 pt-0 sm:px-6 min-h-[calc(100vh-4rem)]">
+    <div className="relative min-h-screen overflow-x-hidden bg-[var(--bg-void)]">
+      <div className="celestial-gradient" aria-hidden="true" />
+      <div className="star-field" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-3xl px-4 pb-24 pt-0 sm:px-6 min-h-[calc(100vh-4rem)]">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
         <button onClick={handleBack} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isRateLimited } from '@/lib/rateLimit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { calculateNatalChart } from '@/services/astronomyCalculator';
 import { calculateTransitReport } from '@/services/transitCalculator';
@@ -59,6 +60,10 @@ async function generateAiDetails(alerts: TransitAlert[], language: 'en' | 'ru'):
 }
 
 export async function POST(request: Request) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+  if (isRateLimited(`transits:${ip}`)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     const body = (await request.json()) as RequestBody;
     if (!body?.birthData || (body.language !== 'en' && body.language !== 'ru')) {

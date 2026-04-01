@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isRateLimited } from '@/lib/rateLimit';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { calculateSynastry } from '@/services/synastryCalculator';
 import type { BirthData, SynastryNarrative } from '@/types';
@@ -120,6 +121,10 @@ async function generateNarrative(body: RequestBody, synastryData: ReturnType<typ
 }
 
 export async function POST(request: Request) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+  if (isRateLimited(`synastry:${ip}`)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
   try {
     const body = (await request.json()) as RequestBody;
     if (!body?.birthDataA || !body?.birthDataB || (body.language !== 'en' && body.language !== 'ru')) {

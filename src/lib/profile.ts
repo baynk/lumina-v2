@@ -35,11 +35,21 @@ export function saveProfile(profile: UserProfileLocal): void {
   }
 }
 
+const PROFILE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
 export function loadProfile(): UserProfileLocal | null {
   if (typeof window === 'undefined') return null;
   try {
     const stored = localStorage.getItem(PROFILE_KEY);
-    if (stored) return JSON.parse(stored) as UserProfileLocal;
+    if (stored) {
+      const parsed = JSON.parse(stored) as UserProfileLocal;
+      if (parsed.savedAt && Date.now() - parsed.savedAt > PROFILE_TTL_MS) {
+        // Stale cache — re-save to refresh timestamp but still return data
+        saveProfile(parsed);
+      }
+      if (!parsed.birthData) return null; // Invalid shape
+      return parsed;
+    }
     const oldData = localStorage.getItem(OLD_BIRTH_KEY);
     if (oldData) {
       const parsed = JSON.parse(oldData);

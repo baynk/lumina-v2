@@ -266,7 +266,7 @@ function ConsultationPageContent() {
       <div className="aura aura-violet left-1/2 top-10 h-[380px] w-[380px] -translate-x-[62%]" />
       <div className="aura aura-indigo left-1/2 top-[24rem] h-[360px] w-[360px] -translate-x-[8%] [animation-delay:-5s]" />
       <div className="aura aura-blue left-1/2 bottom-12 h-[400px] w-[400px] -translate-x-[74%] [animation-delay:-2s]" />
-      <div className="mx-auto max-w-2xl px-4 pb-10 pt-0 sm:px-6">
+      <div className="relative z-[1] mx-auto max-w-3xl px-4 pb-24 pt-0 sm:px-6 min-h-[calc(100vh-4rem)]">
       {/* Header */}
       <header className="mb-6 flex items-center justify-between">
         <button onClick={handleBack} className="min-h-11 rounded-full px-4 text-sm text-[#8D8B9F] transition hover:text-[#FDFBF7]">
@@ -290,42 +290,37 @@ function ConsultationPageContent() {
 
       {/* Type selector — show when no type chosen */}
       {showSelector && (
-        <div className="grid gap-4 sm:grid-cols-3 animate-fadeInUp">
+        <div className="grid gap-5 sm:grid-cols-3 animate-fadeInUp">
           {/* Written Reading */}
-          <button
-            type="button"
-            onClick={() => void handleTierSelection('written')}
-            disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
-            className="glass-card group p-6 text-left transition hover:border-white/[0.16]"
-          >
+          <div className="glass-card flex flex-col p-6">
             <MessageCircle className="mb-3 text-[#8D8B9F]" size={28} strokeWidth={1.5} />
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Письменный разбор' : 'Written Reading'}
             </h3>
-            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F]">
+            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F] flex-1">
               {language === 'ru'
                 ? 'Детальная интерпретация натальной карты, доставка на email в течение 48 часов'
                 : 'Detailed natal chart interpretation, delivered to your email within 48 hours'}
             </p>
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-baseline gap-1 mb-5">
               <span className="font-heading text-2xl text-[#FDFBF7]">€25</span>
             </div>
-            <span className="mt-5 flex w-full min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20 whitespace-nowrap">
+            <button
+              type="button"
+              onClick={() => void handleTierSelection('written')}
+              disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
+              className="lumina-button w-full text-sm"
+            >
               {checkoutLoadingType === 'written'
                 ? '...'
                 : language === 'ru'
                   ? 'К оплате · €25'
-                  : 'Continue to Payment · €25'}
-            </span>
-          </button>
+                  : 'Continue · €25'}
+            </button>
+          </div>
 
           {/* Video 40 min */}
-          <button
-            type="button"
-            onClick={() => void handleTierSelection('video-40')}
-            disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
-            className="glass-card group relative overflow-hidden p-6 text-left transition hover:border-white/[0.16]"
-          >
+          <div className="glass-card relative flex flex-col overflow-hidden p-6">
             <div className="absolute top-3 right-3">
               <span className="badge px-2.5 py-0.5 text-[10px]">
                 {language === 'ru' ? 'Популярный' : 'Popular'}
@@ -335,52 +330,57 @@ function ConsultationPageContent() {
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Личная сессия' : 'Personal Session'}
             </h3>
-            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F]">
+            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F] flex-1">
               {language === 'ru'
                 ? '40 минут видео-консультации — ответы на ваши главные вопросы'
                 : '40 min video call — focused answers to your key questions'}
             </p>
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-baseline gap-1 mb-5">
               <span className="font-heading text-2xl text-[#FDFBF7]">€35</span>
               <span className="text-xs text-[#8D8B9F]">/ 40 min</span>
             </div>
-            <span className="mt-5 flex w-full min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20 whitespace-nowrap">
+            <button
+              type="button"
+              onClick={() => void handleTierSelection('video-40')}
+              disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
+              className="lumina-button w-full text-sm"
+            >
               {checkoutLoadingType === 'video-40'
                 ? '...'
                 : language === 'ru'
-                  ? 'Оплатить и продолжить · €35'
+                  ? 'Оплатить · €35'
                   : 'Pay & Continue · €35'}
-            </span>
-          </button>
+            </button>
+          </div>
 
           {/* Video 60 min */}
-          <button
-            type="button"
-            onClick={() => void handleTierSelection('video-60')}
-            disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
-            className="glass-card group p-6 text-left transition hover:border-white/[0.16]"
-          >
+          <div className="glass-card flex flex-col p-6">
             <Sparkles className="mb-3 text-[#C8A4A4]" size={28} strokeWidth={1.5} />
             <h3 className="font-heading text-lg text-lumina-soft mb-1">
               {language === 'ru' ? 'Глубокий разбор' : 'Deep Dive'}
             </h3>
-            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F]">
+            <p className="mb-4 text-xs leading-relaxed text-[#8D8B9F] flex-1">
               {language === 'ru'
                 ? '60 минут видео — полный разбор карты, транзиты, прогноз'
                 : '60 min video — full chart analysis, transits, and forecast'}
             </p>
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-baseline gap-1 mb-5">
               <span className="font-heading text-2xl text-[#FDFBF7]">€55</span>
               <span className="text-xs text-[#8D8B9F]">/ 60 min</span>
             </div>
-            <span className="mt-5 flex w-full min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20 whitespace-nowrap">
+            <button
+              type="button"
+              onClick={() => void handleTierSelection('video-60')}
+              disabled={checkoutLoadingType !== null || sessionStatus === 'loading'}
+              className="lumina-button w-full text-sm"
+            >
               {checkoutLoadingType === 'video-60'
                 ? '...'
                 : language === 'ru'
-                  ? 'Оплатить и продолжить · €55'
+                  ? 'Оплатить · €55'
                   : 'Pay & Continue · €55'}
-            </span>
-          </button>
+            </button>
+          </div>
         </div>
       )}
 

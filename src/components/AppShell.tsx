@@ -14,7 +14,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
       {!isOnboarding ? (
-        <nav className={`relative z-40 ${isHome ? '' : 'border-b border-white/5 bg-[#0B0814]/72 backdrop-blur-xl'}`}>
+        <nav className="relative z-40 border-b border-white/5 bg-[#0B0814]/72 backdrop-blur-xl">
           <div className="mx-auto flex w-full max-w-6xl items-center justify-end gap-2 px-4 py-3 pt-safe sm:px-6">
             <LanguageToggle />
             <UserMenu />

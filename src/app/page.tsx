@@ -490,18 +490,7 @@ export default function LandingPage() {
         <div className="star-field" aria-hidden="true" />
 
         <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-safe sm:px-6 lg:max-w-5xl lg:pb-10">
-          <header className="pb-6 pt-4">
-            <button
-              type="button"
-              onClick={() => router.push('/')}
-              className="font-heading text-[26px] font-medium tracking-[0.5px] text-text-primary"
-              aria-label="Lumina"
-            >
-              lumina<span className="align-top text-lg text-[var(--wordmark-sparkle)]">✦</span>
-            </button>
-          </header>
-
-          <section className="animate-stagger-1">
+          <section className="pt-4 animate-stagger-1">
             <p className="lumina-label">{homeCopy.heroLabel}</p>
             <h1 className="mt-3 font-heading text-[34px] leading-[1.02] text-text-primary">
               {greeting}

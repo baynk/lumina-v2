@@ -310,7 +310,7 @@ function ConsultationPageContent() {
             <div className="flex items-baseline gap-1">
               <span className="font-heading text-2xl text-[#FDFBF7]">€25</span>
             </div>
-            <span className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20">
+            <span className="mt-5 flex w-full min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20 whitespace-nowrap">
               {checkoutLoadingType === 'written'
                 ? '...'
                 : language === 'ru'
@@ -344,7 +344,7 @@ function ConsultationPageContent() {
               <span className="font-heading text-2xl text-[#FDFBF7]">€35</span>
               <span className="text-xs text-[#8D8B9F]">/ 40 min</span>
             </div>
-            <span className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20">
+            <span className="mt-5 flex w-full min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20 whitespace-nowrap">
               {checkoutLoadingType === 'video-40'
                 ? '...'
                 : language === 'ru'
@@ -373,7 +373,7 @@ function ConsultationPageContent() {
               <span className="font-heading text-2xl text-[#FDFBF7]">€55</span>
               <span className="text-xs text-[#8D8B9F]">/ 60 min</span>
             </div>
-            <span className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20">
+            <span className="mt-5 flex w-full min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-xs uppercase tracking-[0.18em] text-[#FDFBF7] transition group-hover:border-white/20 whitespace-nowrap">
               {checkoutLoadingType === 'video-60'
                 ? '...'
                 : language === 'ru'

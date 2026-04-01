@@ -130,7 +130,7 @@ const RETROGRADE_RANGES_2026: RetrogradeRange[] = [
   { body: 'Mercury', start: utcDate(2026, 2, 27), end: utcDate(2026, 3, 22) },
   { body: 'Mercury', start: utcDate(2026, 7, 1), end: utcDate(2026, 7, 25) },
   { body: 'Mercury', start: utcDate(2026, 10, 25), end: utcDate(2026, 11, 15) },
-  { body: 'Venus', start: utcDate(2026, 3, 1), end: utcDate(2026, 4, 12) },
+  { body: 'Venus', start: utcDate(2026, 10, 3), end: utcDate(2026, 11, 14) },
   { body: 'Saturn', start: utcDate(2026, 7, 26), end: utcDate(2026, 12, 10) },
   { body: 'Jupiter', start: utcDate(2026, 11, 11), end: utcDate(2027, 3, 11) },
   { body: 'Jupiter', start: utcDate(2025, 10, 9), end: utcDate(2026, 2, 4) },

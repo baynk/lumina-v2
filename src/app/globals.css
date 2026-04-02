@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Outfit', Inter, system-ui, -apple-system, sans-serif;
   --bg-void: #050408;
   --bg-base: #0b0814;
   --bg-frame: #14111d;

@@ -217,7 +217,7 @@ export async function updateProfile(
     UPDATE users SET
       gender = COALESCE(${data.gender ?? null}, gender),
       relationship_status = COALESCE(${data.relationship_status ?? null}, relationship_status),
-      interests = COALESCE(${data.interests ?? null}, interests),
+      interests = COALESCE(${data.interests ? `{${data.interests.join(',')}}` : null}::TEXT[], interests),
       name = COALESCE(${data.name ?? null}, name),
       last_active_at = now(),
       updated_at = now()
@@ -243,7 +243,7 @@ export async function saveConsultation(data: {
 }) {
   const result = await sql`
     INSERT INTO consultations (user_id, name, contact_email, contact_phone, topics, question, birth_date, birth_time, birth_place, preferred_format, unsure_birth_time)
-    VALUES (${data.user_id || null}, ${data.name}, ${data.contact_email || null}, ${data.contact_phone || null}, ${data.topics || null}, ${data.question}, ${data.birth_date || null}, ${data.birth_time || null}, ${data.birth_place || null}, ${data.preferred_format || null}, ${data.unsure_birth_time || false})
+    VALUES (${data.user_id || null}, ${data.name}, ${data.contact_email || null}, ${data.contact_phone || null}, ${data.topics ? `{${data.topics.join(',')}}` : null}::TEXT[], ${data.question}, ${data.birth_date || null}, ${data.birth_time || null}, ${data.birth_place || null}, ${data.preferred_format || null}, ${data.unsure_birth_time || false})
     RETURNING *
   `;
   return result.rows[0];

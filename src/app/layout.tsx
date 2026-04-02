@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { Outfit, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
@@ -8,21 +7,6 @@ import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 import AppShell from '@/components/AppShell';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luminastrology.com';
-
-const playfair = Playfair_Display({
-  subsets: ['latin', 'cyrillic'],
-  style: ['normal', 'italic'],
-  weight: ['400', '500', '600'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const outfit = Outfit({
-  subsets: ['latin', 'latin-ext'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-body',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'Lumina — Astrology & Celestial Guidance',
@@ -108,8 +92,14 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${playfair.variable} ${outfit.variable}`}>
+    <html lang="en">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Outfit:wght@300;400;500;600&display=swap"
+          rel="stylesheet"
+        />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0B0814" />
         <script

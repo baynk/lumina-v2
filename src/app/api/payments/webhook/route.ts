@@ -109,7 +109,7 @@ export async function POST(request: Request) {
           SET
             subscription_status = ${toSubscriptionStatus(subscription.status)},
             subscription_id = ${subscription.id},
-            subscription_end = to_timestamp(${subscription.current_period_end}),
+            subscription_end = to_timestamp(${subscription.items.data[0]?.current_period_end ?? 0}),
             updated_at = now()
           WHERE stripe_customer_id = ${customerId}
         `;
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
           SET
             subscription_status = 'canceled',
             subscription_id = ${subscription.id},
-            subscription_end = to_timestamp(${subscription.current_period_end}),
+            subscription_end = to_timestamp(${subscription.items.data[0]?.current_period_end ?? 0}),
             updated_at = now()
           WHERE stripe_customer_id = ${customerId}
         `;
